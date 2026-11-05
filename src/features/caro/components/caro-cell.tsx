@@ -42,7 +42,7 @@ export const CaroCell = memo(function CaroCell({
       type="button"
       onClick={handleClick}
       disabled={Boolean(value) || !canClick}
-      aria-label={`Ô hàng ${row + 1}, cột ${col + 1}${value ? `, quân ${value}` : ""}`}
+      aria-label={`Row ${row + 1}, Column ${col + 1}${value ? `, piece ${value}` : ""}`}
       className={cn(
         "relative w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 flex items-center justify-center transition-colors duration-150 border-[0.5px] border-slate-700/60 select-none group",
         // Background states

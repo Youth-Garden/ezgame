@@ -1,0 +1,91 @@
+{
+  "app": {
+    "name": "EzGame",
+    "tagline": "Nền Tảng Casual Web Gaming Platform"
+  },
+  "nav": {
+    "backToLobby": "Về trang chủ"
+  },
+  "hero": {
+    "badge": "Không Cần Tài Khoản • Vào Là Chơi Ngay",
+    "title": "Nền Tảng Đấu Trí Casual",
+    "titleAccent": "Thời Gian Thực Siêu Tốc",
+    "subtitle": "Tạo phòng chỉ với 1 click, gửi link qua Zalo hay Messenger cho bạn bè để cùng so tài. Không cần cài đặt, không cần đăng ký rườm rà."
+  },
+  "lobby": {
+    "selectGame": "Chọn trò chơi",
+    "variousCategories": "Đa dạng thể loại",
+    "gameCaro": "Cờ Caro (Gomoku)",
+    "gameCaroDesc": "Luật 5 ô liên tiếp truyền thống trên bàn cờ 15x15. Đấu trí đỉnh cao thời gian thực!",
+    "gamePlayers": "2 Người",
+    "gameReady": "Sẵn sàng chơi",
+    "gameComingSoon": "Sắp ra mắt",
+    "gameTicTacToe": "Tic-Tac-Toe (3x3)",
+    "gameTicTacToeDesc": "Trò chơi 3x3 kinh điển, đánh nhanh thắng nhanh trong 30 giây.",
+    "createRoom": "Tạo Phòng Mới",
+    "createRoomDesc": "Bạn giữ vai <strong>Quân X (Đi trước)</strong>. Nhận link để gửi cho bạn bè.",
+    "creatingRoom": "Đang tạo phòng...",
+    "createRoomNow": "Tạo phòng ngay",
+    "joinRoom": "Tham Gia Phòng",
+    "joinRoomDesc": "Nhập mã phòng bạn được chia sẻ để giữ vai <strong>Quân O (Đi sau)</strong>.",
+    "joinRoomPlaceholder": "Ví dụ: CR-7821",
+    "joining": "Đang vào...",
+    "enterMatch": "Vào trận",
+    "featureRealtime": "Supabase Realtime P2P",
+    "featureRealtimeDesc": "Truyền nước đi mili-giây qua Broadcast Channel, nhận diện đối thủ online bằng Presence.",
+    "featureNoAuth": "No-Auth Tiện Lợi",
+    "featureNoAuthDesc": "Không lưu trữ thông tin cá nhân, không mật khẩu, chỉ lưu mã phòng tối giản trên DB.",
+    "featureShare": "Chia Sẻ 1 Click",
+    "featureShareDesc": "Sao chép đường link gửi qua tin nhắn để bạn bè mở trực tiếp trên điện thoại hoặc máy tính.",
+    "errors": {
+      "createFailed": "Không thể khởi tạo phòng. Vui lòng thử lại!",
+      "serverError": "Lỗi kết nối máy chủ. Vui lòng thử lại!",
+      "emptyCode": "Vui lòng nhập mã phòng!",
+      "roomNotFound": "Mã phòng không tồn tại hoặc đã hết hạn!",
+      "joinFailed": "Lỗi khi kết nối đến phòng!"
+    }
+  },
+  "game": {
+    "turn": "Lượt đánh",
+    "piece": "Quân",
+    "yourTurn": "Đến lượt bạn!",
+    "waitingForOpponent": "Đang chờ đối phương...",
+    "localMode": "Chơi 1 máy",
+    "switchRole": "Đổi vai quân cờ để kiểm thử",
+    "surrender": "Đầu hàng",
+    "newRound": "Ván mới",
+    "surrenderConfirm": "Bạn có chắc chắn muốn đầu hàng ván này không?",
+    "room": "Phòng",
+    "youAre": "Bạn là",
+    "opponent": "Đối thủ",
+    "online": "Online",
+    "waiting": "Đang chờ...",
+    "inviteFriend": "Mời bạn",
+    "soundOn": "Tắt âm thanh",
+    "soundOff": "Bật âm thanh",
+    "devMode": "Tab-to-Tab Dev Mode"
+  },
+  "result": {
+    "victory": "Chiến Thắng!",
+    "draw": "Bất Phân Thắng Bại!",
+    "defeat": "Thất Bại!",
+    "victoryDesc": "Chúc mừng! Bạn (Quân {role}) đã xuất sắc giành chiến thắng ván cờ này.",
+    "drawDesc": "Hai bên đã thi đấu giằng co và kết thúc với tỷ số hòa.",
+    "defeatDesc": "Quân {winner} đã giành 5 ô liên tiếp. Hãy phục vengeance ở ván tiếp theo!",
+    "rematchAccept": "Đối thủ mời tái đấu! Chấp nhận",
+    "rematchPending": "Đang đợi đối thủ xác nhận...",
+    "rematchRequest": "Yêu cầu tái đấu ván mới",
+    "reviewBoard": "Xem lại bàn cờ",
+    "backToLobby": "Về trang chủ"
+  },
+  "api": {
+    "createRoomFailed": "Không thể tạo phòng",
+    "missingCode": "Thiếu mã phòng",
+    "roomNotFound": "Phòng không tồn tại hoặc đã hết hạn",
+    "checkFailed": "Lỗi kiểm tra phòng"
+  },
+  "common": {
+    "close": "Đóng",
+    "copied": "Đã sao chép!"
+  }
+}

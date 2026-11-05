@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { PortalRenderer } from "@/shared/components/portal";
 import "./globals.css";
+import { getLocale, getMessages } from "next-intl/server";
+import { Providers } from "./providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,24 +16,29 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "EzGame - Nền tảng Casual Game Thời Gian Thực (No-Auth)",
+  title: "EzGame - Casual Game Realtime Platform (No-Auth)",
   description:
-    "Vào là chơi ngay, không cần đăng nhập. Chơi cờ Caro 15x15 thời gian thực P2P siêu mượt cùng bạn bè chỉ qua 1 link mời!",
+    "Join and play instantly, no login required. Play Caro 15x15 realtime P2P smoothly with friends via one invite link!",
   keywords: ["caro", "gomoku", "casual game", "realtime", "nextjs", "supabase"],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
     <html
-      lang="vi"
+      lang={locale}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
     >
-      <body className="min-h-full flex flex-col bg-slate-950 text-slate-100 bg-grid-pattern selection:bg-cyan-500 selection:text-black">
-        {children}
+      <body className="min-h-full flex flex-col bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary">
+        <Providers messages={messages} locale={locale}>
+          {children}
+        </Providers>
         <PortalRenderer />
       </body>
     </html>

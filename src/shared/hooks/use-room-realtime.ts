@@ -32,7 +32,6 @@ export function useRoomRealtime({
   const [isConfigured] = useState(() => isSupabaseConfigured());
 
   const channelRef = useRef<RealtimeChannel | null>(null);
-  const broadcastChannelRef = useRef<BroadcastChannel | null>(null);
   const eventHandlerRef = useRef(onEventReceived);
   const clientIdRef = useRef<string>("");
 
@@ -51,139 +50,74 @@ export function useRoomRealtime({
     setIsOpponentOnline(oppFound);
   }, [peers, expectedOpponentRole]);
 
-  // Handle Supabase Realtime OR Local BroadcastChannel
+  // Handle Supabase Realtime Channel
   useEffect(() => {
-    if (!roomCode) return;
+    if (!roomCode || !isConfigured) return;
 
     let active = true;
     const clientId = getOrCreateClientId();
     clientIdRef.current = clientId;
 
-    // 1. Fallback / Tab-to-Tab Local Broadcast Channel
-    let localBroadcastChannel: BroadcastChannel | null = null;
-    if (typeof window !== "undefined" && "BroadcastChannel" in window) {
-      localBroadcastChannel = new BroadcastChannel(`ezgame_room_${roomCode}`);
-      broadcastChannelRef.current = localBroadcastChannel;
-
-      localBroadcastChannel.onmessage = (event) => {
-        if (!active || !event.data) return;
-        const msg = event.data;
-        if (msg.senderId === clientId) return;
-
-        if (msg.type === "PRESENCE_PING") {
-          localBroadcastChannel?.postMessage({
-            type: "PRESENCE_PONG",
-            senderId: clientId,
-            presence: {
-              id: clientId,
-              role: myRole,
-              joinedAt: Date.now(),
-            },
-          });
-          setPeers((prev) => {
-            const exists = prev.some((peer) => peer.id === msg.presence.id);
-            if (exists) return prev;
-            return [...prev, msg.presence];
-          });
-        } else if (msg.type === "PRESENCE_PONG") {
-          setPeers((prev) => {
-            const exists = prev.some((peer) => peer.id === msg.presence.id);
-            if (exists) return prev;
-            return [...prev, msg.presence];
-          });
-        } else if (msg.type === "PEER_LEAVE") {
-          setPeers((prev) => prev.filter((peer) => peer.id !== msg.senderId));
-        } else if (msg.type === "REALTIME_EVENT") {
-          eventHandlerRef.current?.(msg.event);
-        }
-      };
-
-      // Announce our presence locally
-      localBroadcastChannel.postMessage({
-        type: "PRESENCE_PING",
-        senderId: clientId,
+    const supabase = getSupabaseClient();
+    const channel = supabase.channel(`room:${roomCode}`, {
+      config: {
         presence: {
-          id: clientId,
-          role: myRole,
-          joinedAt: Date.now(),
+          key: clientId,
         },
-      });
-
-      // Include self in peers
-      setPeers([{ id: clientId, role: myRole, joinedAt: Date.now() }]);
-      setIsChannelReady(true);
-    }
-
-    // 2. Supabase Realtime Channel
-    if (isConfigured) {
-      const supabase = getSupabaseClient();
-      const channel = supabase.channel(`room:${roomCode}`, {
-        config: {
-          presence: {
-            key: clientId,
-          },
-          broadcast: {
-            self: false,
-          },
+        broadcast: {
+          self: false,
         },
-      });
+      },
+    });
 
-      channelRef.current = channel;
+    channelRef.current = channel;
 
-      channel
-        .on("presence", { event: "sync" }, () => {
-          if (!active) return;
-          const presenceState = channel.presenceState<PlayerPresence>();
-          const currentPeers: PlayerPresence[] = [];
-          Object.values(presenceState).forEach((presences) => {
-            presences.forEach((peer) => currentPeers.push(peer));
-          });
-          setPeers(currentPeers);
-        })
-        .on("presence", { event: "join" }, ({ newPresences }) => {
-          if (!active) return;
-          setPeers((prev) => {
-            const ids = new Set(prev.map((peer) => peer.id));
-            const added = (newPresences as unknown as PlayerPresence[]).filter(
-              (peer) => !ids.has(peer.id)
-            );
-            return [...prev, ...added];
-          });
-        })
-        .on("presence", { event: "leave" }, ({ leftPresences }) => {
-          if (!active) return;
-          const leftIds = new Set(
-            (leftPresences as unknown as PlayerPresence[]).map((peer) => peer.id)
-          );
-          setPeers((prev) => prev.filter((peer) => !leftIds.has(peer.id)));
-        })
-        .on("broadcast", { event: "game_event" }, ({ payload }) => {
-          if (!active) return;
-          if (payload) {
-            eventHandlerRef.current?.(payload as RealtimeEvent);
-          }
-        })
-        .subscribe(async (status) => {
-          if (status === "SUBSCRIBED") {
-            setIsChannelReady(true);
-            await channel.track({
-              id: clientId,
-              role: myRole,
-              joinedAt: Date.now(),
-            });
-          }
+    channel
+      .on("presence", { event: "sync" }, () => {
+        if (!active) return;
+        const presenceState = channel.presenceState<PlayerPresence>();
+        const currentPeers: PlayerPresence[] = [];
+        Object.values(presenceState).forEach((presences) => {
+          presences.forEach((peer) => currentPeers.push(peer));
         });
-    }
+        setPeers(currentPeers);
+      })
+      .on("presence", { event: "join" }, ({ newPresences }) => {
+        if (!active) return;
+        setPeers((prev) => {
+          const ids = new Set(prev.map((peer) => peer.id));
+          const added = (newPresences as unknown as PlayerPresence[]).filter(
+            (peer) => !ids.has(peer.id)
+          );
+          return [...prev, ...added];
+        });
+      })
+      .on("presence", { event: "leave" }, ({ leftPresences }) => {
+        if (!active) return;
+        const leftIds = new Set(
+          (leftPresences as unknown as PlayerPresence[]).map((peer) => peer.id)
+        );
+        setPeers((prev) => prev.filter((peer) => !leftIds.has(peer.id)));
+      })
+      .on("broadcast", { event: "game_event" }, ({ payload }) => {
+        if (!active) return;
+        if (payload) {
+          eventHandlerRef.current?.(payload as RealtimeEvent);
+        }
+      })
+      .subscribe(async (status) => {
+        if (status === "SUBSCRIBED") {
+          setIsChannelReady(true);
+          await channel.track({
+            id: clientId,
+            role: myRole,
+            joinedAt: Date.now(),
+          });
+        }
+      });
 
     return () => {
       active = false;
-      if (localBroadcastChannel) {
-        localBroadcastChannel.postMessage({
-          type: "PEER_LEAVE",
-          senderId: clientId,
-        });
-        localBroadcastChannel.close();
-      }
       if (channelRef.current) {
         channelRef.current.unsubscribe();
       }
@@ -192,14 +126,6 @@ export function useRoomRealtime({
 
   const sendEvent = useCallback(
     async (event: RealtimeEvent) => {
-      if (broadcastChannelRef.current) {
-        broadcastChannelRef.current.postMessage({
-          type: "REALTIME_EVENT",
-          senderId: clientIdRef.current,
-          event,
-        });
-      }
-
       if (isConfigured && channelRef.current) {
         await channelRef.current.send({
           type: "broadcast",

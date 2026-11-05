@@ -1,0 +1,91 @@
+{
+  "app": {
+    "name": "EzGame",
+    "tagline": "Casual Web Gaming Platform"
+  },
+  "nav": {
+    "backToLobby": "Back to Lobby"
+  },
+  "hero": {
+    "badge": "No Account Needed • Join and Play Instantly",
+    "title": "Casual Battle Platform",
+    "titleAccent": "Blazing Fast Realtime",
+    "subtitle": "Create a room with one click, send the link via Zalo or Messenger to friends for a showdown. No installation needed, no tedious registration."
+  },
+  "lobby": {
+    "selectGame": "Choose a Game",
+    "variousCategories": "Various Categories",
+    "gameCaro": "Caro Board (Gomoku)",
+    "gameCaroDesc": "Classic 5-in-a-row rules on a 15x15 board. Real-time brain battle at its peak!",
+    "gamePlayers": "2 Players",
+    "gameReady": "Ready to Play",
+    "gameComingSoon": "Coming Soon",
+    "gameTicTacToe": "Tic-Tac-Toe (3x3)",
+    "gameTicTacToeDesc": "Classic 3x3 game, play fast win fast in 30 seconds.",
+    "createRoom": "Create New Room",
+    "createRoomDesc": "You play as <strong>X (Go First)</strong>. Get a link to share with friends.",
+    "creatingRoom": "Creating room...",
+    "createRoomNow": "Create Room Now",
+    "joinRoom": "Join Room",
+    "joinRoomDesc": "Enter the shared room code to play as <strong>O (Go Second)</strong>.",
+    "joinRoomPlaceholder": "e.g. CR-7821",
+    "joining": "Joining...",
+    "enterMatch": "Enter Match",
+    "featureRealtime": "Supabase Realtime P2P",
+    "featureRealtimeDesc": "Send moves in milliseconds via Broadcast Channel, identify online opponents via Presence.",
+    "featureNoAuth": "Convenient No-Auth",
+    "featureNoAuthDesc": "No personal info stored, no passwords, only minimal room codes kept in DB.",
+    "featureShare": "One-Click Share",
+    "featureShareDesc": "Copy the link to send via messages so friends can open directly on phone or computer.",
+    "errors": {
+      "createFailed": "Failed to create room. Please try again!",
+      "serverError": "Server connection error. Please try again!",
+      "emptyCode": "Please enter a room code!",
+      "roomNotFound": "Room code not found or expired!",
+      "joinFailed": "Failed to connect to room!"
+    }
+  },
+  "game": {
+    "turn": "Turn",
+    "piece": "Piece",
+    "yourTurn": "Your Turn!",
+    "waitingForOpponent": "Waiting for opponent...",
+    "localMode": "Local Mode",
+    "switchRole": "Switch role for testing",
+    "surrender": "Surrender",
+    "newRound": "New Round",
+    "surrenderConfirm": "Are you sure you want to surrender this match?",
+    "room": "Room",
+    "youAre": "You are",
+    "opponent": "Opponent",
+    "online": "Online",
+    "waiting": "Waiting...",
+    "inviteFriend": "Invite Friend",
+    "soundOn": "Turn off sound",
+    "soundOff": "Turn on sound",
+    "devMode": "Tab-to-Tab Dev Mode"
+  },
+  "result": {
+    "victory": "Victory!",
+    "draw": "Draw Game!",
+    "defeat": "Defeat!",
+    "victoryDesc": "Congratulations! You (Piece {role}) have won this match.",
+    "drawDesc": "Both sides fought hard and the match ended in a draw.",
+    "defeatDesc": "Piece {winner} got 5 in a row. Seek revenge in the next round!",
+    "rematchAccept": "Opponent wants a rematch! Accept",
+    "rematchPending": "Waiting for opponent confirmation...",
+    "rematchRequest": "Request Rematch New Round",
+    "reviewBoard": "Review Board",
+    "backToLobby": "Back to Lobby"
+  },
+  "api": {
+    "createRoomFailed": "Failed to create room",
+    "missingCode": "Missing room code",
+    "roomNotFound": "Room not found or expired",
+    "checkFailed": "Failed to check room"
+  },
+  "common": {
+    "close": "Close",
+    "copied": "Copied!"
+  }
+}

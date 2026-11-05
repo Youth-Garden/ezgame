@@ -1,126 +1,126 @@
-# EzGame - Nền Tảng Web Game Đối Kháng Thời Gian Thực (No-Auth)
+# EzGame - Realtime Web Battle Platform (No-Auth)
 
-Nền tảng web game đối kháng trực tiếp thời gian thực xây dựng bằng **Next.js 16 (App Router) + React 19 + TypeScript + Bun + Supabase Realtime + Tailwind CSS v4**.
+A realtime web game battle platform built with **Next.js 16 (App Router) + React 19 + TypeScript + Bun + Supabase Realtime + Tailwind CSS v4**.
 
-Hệ thống được thiết kế theo kiến trúc **Feature-Sliced Design (FSD)** và triết lý **Zero Configuration / No-Auth**: Người chơi không cần đăng ký tài khoản, không cần mật khẩu, mở web là chơi được ngay lập tức.
+Designed with **Feature-Sliced Design (FSD)** architecture and a **Zero Configuration / No-Auth** philosophy: no account registration, no password required — open the web and play instantly.
 
 ---
 
-## ⚡ Bạn Có Cần Set Up Thêm Gì Không?
+## ⚡ What Do You Need to Set Up?
 
-### 👉 Trường hợp 1: Chơi thử ngay trên máy tính của bạn (KHÔNG CẦN SET UP GÌ)
-* **Chế độ 1 máy (Pass & Play)**: 2 người ngồi cạnh nhau chia sẻ cùng 1 màn hình và chuột. Chỉ cần gạt công tắc `"Chơi 1 máy: BẬT"`.
-* **Chế độ 2 tab cùng máy**: Mở 2 tab trên trình duyệt (tab 1 tạo phòng, tab 2 mở link mời). Trò chơi tự động đồng bộ qua API `BroadcastChannel` của trình duyệt mà **không cần tài khoản Supabase hay Database**.
-* **Cách chạy**:
+### 👉 Case 1: Try It on Your Own Machine (No Setup Required)
+* **Pass & Play Mode**: Two people sit side by side sharing one screen and mouse. Just toggle `"Local Mode: ON"`.
+* **Two Tabs on the Same Machine**: Open 2 browser tabs (tab 1 creates a room, tab 2 opens the invite link). The game syncs automatically via the browser's `BroadcastChannel` API — **no Supabase account or database needed**.
+* **How to Run**:
   ```bash
   cd d:\learn\ezgame
   bun install
   bun run dev
   ```
-  Truy cập: [http://localhost:3000](http://localhost:3000) là chơi được ngay!
+  Access: [http://localhost:3000](http://localhost:3000) and you're playing!
 
 ---
 
-### 👉 Trường hợp 2: Muốn 2 người ở 2 nơi khác nhau (2 máy/2 mạng khác nhau) chơi chung
-* **Bạn chỉ cần làm đúng 1 việc duy nhất**: Tạo 1 project Supabase miễn phí và điền 2 dòng key vào file `.env.local`:
-  1. Vào [supabase.com](https://supabase.com) tạo project (mất 1-2 phút).
-  2. Vào **Project Settings -> API**, copy:
+### 👉 Case 2: Two People in Different Locations (2 Machines / 2 Networks) Playing Together
+* **You only need to do one thing**: Create a free Supabase project and fill in 2 keys in `.env.local`:
+  1. Go to [supabase.com](https://supabase.com) and create a project (takes 1-2 minutes).
+  2. Go to **Project Settings -> API**, copy:
      - **Project URL**
      - **anon / public key**
-  3. Mở file `.env.local` và thay thế:
+  3. Open `.env.local` and replace:
      ```env
      NEXT_PUBLIC_SUPABASE_URL="https://[PROJECT-ID].supabase.co"
      NEXT_PUBLIC_SUPABASE_ANON_KEY="eyJhbGciOi..."
      ```
-  *(Không bắt buộc phải cấu hình PostgreSQL/Prisma vì hệ thống đã có sẵn in-memory cache tự sinh và quản lý phòng).*
+  *(PostgreSQL/Prisma configuration is optional — the system includes an in-memory fallback that auto-generates and manages rooms.)*
 
-* **Sau đó, đưa web ra ngoài Internet để bạn bè truy cập**:
-  * **Cách nhanh nhất để test (không cần deploy)**:
+* **Then, expose the web to the Internet so friends can access it**:
+  * **Quickest way to test (no deploy needed)**:
     ```bash
     npx cloudflared tunnel --url http://localhost:3000
     ```
-    Hệ thống sẽ cấp 1 đường link public (ví dụ `https://xxx.trycloudflare.com`). Bạn gửi link này cho bạn bè.
-  * **Cách chuyên nghiệp lâu dài**: Đẩy code lên GitHub và import vào **Vercel** (miễn phí), điền 2 biến môi trường trên là xong.
+    The system will generate a public link (e.g. `https://xxx.trycloudflare.com`). Send this link to your friends.
+  * **Professional long-term option**: Push the code to GitHub and import it into **Vercel** (free), then add the 2 environment variables above.
 
-📖 **Xem tài liệu chi tiết có hình ảnh minh họa tại**: [docs/ONLINE_MULTIPLAYER_GUIDE.md](docs/ONLINE_MULTIPLAYER_GUIDE.md)
-
----
-
-## 🎮 Game Cờ Caro (Gomoku 15x15) Đã Chơi Được Chưa?
-
-**Game Cờ Caro đã hoàn thiện 100% và đã chơi được trọn vẹn:**
-
-* **Bàn cờ chuẩn 15x15**: Đánh số hàng (1 - 15) và cột chữ (A - O).
-* **Ghost Hover Preview**: Xem trước nước cờ sắp hạ (quân X màu xanh cyan, quân O màu hồng rose).
-* **Thuật toán O(1)**: Hàm `checkWin` kiểm tra 4 hướng tức thời (ngang, dọc, 2 đường chéo) khi vừa hạ quân, không gây giật lag.
-* **Đường thắng phát sáng**: 5 quân cờ tạo thành chuỗi thắng tự động phát sáng và nhấp nháy hiệu ứng pulse.
-* **Đầu hàng & Tái đấu**:
-  * Nút "Đầu hàng" có xác nhận an toàn.
-  * Hộp thoại kết quả (Portal Dialog) tích hợp pháo hoa `canvas-confetti`.
-  * Tính năng xin tái đấu 2 chiều: Khi 1 bên bấm "Yêu cầu tái đấu", bên kia sẽ nhận được thông báo để chấp nhận hoặc từ chối.
-* **Web Audio Sound Effects**: Tự phát âm thanh lách cách khi đặt cờ và âm hưởng chiến thắng mà không cần tải file MP3 bên ngoài.
+📖 **See the illustrated step-by-step guide at**: [docs/ONLINE_MULTIPLAYER_GUIDE.md](docs/ONLINE_MULTIPLAYER_GUIDE.md)
 
 ---
 
-## 🚀 Các Lệnh Thao Tác Với Bun
+## 🎮 Caro Board (Gomoku 15x15) — Ready to Play?
+
+**Caro is 100% complete and fully playable:**
+
+* **Standard 15x15 board**: Row numbers (1 - 15) and column letters (A - O).
+* **Ghost Hover Preview**: Preview the next move (X in cyan, O in rose).
+* **O(1) Algorithm**: The `checkWin` function instantly checks 4 directions (horizontal, vertical, 2 diagonals) when a move is placed — no lag.
+* **Winning Line Glow**: The 5 winning pieces automatically light up with a pulse animation.
+* **Surrender & Rematch**:
+  * "Surrender" button with a safety confirmation.
+  * Result dialog (Portal Dialog) integrated with `canvas-confetti` confetti effects.
+  * Two-way rematch request: when one side clicks "Request Rematch", the other receives a notification to accept or decline.
+* **Web Audio Sound Effects**: Plays piece-placement chimes and victory fanfares — no external MP3 files required.
+
+---
+
+## 🚀 Bun Commands
 
 ```bash
-# Cài đặt dependencies
+# Install dependencies
 bun install
 
-# Khởi động môi trường phát triển (Dev server)
+# Start the dev server
 bun run dev
 
-# Kiểm tra lỗi cú pháp và kiểu dữ liệu TypeScript (0 lỗi)
+# Check TypeScript syntax and types (0 errors)
 bunx tsc --noEmit
 
-# Kiểm tra chuẩn code Linting (0 warning, 0 error)
+# Check code linting (0 warnings, 0 errors)
 bun run lint
 
-# Biên dịch ứng dụng cho Production
+# Build the app for production
 bun run build
 ```
 
 ---
 
-## 🧩 Cấu Trúc Dự Án (Feature-Sliced Design)
+## 🧩 Project Structure (Feature-Sliced Design)
 
 ```text
 ezgame/
 ├── docs/
-│   └── ONLINE_MULTIPLAYER_GUIDE.md # Hướng dẫn chi tiết kết nối 2 người chơi qua Internet
+│   └── ONLINE_MULTIPLAYER_GUIDE.md # Step-by-step guide for 2 players connecting over the Internet
 ├── prisma/
-│   └── schema.prisma               # Schema Room tối giản (WAITING, PLAYING, FINISHED)
+│   └── schema.prisma               # Minimal Room schema (WAITING, PLAYING, FINISHED)
 ├── src/
 │   ├── app/                        # App Router (Next.js 16)
-│   │   ├── api/rooms/route.ts      # API tạo/kiểm tra mã phòng (hỗ trợ in-memory fallback)
-│   │   ├── play/[game]/[code]/     # Dynamic Route nạp game theo mã phòng
-│   │   ├── layout.tsx              # Root Layout chứa PortalRenderer
-│   │   └── page.tsx                # Trang chủ (Lobby)
-│   ├── features/                   # Các Module nghiệp vụ độc lập
-│   │   ├── caro/                   # Game Cờ Caro
+│   │   ├── api/rooms/route.ts      # API to create/verify room codes (with in-memory fallback)
+│   │   ├── play/[game]/[code]/     # Dynamic Route that loads the game by room code
+│   │   ├── layout.tsx              # Root Layout containing PortalRenderer
+│   │   └── page.tsx                # Home page (Lobby)
+│   ├── features/                   # Independent business modules
+│   │   ├── caro/                   # Caro Game
 │   │   │   ├── components/         # CaroBoard, CaroCell
 │   │   │   ├── pages/              # CaroPlayPage
 │   │   │   ├── utils/              # checkWin O(1), createEmptyBoard
 │   │   │   └── types.ts            # CaroPlayer, GameWinner, CaroGameState
-│   │   └── lobby/                  # Giao diện sảnh chính, tạo & nhập phòng
-│   └── shared/                     # Hạ tầng dùng chung
+│   │   └── lobby/                  # Main lobby UI, create & join rooms
+│   └── shared/                     # Shared infrastructure
 │       ├── components/             # RoomHeader, ResultDialog, CopyLinkButton
 │       │   └── portal/             # Portal Stack System (usePortal, PortalRenderer)
 │       ├── hooks/                  # useRoomRealtime (Supabase Broadcast + Local BroadcastChannel)
 │       ├── lib/                    # Supabase client, Web Audio sound effects, utils
 │       └── types/                  # Room, PlayerRole, RealtimeEventType
-├── .env.example                    # File mẫu biến môi trường
-├── bun.lock                        # Lockfile chuẩn của Bun
+├── .env.example                    # Environment variable template
+├── bun.lock                        # Bun lockfile
 └── package.json
 ```
 
 ---
 
-## 🛡️ Bảng Tóm Tắt Kịch Bản Cấu Hình
+## 🛡️ Configuration Matrix
 
-| Nhu Cầu Chơi | Cần Cài Supabase? | Cần Cài PostgreSQL? | Cần Deploy / Tunnel? |
+| Use Case | Supabase Needed? | PostgreSQL Needed? | Deploy / Tunnel Needed? |
 | :--- | :---: | :---: | :---: |
-| **Chơi 2 người chung 1 máy tính** | ❌ Không | ❌ Không | ❌ Không (chỉ cần `bun run dev`) |
-| **Chơi 2 tab trên cùng 1 máy tính** | ❌ Không | ❌ Không | ❌ Không (dùng `BroadcastChannel` local) |
-| **Chơi 2 người ở 2 nơi (Internet)** | ✅ **Cần điền Key** | ❌ Không bắt buộc | ✅ **Cần** (qua Tunnel hoặc Vercel) |
+| **2 players on the same machine** | ❌ No | ❌ No | ❌ No (just `bun run dev`) |
+| **2 tabs on the same machine** | ❌ No | ❌ No | ❌ No (uses local `BroadcastChannel`) |
+| **2 players in different locations (Internet)** | ✅ **Yes, keys required** | ❌ Optional | ✅ **Yes** (via Tunnel or Vercel) |

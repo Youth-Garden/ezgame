@@ -2,15 +2,15 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useParams, useSearchParams } from "next/navigation";
+import { Flag } from "lucide-react";
 import { CaroBoard } from "../components/caro-board";
 import { checkWin, createEmptyBoard } from "../utils/check-win";
+import { CaroPlayer, GameWinner, type CaroGameState } from "../types";
 import { useRoomRealtime } from "@/shared/hooks/use-room-realtime";
 import { RoomHeader } from "@/shared/components/room-header";
 import { ResultDialog, type ResultDialogData } from "@/shared/components/result-dialog";
 import { usePortal } from "@/shared/components/portal";
 import { sounds } from "@/shared/lib/sound-effects";
-import { Flag, RotateCcw, Monitor } from "lucide-react";
-import { CaroPlayer, GameWinner, type CaroGameState } from "../types";
 import { PlayerRole, RealtimeEventType, type RealtimeEvent } from "@/shared/types/room";
 
 export function CaroPlayPage() {
@@ -27,9 +27,6 @@ export function CaroPlayPage() {
       : roleParam === "SPECTATOR"
       ? PlayerRole.SPECTATOR
       : PlayerRole.X;
-
-  // Pass & Play local mode toggle
-  const [isLocalMode, setIsLocalMode] = useState(false);
 
   // My Role (X, O, or SPECTATOR)
   const [myRole, setMyRole] = useState<PlayerRole>(initialRole);
@@ -52,7 +49,6 @@ export function CaroPlayPage() {
   const stateRef = useRef({
     gameState,
     myRole,
-    isLocalMode,
   });
 
   const sendEventRef = useRef<(event: RealtimeEvent) => Promise<void>>(
@@ -69,10 +65,10 @@ export function CaroPlayPage() {
 
   // Reset board helper
   const resetGame = useCallback(
-    (startingPlayer: CaroPlayer = CaroPlayer.X) => {
+    (nextTurn: CaroPlayer = CaroPlayer.X) => {
       setGameState({
         board: createEmptyBoard(),
-        currentTurn: startingPlayer,
+        currentTurn: nextTurn,
         lastMove: null,
         winner: null,
         winningLine: null,
@@ -97,13 +93,7 @@ export function CaroPlayPage() {
         isRematchRequestedByMe: isRequestedByMe,
         isRematchRequestedByOpponent: isRequestedByOpponent,
         onRequestRematch: async () => {
-          const { isLocalMode: local, myRole: role, gameState: current } =
-            stateRef.current;
-
-          if (local) {
-            resetGame(CaroPlayer.X);
-            return;
-          }
+          const { myRole: role, gameState: current } = stateRef.current;
 
           showDialogRef.current(current.winner, true, false);
           await sendEventRef.current({
@@ -112,15 +102,13 @@ export function CaroPlayPage() {
           });
         },
         onAcceptRematch: async () => {
-          const { isLocalMode: local, myRole: role } = stateRef.current;
+          const { myRole: role } = stateRef.current;
           resetGame(CaroPlayer.X);
 
-          if (!local) {
-            await sendEventRef.current({
-              type: RealtimeEventType.REMATCH_ACCEPT,
-              payload: { acceptedBy: role },
-            });
-          }
+          await sendEventRef.current({
+            type: RealtimeEventType.REMATCH_ACCEPT,
+            payload: { acceptedBy: role },
+          });
         },
       });
     },
@@ -129,9 +117,9 @@ export function CaroPlayPage() {
 
   // Synchronize refs safely in effect
   useEffect(() => {
-    stateRef.current = { gameState, myRole, isLocalMode };
+    stateRef.current = { gameState, myRole };
     showDialogRef.current = showResultDialog;
-  }, [gameState, myRole, isLocalMode, showResultDialog]);
+  }, [gameState, myRole, showResultDialog]);
 
   // Handle incoming broadcast events from peer
   const handleRealtimeEvent = useCallback(
@@ -162,11 +150,7 @@ export function CaroPlayPage() {
               nextMoveCount
             );
 
-            sounds.playMoveSound(player);
-
-            if (winner) {
-              showResultDialog(winner, false, false);
-            }
+            sounds.playMoveSound(caroPlayer as unknown as "X" | "O");
 
             return {
               board: nextBoard,
@@ -178,15 +162,37 @@ export function CaroPlayPage() {
               moveCount: nextMoveCount,
             };
           });
+
+          // Check win from updated values
+          const updatedState = stateRef.current.gameState;
+          const updatedBoard = updatedState.board.map((r, rIdx) =>
+            rIdx === row
+              ? r.map((c, cIdx) => (cIdx === col ? caroPlayer : c))
+              : r
+          );
+          const outcome = checkWin(
+            updatedBoard,
+            row,
+            col,
+            caroPlayer,
+            updatedState.moveCount + 1
+          );
+
+          if (outcome.winner) {
+            showResultDialog(outcome.winner, false, false);
+          }
           break;
         }
 
-        case RealtimeEventType.GAME_RESET: {
-          const starting =
-            event.payload.startingPlayer === PlayerRole.X
-              ? CaroPlayer.X
-              : CaroPlayer.O;
-          resetGame(starting);
+        case RealtimeEventType.PLAYER_SURRENDER: {
+          const { player } = event.payload;
+          const winner =
+            player === PlayerRole.X ? GameWinner.O : GameWinner.X;
+          setGameState((prev) => ({
+            ...prev,
+            winner,
+          }));
+          showResultDialog(winner, false, false);
           break;
         }
 
@@ -200,18 +206,8 @@ export function CaroPlayPage() {
           break;
         }
 
-        case RealtimeEventType.PLAYER_SURRENDER: {
-          const surrenderingPlayer = event.payload.player;
-          const winner: GameWinner =
-            surrenderingPlayer === PlayerRole.X ? GameWinner.O : GameWinner.X;
-          setGameState((prev) => ({
-            ...prev,
-            winner,
-          }));
-
-          showResultDialog(winner, false, false);
+        default:
           break;
-        }
       }
     },
     [resetGame, showResultDialog]
@@ -236,17 +232,14 @@ export function CaroPlayPage() {
   // Check if current client is allowed to place a stone
   const canClick =
     !gameState.winner &&
-    (isLocalMode ||
-      (myRole as unknown as CaroPlayer) === gameState.currentTurn);
+    (myRole as unknown as CaroPlayer) === gameState.currentTurn;
 
   // Handle cell click
   const handleCellClick = useCallback(
     async (row: number, col: number) => {
       if (!canClick || gameState.board[row][col] || gameState.winner) return;
 
-      const playerToPlace: CaroPlayer = isLocalMode
-        ? gameState.currentTurn
-        : (myRole as unknown as CaroPlayer);
+      const playerToPlace: CaroPlayer = myRole as unknown as CaroPlayer;
 
       const nextBoard = gameState.board.map((rowCells, rowIndex) =>
         rowIndex === row
@@ -280,27 +273,25 @@ export function CaroPlayPage() {
         showResultDialog(winner, false, false);
       }
 
-      if (!isLocalMode) {
-        await sendEvent({
-          type: RealtimeEventType.GAME_MOVE,
-          payload: {
-            row,
-            col,
-            player:
-              playerToPlace === CaroPlayer.X ? PlayerRole.X : PlayerRole.O,
-            timestamp: Date.now(),
-          },
-        });
-      }
+      await sendEvent({
+        type: RealtimeEventType.GAME_MOVE,
+        payload: {
+          row,
+          col,
+          player:
+            playerToPlace === CaroPlayer.X ? PlayerRole.X : PlayerRole.O,
+          timestamp: Date.now(),
+        },
+      });
     },
-    [canClick, gameState, isLocalMode, myRole, sendEvent, showResultDialog]
+    [canClick, gameState, myRole, sendEvent, showResultDialog]
   );
 
   // Surrender Handler
   const handleSurrender = async () => {
     if (gameState.winner || myRole === PlayerRole.SPECTATOR) return;
     const confirmSurrender = window.confirm(
-      "Bạn có chắc chắn muốn đầu hàng ván này không?"
+      "Are you sure you want to surrender this match?"
     );
     if (!confirmSurrender) return;
 
@@ -313,12 +304,10 @@ export function CaroPlayPage() {
 
     showResultDialog(winner, false, false);
 
-    if (!isLocalMode) {
-      await sendEvent({
-        type: RealtimeEventType.PLAYER_SURRENDER,
-        payload: { player: myRole },
-      });
-    }
+    await sendEvent({
+      type: RealtimeEventType.PLAYER_SURRENDER,
+      payload: { player: myRole },
+    });
   };
 
   return (
@@ -326,7 +315,7 @@ export function CaroPlayPage() {
       {/* Room Header */}
       <RoomHeader
         roomCode={roomCode}
-        gameTitle="Cờ Caro 15x15"
+        gameTitle="Caro 15x15"
         myRole={myRole}
         isOpponentOnline={isOpponentOnline}
         expectedOpponentRole={expectedOpponentRole}
@@ -337,59 +326,32 @@ export function CaroPlayPage() {
       <main className="flex-1 flex flex-col items-center justify-center p-3 sm:p-6 max-w-6xl mx-auto w-full">
         {/* Game Tools & Quick Actions */}
         <div className="w-full max-w-md flex items-center justify-between gap-2 mb-3">
-          {/* Toggle Pass & Play local mode */}
-          <button
-            onClick={() => setIsLocalMode(!isLocalMode)}
-            type="button"
-            className={`px-3 py-1.5 rounded-xl text-xs font-medium flex items-center gap-1.5 transition-colors border ${
-              isLocalMode
-                ? "bg-purple-500/20 text-purple-300 border-purple-500/40"
-                : "bg-white/5 text-white/60 border-white/5 hover:text-white"
-            }`}
-            title="Bật để chơi 2 người trên cùng một thiết bị"
-          >
-            <Monitor className="w-3.5 h-3.5" />
-            <span>Chơi 1 máy: {isLocalMode ? "BẬT" : "TẮT"}</span>
-          </button>
-
           <div className="flex items-center gap-2">
             {/* Quick Switch Role (for testing) */}
-            {!isLocalMode && (
-              <button
-                onClick={() =>
-                  setMyRole((prev) =>
-                    prev === PlayerRole.X ? PlayerRole.O : PlayerRole.X
-                  )
-                }
-                type="button"
-                className="px-2.5 py-1 rounded-xl text-[11px] font-medium bg-white/5 hover:bg-white/10 text-white/60 hover:text-white border border-white/5 transition-colors"
-                title="Đổi vai quân cờ để kiểm thử"
-              >
-                Đổi thành {myRole === PlayerRole.X ? "O" : "X"}
-              </button>
-            )}
+            <button
+              onClick={() =>
+                setMyRole((prev) =>
+                  prev === PlayerRole.X ? PlayerRole.O : PlayerRole.X
+                )
+              }
+              type="button"
+              className="px-2.5 py-1 rounded-xl text-[11px] font-medium bg-white/5 hover:bg-white/10 text-white/60 hover:text-white border border-white/5 transition-colors"
+              title="Switch role for testing"
+            >
+              Switch to {myRole === PlayerRole.X ? "O" : "X"}
+            </button>
+          </div>
 
+          <div className="flex items-center gap-2">
             {/* Surrender button */}
-            {!gameState.winner && !isLocalMode && (
+            {!gameState.winner && (
               <button
                 onClick={handleSurrender}
                 type="button"
                 className="px-3 py-1.5 rounded-xl text-xs font-medium bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 transition-colors flex items-center gap-1.5"
               >
                 <Flag className="w-3.5 h-3.5" />
-                Đầu hàng
-              </button>
-            )}
-
-            {/* Reset Game for local mode */}
-            {isLocalMode && (
-              <button
-                onClick={() => resetGame(CaroPlayer.X)}
-                type="button"
-                className="px-3 py-1.5 rounded-xl text-xs font-medium bg-white/10 hover:bg-white/15 text-white/80 border border-white/10 transition-colors flex items-center gap-1.5"
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-                Ván mới
+                Surrender
               </button>
             )}
           </div>

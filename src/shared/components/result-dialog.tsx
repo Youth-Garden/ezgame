@@ -9,6 +9,7 @@ import { PlayerRole } from "@/shared/types/room";
 import { GameWinner } from "@/features/caro/types";
 import type { PortalProps } from "@/shared/types/portal.types";
 import { Dialog, DialogContent } from "@/shared/components/ui/dialog";
+import { Button } from "@/shared/components/ui/button";
 
 export interface ResultDialogData {
   winner: GameWinner | null;
@@ -39,10 +40,9 @@ export function ResultDialog({
       sounds.playWinFanfare();
       try {
         confetti({
-          particleCount: 120,
-          spread: 70,
+          particleCount: 100,
+          spread: 60,
           origin: { y: 0.6 },
-          colors: ["#38bdf8", "#818cf8", "#34d399", "#fbbf24"],
         });
       } catch {
         // Confetti silently handled
@@ -56,102 +56,97 @@ export function ResultDialog({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onDismiss?.()}>
       <DialogContent
         showCloseButton={false}
-        className="max-w-sm text-center overflow-hidden border-white/15 bg-slate-900/95"
+        className="max-w-sm text-center overflow-hidden border border-border bg-card p-6"
       >
-        {/* Glow accent */}
-        <div
-          className={`absolute -top-16 left-1/2 -translate-x-1/2 w-40 h-40 rounded-full blur-3xl opacity-30 pointer-events-none ${
-            isMeWinner
-              ? "bg-cyan-500"
-              : isDraw
-              ? "bg-amber-500"
-              : "bg-rose-500"
-          }`}
-        />
-
-        {/* Icon & Headline */}
         <div className="relative z-10 flex flex-col items-center">
+          {/* Icon */}
           <div
-            className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 shadow-lg ${
+            className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-3 ${
               isMeWinner
-                ? "bg-gradient-to-tr from-cyan-500 to-indigo-500 text-white shadow-cyan-500/30"
+                ? "bg-primary/10 text-primary border border-primary/20"
                 : isDraw
-                ? "bg-gradient-to-tr from-amber-500 to-orange-500 text-white shadow-amber-500/30"
-                : "bg-gradient-to-tr from-rose-500 to-slate-700 text-white shadow-rose-500/30"
+                ? "bg-secondary text-secondary-foreground border border-border"
+                : "bg-destructive/10 text-destructive border border-destructive/20"
             }`}
           >
             {isMeWinner ? (
-              <Trophy className="w-8 h-8 animate-bounce" />
+              <Trophy className="w-7 h-7" />
             ) : isDraw ? (
-              <MinusCircle className="w-8 h-8" />
+              <MinusCircle className="w-7 h-7" />
             ) : (
-              <Frown className="w-8 h-8" />
+              <Frown className="w-7 h-7" />
             )}
           </div>
 
-          <h3 className="text-2xl font-black tracking-tight text-white mb-1">
+          <h3 className="text-xl font-bold tracking-tight text-card-foreground mb-1">
             {isMeWinner
-              ? "Chiến Thắng!"
+              ? "Victory!"
               : isDraw
-              ? "Bất Phân Thắng Bại!"
-              : "Thất Bại!"}
+              ? "Draw Game"
+              : "Defeat"}
           </h3>
 
-          <p className="text-sm text-white/70 mb-6">
+          <p className="text-xs text-muted-foreground mb-6 leading-relaxed">
             {isMeWinner
-              ? `Chúc mừng! Bạn (Quân ${myRole}) đã xuất sắc giành chiến thắng ván cờ này.`
+              ? `Congratulations! You (Piece ${myRole}) took the win.`
               : isDraw
-              ? "Hai bên đã thi đấu giằng co và kết thúc với tỷ số hòa."
-              : `Quân ${winner} đã giành 5 ô liên tiếp. Hãy phục thù ở ván tiếp theo!`}
+              ? "Both sides played evenly to a draw."
+              : `Piece ${winner} connected 5. Ready for the next round?`}
           </p>
 
           {/* Action Buttons */}
-          <div className="w-full flex flex-col gap-2.5">
+          <div className="w-full flex flex-col gap-2">
             {isRematchRequestedByOpponent ? (
-              <button
+              <Button
+                variant="default"
+                size="default"
                 onClick={() => data?.onAcceptRematch?.()}
-                type="button"
-                className="w-full py-3 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98] animate-pulse"
+                className="w-full gap-2"
               >
                 <RotateCcw className="w-4 h-4" />
-                Đối thủ mời tái đấu! Chấp nhận
-              </button>
+                <span>Accept Rematch</span>
+              </Button>
             ) : isRematchRequestedByMe ? (
-              <button
+              <Button
+                variant="subtle"
+                size="default"
                 disabled
-                type="button"
-                className="w-full py-3 px-4 rounded-xl font-medium text-sm bg-white/10 text-white/50 border border-white/10 flex items-center justify-center gap-2 cursor-not-allowed"
+                className="w-full gap-2 text-muted-foreground"
               >
-                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-                Đang đợi đối thủ xác nhận...
-              </button>
+                <span className="w-2 h-2 rounded-full bg-primary animate-ping" />
+                <span>Waiting for opponent...</span>
+              </Button>
             ) : (
-              <button
+              <Button
+                variant="default"
+                size="default"
                 onClick={() => data?.onRequestRematch?.()}
-                type="button"
-                className="w-full py-3 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-lg shadow-cyan-500/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+                className="w-full gap-2"
               >
                 <RotateCcw className="w-4 h-4" />
-                Yêu cầu tái đấu ván mới
-              </button>
+                <span>Request Rematch</span>
+              </Button>
             )}
 
-            <div className="flex items-center gap-2 mt-1">
-              <button
+            <div className="grid grid-cols-2 gap-2 mt-1">
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={onDismiss}
-                type="button"
-                className="flex-1 py-2.5 px-3 rounded-xl font-medium text-xs text-white/70 hover:text-white bg-white/5 hover:bg-white/10 border border-white/5 transition-colors"
+                className="w-full text-xs"
               >
-                Xem lại bàn cờ
-              </button>
+                Review Board
+              </Button>
 
-              <Link
-                href="/"
-                onClick={onDismiss}
-                className="flex-1 py-2.5 px-3 rounded-xl font-medium text-xs text-white/70 hover:text-white bg-white/5 hover:bg-white/10 border border-white/5 transition-colors flex items-center justify-center gap-1.5"
-              >
-                <Home className="w-3.5 h-3.5" />
-                Về trang chủ
+              <Link href="/" onClick={onDismiss} className="w-full">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full text-xs gap-1.5"
+                >
+                  <Home className="w-3.5 h-3.5" />
+                  <span>Lobby</span>
+                </Button>
               </Link>
             </div>
           </div>

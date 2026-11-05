@@ -6,7 +6,10 @@ export function getSupabaseClient(): SupabaseClient {
   if (supabaseInstance) return supabaseInstance;
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co";
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder-anon-key";
+  const key =
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+    "placeholder-anon-key";
 
   supabaseInstance = createClient(url, key, {
     realtime: {
@@ -21,7 +24,9 @@ export function getSupabaseClient(): SupabaseClient {
 
 export function isSupabaseConfigured(): boolean {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const key =
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
   return Boolean(
     url &&
     key &&

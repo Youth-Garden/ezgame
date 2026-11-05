@@ -47,7 +47,7 @@
 
 ## 7. Import Rules & Code Quality
 - When editing or writing code, always automatically remove unused imports and organize/sort imports neatly.
-- Ensure that `bun run lint` and `bunx tsc --noEmit` always pass with 0 errors and 0 warnings.
+- **Lint / Typecheck Policy**: DO NOT automatically run lint (`eslint`, `bun run lint`) or typecheck on every chat turn or minor edit. ONLY run `bun run lint` / `bunx tsc --noEmit` when explicitly requested by the user, or after major refactoring / editing a large number of files.
 
 ## 8. Strict Git Safety Rules
 - **STRICT RULE FOR GIT COMMIT AND PUSH**: Absolutely NEVER execute `git commit` or `git push` automatically. Every `git commit` or `git push` action MUST be explicitly requested by the user in the CURRENT prompt.
