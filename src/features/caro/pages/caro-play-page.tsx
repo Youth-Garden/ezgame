@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useParams, useSearchParams } from "next/navigation";
-import { Flag } from "lucide-react";
+import { Flag, ArrowLeftRight } from "lucide-react";
 import { CaroBoard } from "../components/caro-board";
 import { checkWin, createEmptyBoard } from "../utils/check-win";
 import { CaroPlayer, GameWinner, type CaroGameState } from "../types";
@@ -11,6 +11,7 @@ import { RoomHeader } from "@/shared/components/room-header";
 import { ResultDialog, type ResultDialogData } from "@/shared/components/result-dialog";
 import { usePortal } from "@/shared/components/portal";
 import { sounds } from "@/shared/lib/sound-effects";
+import { Button } from "@/shared/components/ui/button";
 import { PlayerRole, RealtimeEventType, type RealtimeEvent } from "@/shared/types/room";
 
 export function CaroPlayPage() {
@@ -311,7 +312,7 @@ export function CaroPlayPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex flex-col selection:bg-cyan-500 selection:text-black">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* Room Header */}
       <RoomHeader
         roomCode={roomCode}
@@ -327,32 +328,33 @@ export function CaroPlayPage() {
         {/* Game Tools & Quick Actions */}
         <div className="w-full max-w-md flex items-center justify-between gap-2 mb-3">
           <div className="flex items-center gap-2">
-            {/* Quick Switch Role (for testing) */}
-            <button
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() =>
                 setMyRole((prev) =>
                   prev === PlayerRole.X ? PlayerRole.O : PlayerRole.X
                 )
               }
-              type="button"
-              className="px-2.5 py-1 rounded-xl text-[11px] font-medium bg-white/5 hover:bg-white/10 text-white/60 hover:text-white border border-white/5 transition-colors"
+              className="text-xs gap-1.5"
               title="Switch role for testing"
             >
-              Switch to {myRole === PlayerRole.X ? "O" : "X"}
-            </button>
+              <ArrowLeftRight className="w-3.5 h-3.5" />
+              <span>Switch to {myRole === PlayerRole.X ? "O" : "X"}</span>
+            </Button>
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Surrender button */}
             {!gameState.winner && (
-              <button
+              <Button
+                variant="destructive"
+                size="sm"
                 onClick={handleSurrender}
-                type="button"
-                className="px-3 py-1.5 rounded-xl text-xs font-medium bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 transition-colors flex items-center gap-1.5"
+                className="text-xs gap-1.5"
               >
                 <Flag className="w-3.5 h-3.5" />
-                Surrender
-              </button>
+                <span>Surrender</span>
+              </Button>
             )}
           </div>
         </div>

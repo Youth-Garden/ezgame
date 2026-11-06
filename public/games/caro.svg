@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="100%" height="100%" fill="none">
+  <!-- Rounded Background Container -->
+  <rect width="120" height="120" rx="28" fill="#121214"/>
+  <rect width="118" height="118" x="1" y="1" rx="27" stroke="#27272a" stroke-width="1.5"/>
+
+  <!-- Minimal Grid lines -->
+  <line x1="42" y1="22" x2="42" y2="98" stroke="#27272a" stroke-width="2" stroke-linecap="round"/>
+  <line x1="78" y1="22" x2="78" y2="98" stroke="#27272a" stroke-width="2" stroke-linecap="round"/>
+  <line x1="22" y1="42" x2="98" y2="42" stroke="#27272a" stroke-width="2" stroke-linecap="round"/>
+  <line x1="22" y1="78" x2="98" y2="78" stroke="#27272a" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Glowing X Mark (Cyan/Blue Theme) -->
+  <path d="M32 32L52 52M52 32L32 52" stroke="#38bdf8" stroke-width="4.5" stroke-linecap="round"/>
+
+  <!-- Glowing O Mark (Emerald/Amber Theme) -->
+  <circle cx="78" cy="78" r="11" stroke="#f43f5e" stroke-width="4.5" stroke-linecap="round"/>
+
+  <!-- Center intersection dot -->
+  <circle cx="60" cy="60" r="2.5" fill="#52525b"/>
+  <circle cx="42" cy="78" r="2" fill="#3f3f46"/>
+  <circle cx="78" cy="42" r="2" fill="#3f3f46"/>
+</svg>

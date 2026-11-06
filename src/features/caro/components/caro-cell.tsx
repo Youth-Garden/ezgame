@@ -44,31 +44,30 @@ export const CaroCell = memo(function CaroCell({
       disabled={Boolean(value) || !canClick}
       aria-label={`Row ${row + 1}, Column ${col + 1}${value ? `, piece ${value}` : ""}`}
       className={cn(
-        "relative w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 flex items-center justify-center transition-colors duration-150 border-[0.5px] border-slate-700/60 select-none group",
-        // Background states
-        !value && canClick && "hover:bg-cyan-500/10 cursor-pointer",
+        "relative w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 flex items-center justify-center transition-colors duration-100 border-[0.5px] border-border/60 select-none group bg-card",
+        !value && canClick && "hover:bg-accent/40 cursor-pointer",
         !value && !canClick && "cursor-default",
         value && "cursor-default",
         isWinningCell &&
-          "bg-amber-400/25 z-10 shadow-[inset_0_0_12px_rgba(251,191,36,0.5)] border-amber-400/80 animate-pulse",
-        isLastMove && !isWinningCell && "bg-white/5"
+          "bg-amber-500/20 z-10 border-amber-500/70 animate-pulse",
+        isLastMove && !isWinningCell && "bg-accent/30"
       )}
     >
-      {/* Grid intersections */}
+      {/* Tengen / Hoshi points on Go board */}
       {((row === 3 && col === 3) ||
         (row === 3 && col === 11) ||
         (row === 7 && col === 7) ||
         (row === 11 && col === 3) ||
         (row === 11 && col === 11)) &&
         !value && (
-          <div className="absolute w-1.5 h-1.5 rounded-full bg-slate-600/80 pointer-events-none" />
+          <div className="absolute w-1 h-1 rounded-full bg-border pointer-events-none" />
         )}
 
       {/* Render Value: X */}
       {value === CaroPlayer.X && (
-        <div className="relative flex items-center justify-center animate-in zoom-in-75 duration-150">
+        <div className="relative flex items-center justify-center animate-in zoom-in-90 duration-100">
           <svg
-            className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.7)]"
+            className="w-4 h-4 sm:w-5 sm:h-5 text-primary"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -83,56 +82,51 @@ export const CaroCell = memo(function CaroCell({
 
       {/* Render Value: O */}
       {value === CaroPlayer.O && (
-        <div className="relative flex items-center justify-center animate-in zoom-in-75 duration-150">
+        <div className="relative flex items-center justify-center animate-in zoom-in-90 duration-100">
           <svg
-            className="w-5 h-5 sm:w-6 sm:h-6 text-rose-400 drop-shadow-[0_0_8px_rgba(251,113,133,0.7)]"
+            className="w-4 h-4 sm:w-5 sm:h-5 text-destructive"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             strokeWidth="3"
-            strokeLinecap="round"
           >
-            <circle cx="12" cy="12" r="7" />
+            <circle cx="12" cy="12" r="8" />
           </svg>
         </div>
       )}
 
-      {/* Hover Ghost Preview */}
-      {previewRole && (
-        <div className="absolute opacity-0 group-hover:opacity-30 pointer-events-none transition-opacity">
+      {/* Hover preview ghost for current player */}
+      {!value && previewRole && (
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-30 transition-opacity pointer-events-none">
           {previewRole === CaroPlayer.X ? (
             <svg
-              className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400"
+              className="w-4 h-4 sm:w-5 sm:h-5 text-primary"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
               strokeWidth="2.5"
+              strokeLinecap="round"
             >
               <line x1="18" y1="6" x2="6" y2="18" />
               <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
           ) : (
             <svg
-              className="w-5 h-5 sm:w-6 sm:h-6 text-rose-400"
+              className="w-4 h-4 sm:w-5 sm:h-5 text-destructive"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
               strokeWidth="2.5"
             >
-              <circle cx="12" cy="12" r="7" />
+              <circle cx="12" cy="12" r="8" />
             </svg>
           )}
         </div>
       )}
 
       {/* Last move indicator dot */}
-      {isLastMove && (
-        <div
-          className={cn(
-            "absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full border border-slate-900 pointer-events-none shadow-sm",
-            value === CaroPlayer.X ? "bg-cyan-300" : "bg-rose-300"
-          )}
-        />
+      {isLastMove && !isWinningCell && (
+        <div className="absolute bottom-1 right-1 w-1.5 h-1.5 rounded-full bg-primary" />
       )}
     </button>
   );

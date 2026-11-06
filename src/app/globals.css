@@ -35,9 +35,9 @@
   --sidebar-accent-foreground: #0830a0;
   --sidebar-border: #e4e7ec;
   --sidebar-ring: #3280ff;
-  --font-sans: Inter, sans-serif;
+  --font-sans: var(--font-sans), system-ui, sans-serif;
   --font-serif: Source Serif 4, serif;
-  --font-mono: JetBrains Mono, monospace;
+  --font-mono: var(--font-mono), monospace;
   --radius: 1.15rem;
   --shadow-x: 0;
   --shadow-y: 1px;
@@ -58,24 +58,24 @@
 }
 
 .dark {
-  --background: #171717;
-  --foreground: #e5e5e5;
-  --card: #262626;
-  --card-foreground: #e5e5e5;
-  --popover: #262626;
-  --popover-foreground: #e5e5e5;
+  --background: #09090b;
+  --foreground: #f4f4f5;
+  --card: #121215;
+  --card-foreground: #f4f4f5;
+  --popover: #121215;
+  --popover-foreground: #f4f4f5;
   --primary: #3280ff;
   --primary-foreground: #ffffff;
-  --secondary: #262626;
-  --secondary-foreground: #e5e5e5;
-  --muted: #1f1f1f;
-  --muted-foreground: #a3a3a3;
-  --accent: #2b74e9;
-  --accent-foreground: #bedbff;
+  --secondary: #18181b;
+  --secondary-foreground: #f4f4f5;
+  --muted: #18181b;
+  --muted-foreground: #71717a;
+  --accent: #27272a;
+  --accent-foreground: #fafafa;
   --destructive: #ff3434;
   --destructive-foreground: #ffffff;
-  --border: #404040;
-  --input: #404040;
+  --border: transparent;
+  --input: #27272a;
   --ring: #3280ff;
   --chart-1: #5ba4ff;
   --chart-2: #3280ff;
@@ -90,9 +90,9 @@
   --sidebar-accent-foreground: #bedbff;
   --sidebar-border: #404040;
   --sidebar-ring: #3280ff;
-  --font-sans: Inter, sans-serif;
+  --font-sans: var(--font-sans), system-ui, sans-serif;
   --font-serif: Source Serif 4, serif;
-  --font-mono: JetBrains Mono, monospace;
+  --font-mono: var(--font-mono), monospace;
   --radius: 1.15rem;
   --shadow-x: 0;
   --shadow-y: 1px;
@@ -174,7 +174,23 @@
   }
 }
 
-/* Custom sleek scrollbar */
+/* Ripple animation for button */
+@keyframes ripple-effect {
+  0% {
+    width: 0px;
+    height: 0px;
+    opacity: 0.5;
+  }
+  100% {
+    width: 250px;
+    height: 250px;
+    opacity: 0;
+  }
+}
+
+.animate-ripple {
+  animation: ripple-effect 0.6s linear forwards;
+}
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;

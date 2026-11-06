@@ -24,6 +24,19 @@ export interface DialogProps {
 }
 
 export function Dialog({ open = false, onOpenChange, children }: DialogProps) {
+  const [mounted, setMounted] = React.useState(open);
+
+  if (open && !mounted) {
+    setMounted(true);
+  }
+
+  React.useEffect(() => {
+    if (!open && mounted) {
+      const timer = setTimeout(() => setMounted(false), 200);
+      return () => clearTimeout(timer);
+    }
+  }, [open, mounted]);
+
   React.useEffect(() => {
     if (!open) return;
 
@@ -39,7 +52,7 @@ export function Dialog({ open = false, onOpenChange, children }: DialogProps) {
 
   const value = React.useMemo(() => ({ open, onOpenChange }), [open, onOpenChange]);
 
-  if (!open) return null;
+  if (!mounted) return null;
 
   return (
     <DialogContext.Provider value={value}>
@@ -53,7 +66,7 @@ export interface DialogOverlayProps extends React.HTMLAttributes<HTMLDivElement>
 }
 
 export function DialogOverlay({ className, onClick, ...props }: DialogOverlayProps) {
-  const { onOpenChange } = useDialog();
+  const { open, onOpenChange } = useDialog();
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
     onClick?.(event);
@@ -67,7 +80,8 @@ export function DialogOverlay({ className, onClick, ...props }: DialogOverlayPro
       data-slot="dialog-overlay"
       onClick={handleClick}
       className={cn(
-        "fixed inset-0 z-50 bg-black/60 backdrop-blur-xs duration-150 animate-in fade-in-0",
+        "fixed inset-0 z-50 bg-black/60 backdrop-blur-xs transition-opacity duration-200 ease-out",
+        open ? "opacity-100" : "opacity-0 pointer-events-none",
         className
       )}
       aria-hidden="true"
@@ -87,7 +101,7 @@ export function DialogContent({
   onClick,
   ...props
 }: DialogContentProps) {
-  const { onOpenChange } = useDialog();
+  const { open, onOpenChange } = useDialog();
 
   const handleStopPropagation = (event: React.MouseEvent<HTMLDivElement>) => {
     event.stopPropagation();
@@ -99,7 +113,10 @@ export function DialogContent({
       data-slot="dialog-content"
       onClick={handleStopPropagation}
       className={cn(
-        "relative z-50 w-full max-w-md rounded-2xl border border-border bg-card p-6 text-card-foreground shadow-xl transition-all duration-150 animate-in fade-in-0 zoom-in-98",
+        "relative z-50 w-full max-w-md rounded-2xl bg-card p-6 text-card-foreground shadow-2xl transition-all duration-200 ease-out",
+        open
+          ? "opacity-100 scale-100 translate-y-0"
+          : "opacity-0 scale-95 translate-y-2 pointer-events-none",
         className
       )}
       {...props}

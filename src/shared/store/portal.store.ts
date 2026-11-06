@@ -62,7 +62,7 @@ export const usePortalStore = create<LayoutState>()((set, get) => ({
       if (portal && !portal.isOpen && targetId) {
         removePortal(targetId);
       }
-    }, 200);
+    }, 220);
   },
 
   closeAllPortals: () => {

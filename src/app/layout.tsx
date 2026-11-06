@@ -1,25 +1,46 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { PortalRenderer } from "@/shared/components/portal";
 import "./globals.css";
 import { getLocale, getMessages } from "next-intl/server";
 import { Providers } from "./providers";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+const jakartaSans = Plus_Jakarta_Sans({
+  variable: "--font-sans",
+  subsets: ["latin", "vietnamese"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-mono",
   subsets: ["latin"],
+  display: "swap",
 });
+
+export const viewport: Viewport = {
+  themeColor: "#3280ff",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
 
 export const metadata: Metadata = {
   title: "EzGame - Casual Game Realtime Platform (No-Auth)",
   description:
     "Join and play instantly, no login required. Play Caro 15x15 realtime P2P smoothly with friends via one invite link!",
-  keywords: ["caro", "gomoku", "casual game", "realtime", "nextjs", "supabase"],
+  keywords: ["caro", "gomoku", "casual game", "realtime", "nextjs", "supabase", "pwa"],
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "EzGame",
+  },
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default async function RootLayout({
@@ -33,9 +54,10 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
+      className={`${jakartaSans.variable} ${jetbrainsMono.variable} h-full antialiased dark`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary">
+      <body className="min-h-full flex flex-col bg-background text-foreground font-sans antialiased selection:bg-primary/20">
         <Providers messages={messages} locale={locale}>
           {children}
         </Providers>

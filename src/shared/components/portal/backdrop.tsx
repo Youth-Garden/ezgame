@@ -9,13 +9,12 @@ interface BackdropProps {
 }
 
 export const Backdrop = ({ isOpen, onPress, className }: BackdropProps) => {
-  if (!isOpen) return null;
-
   return (
     <div
       onClick={onPress}
       className={cn(
-        "fixed inset-0 z-50 bg-black/60 backdrop-blur-sm transition-all duration-200 animate-in fade-in-0",
+        "fixed inset-0 z-50 bg-black/60 transition-opacity duration-150 ease-out",
+        isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none",
         className
       )}
       aria-hidden="true"

@@ -5,25 +5,28 @@ import { Copy, Check } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 
 interface CopyLinkButtonProps {
-  textToCopy: string;
+  textToCopy?: string;
+  url?: string;
   label?: string;
   className?: string;
 }
 
 export function CopyLinkButton({
   textToCopy,
+  url,
   label = "Copy invite link",
 }: CopyLinkButtonProps) {
   const [copied, setCopied] = useState(false);
+  const targetText = textToCopy || url || "";
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(textToCopy);
+      await navigator.clipboard.writeText(targetText);
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
     } catch {
       const textArea = document.createElement("textarea");
-      textArea.value = textToCopy;
+      textArea.value = targetText;
       document.body.appendChild(textArea);
       textArea.select();
       document.execCommand("copy");
