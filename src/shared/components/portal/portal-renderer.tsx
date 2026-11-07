@@ -1,9 +1,8 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { usePortalStore } from "@/shared/store/portal.store";
-import type { PortalInstance } from "@/shared/types/portal.types";
 import { Backdrop } from "./backdrop";
 
 const emptySubscribe = () => () => {};
@@ -17,60 +16,67 @@ export const PortalRenderer = () => {
     () => false
   );
 
+  // Close top-most portal when Escape is pressed
+  useEffect(() => {
+    if (!isClient || portals.length === 0) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        const topOpenPortal = [...portals].reverse().find((p) => p.isOpen);
+        if (topOpenPortal && !topOpenPortal.disableCloseByBackdrop) {
+          onDismiss(topOpenPortal.id);
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isClient, portals, onDismiss]);
+
   if (!isClient || portals.length === 0) return null;
 
-  return createPortal(
-    <>
-      {portals.map((instance) => (
-        <PortalInstanceItem
-          key={instance.id}
-          instance={instance}
-          onDismiss={() => onDismiss(instance.id)}
-        />
-      ))}
-    </>,
-    document.body
+  // Global backdrop: active if any portal without disableBackdrop is currently open
+  const activeBackdropPortal = portals.find(
+    (portal) => !portal.disableBackdrop && portal.isOpen
   );
-};
+  const isAnyBackdropOpen = Boolean(activeBackdropPortal);
 
-const PortalInstanceItem = ({
-  instance,
-  onDismiss,
-}: {
-  instance: PortalInstance;
-  onDismiss: () => void;
-}) => {
-  const Component = instance.component;
+  // When clicking backdrop, dismiss the top-most dismissable portal
+  const handleBackdropPress = () => {
+    const topPortal = [...portals].reverse().find((p) => !p.disableBackdrop && p.isOpen);
+    if (topPortal && !topPortal.disableCloseByBackdrop) {
+      onDismiss(topPortal.id);
+    }
+  };
 
-  if (instance.disableBackdrop) {
-    return (
-      <Component
-        id={instance.id}
-        data={instance.data}
-        isOpen={instance.isOpen}
-        onDismiss={onDismiss}
-      />
-    );
-  }
-
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-      <div className="pointer-events-auto w-full h-full flex items-center justify-center">
-        <Backdrop
-          isOpen={instance.isOpen}
-          onPress={() => {
-            if (!instance.disableCloseByBackdrop) {
-              onDismiss();
-            }
-          }}
-        />
-        <Component
-          id={instance.id}
-          data={instance.data}
-          isOpen={instance.isOpen}
-          onDismiss={onDismiss}
-        />
-      </div>
-    </div>
+      {/* Single centralized backdrop configured in 1 place for all portals */}
+      <Backdrop
+        isOpen={isAnyBackdropOpen}
+        onPress={handleBackdropPress}
+      />
+
+      {/* Render all modal/dialog component instances */}
+      {portals.map((instance) => {
+        const Component = instance.component;
+        return (
+          <div
+            key={instance.id}
+            className="absolute inset-0 flex items-center justify-center p-4 pointer-events-none"
+          >
+            <div className="pointer-events-auto w-full max-w-md flex justify-center">
+              <Component
+                id={instance.id}
+                data={instance.data}
+                isOpen={instance.isOpen}
+                onDismiss={() => onDismiss(instance.id)}
+              />
+            </div>
+          </div>
+        );
+      })}
+    </div>,
+    document.body
   );
 };

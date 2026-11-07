@@ -13,6 +13,7 @@ export enum RoomStatus {
 export enum GameType {
   CARO = "caro",
   TICTACTOE = "tictactoe",
+  BIDA = "bida",
 }
 
 export interface RoomData {
@@ -28,6 +29,8 @@ export interface PlayerPresence {
   role: PlayerRole;
   joinedAt: number;
   name?: string;
+  avatarSeed?: string;
+  avatarStyle?: string;
 }
 
 export enum RealtimeEventType {
@@ -36,6 +39,8 @@ export enum RealtimeEventType {
   REMATCH_REQUEST = "REMATCH_REQUEST",
   REMATCH_ACCEPT = "REMATCH_ACCEPT",
   PLAYER_SURRENDER = "PLAYER_SURRENDER",
+  BIDA_SHOT = "BIDA_SHOT",
+  BIDA_STATE_SYNC = "BIDA_STATE_SYNC",
 }
 
 export type RealtimeEvent =
@@ -70,5 +75,31 @@ export type RealtimeEvent =
       type: RealtimeEventType.PLAYER_SURRENDER;
       payload: {
         player: PlayerRole;
+      };
+    }
+  | {
+      type: RealtimeEventType.BIDA_SHOT;
+      payload: {
+        player: PlayerRole.X | PlayerRole.O;
+        cueAngle: number;
+        power: number;
+        cueBallX: number;
+        cueBallY: number;
+        timestamp: number;
+      };
+    }
+  | {
+      type: RealtimeEventType.BIDA_STATE_SYNC;
+      payload: {
+        balls: Array<{
+          id: number;
+          x: number;
+          y: number;
+          isPocketed: boolean;
+        }>;
+        currentTurn: PlayerRole.X | PlayerRole.O;
+        winner?: PlayerRole | null;
+        foulMessage?: string | null;
+        timestamp: number;
       };
     };

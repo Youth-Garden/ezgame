@@ -1,13 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { getSupabaseClient, isSupabaseConfigured } from "@/shared/lib/supabase";
 import { PlayerRole, type PlayerPresence, type RealtimeEvent } from "@/shared/types/room";
+import { type PlayerProfile } from "./use-player-profile";
+import { getAvatarUrl, type AvatarStyle } from "@/shared/lib/avatar";
 
 interface UseRoomRealtimeOptions {
   roomCode: string;
   myRole: PlayerRole;
+  profile?: PlayerProfile;
   onEventReceived?: (event: RealtimeEvent) => void;
 }
 
@@ -24,16 +27,16 @@ function getOrCreateClientId(): string {
 export function useRoomRealtime({
   roomCode,
   myRole,
+  profile,
   onEventReceived,
 }: UseRoomRealtimeOptions) {
   const [peers, setPeers] = useState<PlayerPresence[]>([]);
   const [isChannelReady, setIsChannelReady] = useState(false);
-  const [isOpponentOnline, setIsOpponentOnline] = useState(false);
   const [isConfigured] = useState(() => isSupabaseConfigured());
 
+  const [clientId] = useState(() => getOrCreateClientId());
   const channelRef = useRef<RealtimeChannel | null>(null);
   const eventHandlerRef = useRef(onEventReceived);
-  const clientIdRef = useRef<string>("");
 
   useEffect(() => {
     eventHandlerRef.current = onEventReceived;
@@ -42,30 +45,48 @@ export function useRoomRealtime({
   const expectedOpponentRole: PlayerRole =
     myRole === PlayerRole.X ? PlayerRole.O : PlayerRole.X;
 
-  // Check if opponent is online from peers list
-  useEffect(() => {
-    const oppFound = peers.some(
-      (peer) => peer.role === expectedOpponentRole && peer.id !== clientIdRef.current
+  // Check if opponent is online from peers list directly in render (derived state)
+  const isOpponentOnline = useMemo(() => {
+    return peers.some(
+      (peer) => peer.role === expectedOpponentRole && peer.id !== clientId
     );
-    setIsOpponentOnline(oppFound);
-  }, [peers, expectedOpponentRole]);
+  }, [peers, expectedOpponentRole, clientId]);
+
+  // Extract opponent profile from presence peers
+  const opponentPresence = useMemo(() => {
+    return peers.find(
+      (peer) => peer.role === expectedOpponentRole && peer.id !== clientId
+    );
+  }, [peers, expectedOpponentRole, clientId]);
+
+  const opponentProfile = useMemo(() => {
+    if (!opponentPresence) return null;
+    const seed = opponentPresence.avatarSeed || opponentPresence.id;
+    const style = (opponentPresence.avatarStyle as AvatarStyle) || "bottts-neutral";
+    return {
+      name: opponentPresence.name || `Player ${expectedOpponentRole}`,
+      avatarUrl: getAvatarUrl(style, seed),
+      role: opponentPresence.role,
+    };
+  }, [opponentPresence, expectedOpponentRole]);
 
   // Handle Supabase Realtime Channel
   useEffect(() => {
     if (!roomCode || !isConfigured) return;
 
     let active = true;
-    const clientId = getOrCreateClientId();
-    clientIdRef.current = clientId;
 
     const supabase = getSupabaseClient();
-    const channel = supabase.channel(`room:${roomCode}`, {
+    const channelName = `room-${roomCode}`;
+    const channel = supabase.channel(channelName, {
       config: {
+        private: false,
         presence: {
           key: clientId,
         },
         broadcast: {
           self: false,
+          ack: true,
         },
       },
     });
@@ -101,17 +122,22 @@ export function useRoomRealtime({
       })
       .on("broadcast", { event: "game_event" }, ({ payload }) => {
         if (!active) return;
+        console.log("[Realtime] Received game_event:", payload);
         if (payload) {
           eventHandlerRef.current?.(payload as RealtimeEvent);
         }
       })
-      .subscribe(async (status) => {
+      .subscribe(async (status, err) => {
+        console.log(`[Realtime] Subscription status for ${channelName}:`, status, err || "");
         if (status === "SUBSCRIBED") {
           setIsChannelReady(true);
           await channel.track({
             id: clientId,
             role: myRole,
             joinedAt: Date.now(),
+            name: profile?.name,
+            avatarSeed: profile?.avatarSeed,
+            avatarStyle: profile?.avatarStyle,
           });
         }
       });
@@ -119,19 +145,22 @@ export function useRoomRealtime({
     return () => {
       active = false;
       if (channelRef.current) {
-        channelRef.current.unsubscribe();
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
       }
     };
-  }, [roomCode, myRole, isConfigured]);
+  }, [roomCode, myRole, isConfigured, clientId, profile?.name, profile?.avatarSeed, profile?.avatarStyle]);
 
   const sendEvent = useCallback(
     async (event: RealtimeEvent) => {
       if (isConfigured && channelRef.current) {
-        await channelRef.current.send({
+        console.log("[Realtime] Sending game_event:", event);
+        const resp = await channelRef.current.send({
           type: "broadcast",
           event: "game_event",
           payload: event,
         });
+        console.log("[Realtime] Send response status:", resp);
       }
     },
     [isConfigured]
@@ -140,6 +169,7 @@ export function useRoomRealtime({
   return {
     peers,
     isOpponentOnline,
+    opponentProfile,
     isChannelReady,
     sendEvent,
     isSupabaseConfigured: isConfigured,

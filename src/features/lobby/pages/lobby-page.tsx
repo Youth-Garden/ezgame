@@ -5,7 +5,8 @@ import { GameType } from "@/shared/types/room";
 import { GameCard } from "../components/game-card";
 import { RoomSelectionModal } from "../components/room-selection-modal";
 import type { GameMetadata, GameRoomModalData, LobbyLocale } from "../types";
-import { Gamepad2, Languages, Moon, Sun, ChevronDown, Check, Zap } from "lucide-react";
+import { Icons } from "@/shared/icons";
+import { useRipple } from "@/shared/hooks/use-ripple";
 import { useState, useEffect, useRef } from "react";
 
 type Theme = "dark" | "light";
@@ -48,7 +49,17 @@ const CONTENT: Record<
         players: "2 Người",
         isAvailable: true,
         tag: "Chiến Thuật",
-        iconSrc: "/games/caro.svg",
+        iconSrc: "/games/caro.jpg",
+      },
+      {
+        id: GameType.BIDA,
+        title: "Bida",
+        badge: "Vật lý 2D 60FPS",
+        description: "Đấu cơ bida 2 người theo lượt. Ngắm cơ, kéo lực và đưa bóng vào lỗ trong thời gian thực.",
+        players: "2 Người",
+        isAvailable: true,
+        tag: "Thể Thao",
+        iconSrc: "/games/bida.jpg",
       },
     ],
   },
@@ -73,15 +84,25 @@ const CONTENT: Record<
         players: "2 Players",
         isAvailable: true,
         tag: "Tactical Board",
-        iconSrc: "/games/caro.svg",
+        iconSrc: "/games/caro.jpg",
+      },
+      {
+        id: GameType.BIDA,
+        title: "Bida",
+        badge: "60FPS 2D Physics",
+        description: "Turn-based 2-player billiards. Aim, adjust cue power, and sink your balls in real-time.",
+        players: "2 Players",
+        isAvailable: true,
+        tag: "Sports Physics",
+        iconSrc: "/games/bida.jpg",
       },
     ],
   },
 };
 
-const LANGUAGES: { code: LobbyLocale; label: string; flag: string }[] = [
-  { code: "vi", label: "Tiếng Việt", flag: "🇻🇳" },
-  { code: "en", label: "English", flag: "🇺🇸" },
+const LANGUAGES: { code: LobbyLocale; label: string; flagIcon: string }[] = [
+  { code: "vi", label: "Tiếng Việt", flagIcon: "flag-vn" },
+  { code: "en", label: "English", flagIcon: "flag-us" },
 ];
 
 export function LobbyPage() {
@@ -89,6 +110,8 @@ export function LobbyPage() {
   const [theme, setTheme] = useState<Theme>("dark");
   const [isLangOpen, setIsLangOpen] = useState(false);
   const langDropdownRef = useRef<HTMLDivElement>(null);
+  const { createRipple: rippleLang, RippleContainer: RippleLangContainer } = useRipple<HTMLButtonElement>();
+  const { createRipple: rippleTheme, RippleContainer: RippleThemeContainer } = useRipple<HTMLButtonElement>();
 
   const [presentRoomModal] = usePortal<GameRoomModalData>(RoomSelectionModal);
   const current = CONTENT[locale];
@@ -134,8 +157,8 @@ export function LobbyPage() {
       <header className="bg-neutral-50/80 dark:bg-[#09090b]/80 backdrop-blur-md sticky top-0 z-30 px-4 sm:px-6 py-3.5">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-neutral-200 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 flex items-center justify-center font-bold">
-              <Gamepad2 className="w-4 h-4 text-primary" />
+            <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center shadow-xs">
+              <Icons name="logo" size={32} />
             </div>
             <div className="flex items-baseline gap-2">
               <span className="text-base font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
@@ -148,34 +171,48 @@ export function LobbyPage() {
           </div>
 
           {/* Right Actions: Language Dropdown & Theme Toggle */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             {/* Language Select Dropdown */}
             <div className="relative" ref={langDropdownRef}>
               <button
                 type="button"
-                onClick={() => setIsLangOpen((prev) => !prev)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-200/70 hover:bg-neutral-200 dark:bg-neutral-900 dark:hover:bg-neutral-800 text-xs text-neutral-800 dark:text-neutral-200 transition-colors cursor-pointer"
+                onClick={(e) => {
+                  rippleLang(e);
+                  setIsLangOpen((prev) => !prev);
+                }}
+                className={`relative overflow-hidden flex items-center gap-1.5 h-8 px-2.5 rounded-lg text-xs font-medium transition-colors cursor-pointer select-none ${
+                  isLangOpen
+                    ? "bg-neutral-200 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100"
+                    : "bg-neutral-100 hover:bg-neutral-200/70 dark:bg-neutral-900 dark:hover:bg-neutral-850 text-neutral-700 dark:text-neutral-300"
+                }`}
                 aria-expanded={isLangOpen}
               >
-                <Languages className="w-3.5 h-3.5 text-neutral-500 dark:text-neutral-400" />
-                <span className="font-semibold uppercase tracking-wider">
+                <RippleLangContainer />
+                <Icons name="languages" size={13} className="text-neutral-500 dark:text-neutral-400" />
+                <span className="font-semibold uppercase tracking-wider text-[11px]">
                   {locale}
                 </span>
-                <ChevronDown
-                  className={`w-3 h-3 text-neutral-500 dark:text-neutral-400 transition-transform duration-200 ${
+                <Icons
+                  name="chevron-down"
+                  size={12}
+                  className={`text-neutral-400 dark:text-neutral-500 transition-transform duration-200 ${
                     isLangOpen ? "rotate-180" : "rotate-0"
                   }`}
                 />
               </button>
 
-              {/* Dropdown Menu */}
+              {/* Modern Professional Popover Menu */}
               <div
-                className={`absolute right-0 mt-1.5 w-40 py-1.5 rounded-xl bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100 shadow-xl z-50 transform origin-top-right transition-all duration-150 ease-out border border-neutral-100 dark:border-transparent ${
+                className={`absolute right-0 mt-2 w-44 p-1 rounded-xl bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md shadow-2xl z-50 flex flex-col gap-0.5 transform origin-top-right transition-all duration-150 ease-out ${
                   isLangOpen
                     ? "opacity-100 scale-100 pointer-events-auto"
                     : "opacity-0 scale-95 pointer-events-none"
                 }`}
               >
+                <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
+                  Select Language
+                </div>
+
                 {LANGUAGES.map((item) => {
                   const isSelected = locale === item.code;
                   return (
@@ -186,18 +223,24 @@ export function LobbyPage() {
                         setLocale(item.code);
                         setIsLangOpen(false);
                       }}
-                      className={`w-full flex items-center justify-between px-3.5 py-2 text-xs text-left transition-colors cursor-pointer rounded-lg mx-auto ${
+                      className={`group w-full flex items-center justify-between px-2.5 py-1.5 text-xs text-left transition-all cursor-pointer rounded-lg select-none ${
                         isSelected
-                          ? "bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-white font-medium"
-                          : "text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800/80 hover:text-neutral-900 dark:hover:text-white"
+                          ? "bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 font-semibold"
+                          : "text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100/70 dark:hover:bg-neutral-800/60 hover:text-neutral-900 dark:hover:text-neutral-200"
                       }`}
                     >
                       <span className="flex items-center gap-2.5">
-                        <span className="text-base">{item.flag}</span>
-                        <span>{item.label}</span>
+                        <span className="shadow-2xs rounded-xs overflow-hidden flex items-center justify-center">
+                          <Icons name={item.flagIcon} size={16} />
+                        </span>
+                        <span className="text-[12px]">{item.label}</span>
                       </span>
-                      {isSelected && (
-                        <Check className="w-3.5 h-3.5 text-primary" />
+                      {isSelected ? (
+                        <Icons name="check" size={13} className="text-primary shrink-0" />
+                      ) : (
+                        <span className="text-[10px] uppercase font-mono text-neutral-400 dark:text-neutral-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                          {item.code}
+                        </span>
                       )}
                     </button>
                   );
@@ -208,15 +251,19 @@ export function LobbyPage() {
             {/* Theme Toggle Button */}
             <button
               type="button"
-              onClick={toggleTheme}
-              className="p-1.5 rounded-lg bg-neutral-200/70 hover:bg-neutral-200 dark:bg-neutral-900 dark:hover:bg-neutral-800 text-neutral-800 dark:text-neutral-200 transition-colors cursor-pointer"
+              onClick={(e) => {
+                rippleTheme(e);
+                toggleTheme();
+              }}
+              className="relative overflow-hidden h-8 w-8 rounded-lg bg-neutral-100 hover:bg-neutral-200/70 dark:bg-neutral-900 dark:hover:bg-neutral-850 text-neutral-700 dark:text-neutral-300 flex items-center justify-center transition-colors cursor-pointer"
               aria-label="Toggle Theme"
               title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
+              <RippleThemeContainer />
               {theme === "dark" ? (
-                <Sun className="w-4 h-4 text-amber-400" />
+                <Icons name="sun" size={15} className="text-amber-400" />
               ) : (
-                <Moon className="w-4 h-4 text-neutral-700" />
+                <Icons name="moon" size={15} className="text-neutral-700" />
               )}
             </button>
           </div>
@@ -235,31 +282,31 @@ export function LobbyPage() {
           </p>
         </div>
 
-        {/* Active Games Only */}
-        <div className="flex flex-col gap-4 mb-10">
+        {/* Active Games: Display in Row */}
+        <div className="flex flex-row flex-wrap sm:flex-nowrap gap-4 mb-10 w-full">
           {current.games.map((game) => (
             <GameCard
               key={game.id}
               game={game}
               onSelect={handleGameSelect}
-              playText={current.play}
             />
           ))}
         </div>
 
         {/* Clean Micro Stats */}
         <div className="mt-auto pt-6 grid grid-cols-3 gap-3 text-center">
-          <div className="py-2.5 px-3 rounded-xl bg-neutral-100 dark:bg-neutral-900/60">
-            <div className="text-xs font-semibold text-neutral-800 dark:text-neutral-200 flex items-center justify-center gap-1">
-              <Zap className="w-3.5 h-3.5 text-primary" /> {current.realtime}
+          <div className="py-2.5 px-3 rounded-xl bg-neutral-200/40 dark:bg-neutral-900/40">
+            <div className="text-xs font-semibold text-neutral-800 dark:text-neutral-200 flex items-center justify-center gap-1.5">
+              <Icons name="zap" size={13} className="text-primary" />
+              <span>{current.realtime}</span>
             </div>
             <div className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">{current.realtimeDesc}</div>
           </div>
-          <div className="py-2.5 px-3 rounded-xl bg-neutral-100 dark:bg-neutral-900/60">
+          <div className="py-2.5 px-3 rounded-xl bg-neutral-200/40 dark:bg-neutral-900/40">
             <div className="text-xs font-semibold text-neutral-800 dark:text-neutral-200">{current.noAuth}</div>
             <div className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">{current.noAuthDesc}</div>
           </div>
-          <div className="py-2.5 px-3 rounded-xl bg-neutral-100 dark:bg-neutral-900/60">
+          <div className="py-2.5 px-3 rounded-xl bg-neutral-200/40 dark:bg-neutral-900/40">
             <div className="text-xs font-semibold text-neutral-800 dark:text-neutral-200">{current.share}</div>
             <div className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">{current.shareDesc}</div>
           </div>

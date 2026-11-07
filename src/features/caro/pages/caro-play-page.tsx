@@ -2,7 +2,6 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useParams, useSearchParams } from "next/navigation";
-import { Flag, ArrowLeftRight } from "lucide-react";
 import { CaroBoard } from "../components/caro-board";
 import { checkWin, createEmptyBoard } from "../utils/check-win";
 import { CaroPlayer, GameWinner, type CaroGameState } from "../types";
@@ -13,10 +12,15 @@ import { usePortal } from "@/shared/components/portal";
 import { sounds } from "@/shared/lib/sound-effects";
 import { Button } from "@/shared/components/ui/button";
 import { PlayerRole, RealtimeEventType, type RealtimeEvent } from "@/shared/types/room";
+import { usePlayerProfile } from "@/shared/hooks/use-player-profile";
+import { Icons } from "@/shared/icons";
 
 export function CaroPlayPage() {
   const routeParams = useParams();
   const searchParams = useSearchParams();
+
+  // Guest Player Profile with DiceBear avatar
+  const { profile: myProfile, randomizeAvatar } = usePlayerProfile();
 
   const rawCode = (routeParams?.code as string) || "CR-DEMO";
   const roomCode = rawCode.toUpperCase();
@@ -217,12 +221,14 @@ export function CaroPlayPage() {
   // Hook into Realtime (Broadcast + Presence)
   const {
     isOpponentOnline,
+    opponentProfile,
     sendEvent,
     isSupabaseConfigured,
     expectedOpponentRole,
   } = useRoomRealtime({
     roomCode,
     myRole,
+    profile: myProfile,
     onEventReceived: handleRealtimeEvent,
   });
 
@@ -312,12 +318,15 @@ export function CaroPlayPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
+    <div className="min-h-screen bg-background text-foreground flex flex-col font-game">
       {/* Room Header */}
       <RoomHeader
         roomCode={roomCode}
         gameTitle="Caro 15x15"
         myRole={myRole}
+        myProfile={myProfile}
+        opponentProfile={opponentProfile}
+        onRandomizeAvatar={randomizeAvatar}
         isOpponentOnline={isOpponentOnline}
         expectedOpponentRole={expectedOpponentRole}
         isSupabaseConfigured={isSupabaseConfigured}
@@ -339,7 +348,7 @@ export function CaroPlayPage() {
               className="text-xs gap-1.5"
               title="Switch role for testing"
             >
-              <ArrowLeftRight className="w-3.5 h-3.5" />
+              <Icons name="arrow-left-right" size={14} />
               <span>Switch to {myRole === PlayerRole.X ? "O" : "X"}</span>
             </Button>
           </div>
@@ -352,7 +361,7 @@ export function CaroPlayPage() {
                 onClick={handleSurrender}
                 className="text-xs gap-1.5"
               >
-                <Flag className="w-3.5 h-3.5" />
+                <Icons name="flag" size={14} />
                 <span>Surrender</span>
               </Button>
             )}

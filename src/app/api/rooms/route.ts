@@ -6,6 +6,7 @@ function parseGameType(raw: string | undefined): GameType {
   if (!raw) return GameType.CARO;
   const lower = raw.toLowerCase();
   if (lower === "tictactoe") return GameType.TICTACTOE;
+  if (lower === "bida") return GameType.BIDA;
   return GameType.CARO;
 }
 
@@ -13,8 +14,7 @@ export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => ({}));
     const gameType = parseGameType(body?.gameType);
-    const prefix = gameType === GameType.CARO ? "CR" : "EZ";
-    const code = generateRoomCode(prefix);
+    const code = generateRoomCode();
 
     return NextResponse.json({
       success: true,
@@ -47,14 +47,17 @@ export async function GET(req: Request) {
       );
     }
 
-    if (/^[A-Z]{2}-[A-Z0-9]{4}$/i.test(code)) {
-      const isCaro = code.startsWith("CR");
+    // Accept 6 alphanumeric characters or legacy prefix-code format
+    if (/^[A-Z0-9]{6}$/i.test(code) || /^[A-Z]{2}-[A-Z0-9]{4}$/i.test(code)) {
+      const isBida = code.startsWith("BD");
+      const isCaro = !isBida;
+      const gameType = isBida ? GameType.BIDA : isCaro ? GameType.CARO : GameType.TICTACTOE;
       return NextResponse.json({
         success: true,
         room: {
           id: `room_${code}`,
           code,
-          gameType: isCaro ? GameType.CARO : GameType.TICTACTOE,
+          gameType,
           status: RoomStatus.WAITING,
           createdAt: new Date().toISOString(),
         },

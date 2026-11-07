@@ -37,17 +37,17 @@ export function CaroBoard({
   return (
     <div className="flex flex-col items-center">
       {/* Turn Banner */}
-      <div className="mb-4 flex items-center justify-between w-full max-w-md px-4 py-2.5 rounded-xl bg-card border border-border shadow-2xs text-xs sm:text-sm">
+      <div className="mb-4 flex items-center justify-between w-full max-w-md px-4 py-2.5 rounded-xl bg-neutral-100 dark:bg-neutral-900 shadow-xs text-xs sm:text-sm">
         <div className="flex items-center gap-2">
-          <span className="text-muted-foreground">Turn:</span>
+          <span className="text-neutral-500 dark:text-neutral-400">Turn:</span>
           <span
             className={`font-semibold flex items-center gap-1.5 ${
-              currentTurn === CaroPlayer.X ? "text-primary" : "text-destructive"
+              currentTurn === CaroPlayer.X ? "text-sky-500" : "text-rose-500"
             }`}
           >
             <span
               className={`w-2 h-2 rounded-full ${
-                currentTurn === CaroPlayer.X ? "bg-primary" : "bg-destructive"
+                currentTurn === CaroPlayer.X ? "bg-sky-500" : "bg-rose-500"
               }`}
             />
             Piece {currentTurn}
@@ -61,20 +61,20 @@ export function CaroBoard({
               Your Turn
             </span>
           ) : (
-            <span className="text-muted-foreground">Waiting for opponent...</span>
+            <span className="text-neutral-500 dark:text-neutral-400">Waiting for opponent...</span>
           )}
         </div>
       </div>
 
       {/* Board Outer Card */}
-      <div className="p-3 sm:p-5 rounded-2xl bg-card border border-border shadow-xs max-w-full overflow-x-auto select-none">
+      <div className="p-3 sm:p-5 rounded-2xl bg-neutral-100/90 dark:bg-neutral-900 shadow-sm max-w-full overflow-x-auto select-none">
         <div className="min-w-fit flex flex-col">
           {/* Top Column Labels (A - O) */}
           <div className="flex ml-6 sm:ml-7 mb-1.5">
             {COL_LABELS.map((label) => (
               <div
                 key={label}
-                className="w-7 sm:w-8 md:w-9 text-center text-[10px] sm:text-xs font-mono font-medium text-muted-foreground/70"
+                className="w-7 sm:w-8 md:w-9 text-center text-[10px] sm:text-xs font-mono font-medium text-neutral-400 dark:text-neutral-500"
               >
                 {label}
               </div>
@@ -82,33 +82,37 @@ export function CaroBoard({
           </div>
 
           {/* Board Rows with Left Row Numbers (1 - 15) */}
-          <div className="flex flex-col border border-border/80 bg-background/50 rounded-lg overflow-hidden">
+          <div className="flex flex-col">
             {board.map((row, rowIndex) => (
               <div key={rowIndex} className="flex items-center">
                 {/* Left Row Number */}
-                <div className="w-6 sm:w-7 text-right pr-2 text-[10px] sm:text-xs font-mono font-medium text-muted-foreground/70 select-none">
+                <div className="w-6 sm:w-7 text-right pr-2 text-[10px] sm:text-xs font-mono font-medium text-neutral-400 dark:text-neutral-500 select-none">
                   {rowIndex + 1}
                 </div>
 
                 {/* Row of Cells */}
-                <div className="flex">
+                <div className={`flex ${rowIndex === 0 ? "border-t border-neutral-200 dark:border-neutral-800" : ""}`}>
                   {row.map((cellValue, colIndex) => {
                     const isLast =
                       lastMove?.[0] === rowIndex && lastMove?.[1] === colIndex;
                     const isWin = winningSet.has(`${rowIndex}-${colIndex}`);
 
                     return (
-                      <CaroCell
+                      <div
                         key={`${rowIndex}-${colIndex}`}
-                        row={rowIndex}
-                        col={colIndex}
-                        value={cellValue}
-                        isLastMove={isLast}
-                        isWinningCell={isWin}
-                        canClick={canClick}
-                        myRole={myRole}
-                        onClick={onCellClick}
-                      />
+                        className={colIndex === 0 ? "border-l border-neutral-200 dark:border-neutral-800" : ""}
+                      >
+                        <CaroCell
+                          row={rowIndex}
+                          col={colIndex}
+                          value={cellValue}
+                          isLastMove={isLast}
+                          isWinningCell={isWin}
+                          canClick={canClick}
+                          myRole={myRole}
+                          onClick={onCellClick}
+                        />
+                      </div>
                     );
                   })}
                 </div>

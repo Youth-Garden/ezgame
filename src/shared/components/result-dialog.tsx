@@ -2,14 +2,13 @@
 
 import { useEffect } from "react";
 import confetti from "canvas-confetti";
-import { Trophy, Frown, MinusCircle, RotateCcw, Home } from "lucide-react";
 import Link from "next/link";
 import { sounds } from "@/shared/lib/sound-effects";
 import { PlayerRole } from "@/shared/types/room";
 import { GameWinner } from "@/features/caro/types";
 import type { PortalProps } from "@/shared/types/portal.types";
-import { Dialog, DialogContent } from "@/shared/components/ui/dialog";
 import { Button } from "@/shared/components/ui/button";
+import { Icons } from "@/shared/icons";
 
 export interface ResultDialogData {
   winner: GameWinner | null;
@@ -47,111 +46,108 @@ export function ResultDialog({
       } catch {
         // Confetti silently handled
       }
+    } else if (isDraw) {
+      sounds.playDrawTone();
+    } else {
+      sounds.playLoseTone();
     }
-  }, [isOpen, winner, isMeWinner]);
+  }, [isOpen, winner, isMeWinner, isDraw]);
 
-  if (!isOpen || !winner) return null;
+  if (!winner) return null;
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onDismiss?.()}>
-      <DialogContent
-        showCloseButton={false}
-        className="max-w-sm text-center overflow-hidden border border-border bg-card p-6"
-      >
-        <div className="relative z-10 flex flex-col items-center">
-          {/* Icon */}
-          <div
-            className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-3 ${
-              isMeWinner
-                ? "bg-primary/10 text-primary border border-primary/20"
-                : isDraw
-                ? "bg-secondary text-secondary-foreground border border-border"
-                : "bg-destructive/10 text-destructive border border-destructive/20"
-            }`}
-          >
-            {isMeWinner ? (
-              <Trophy className="w-7 h-7" />
-            ) : isDraw ? (
-              <MinusCircle className="w-7 h-7" />
-            ) : (
-              <Frown className="w-7 h-7" />
-            )}
-          </div>
+    <div
+      className={`relative w-full max-w-sm mx-4 z-50 rounded-2xl bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 p-6 shadow-2xl text-center overflow-hidden ${
+        isOpen ? "animate-modal-in" : "animate-modal-out pointer-events-none"
+      }`}
+    >
+      <div className="relative z-10 flex flex-col items-center">
+        {/* 3D / Cartoon Game Result Illustration (Zero-border, Standalone) */}
+        <div className="mb-3 transform hover:scale-105 transition-transform duration-200">
+          {isMeWinner ? (
+            <Icons name="victory-3d" size={80} />
+          ) : isDraw ? (
+            <Icons name="draw-3d" size={72} />
+          ) : (
+            <Icons name="defeat-3d" size={80} />
+          )}
+        </div>
 
-          <h3 className="text-xl font-bold tracking-tight text-card-foreground mb-1">
-            {isMeWinner
-              ? "Victory!"
-              : isDraw
-              ? "Draw Game"
-              : "Defeat"}
-          </h3>
+        {/* Title */}
+        <h2 className="text-xl font-bold tracking-tight mb-1 text-neutral-900 dark:text-neutral-100 font-game">
+          {isMeWinner
+            ? "Victory!"
+            : isDraw
+            ? "Game Draw!"
+            : "Defeat!"}
+        </h2>
 
-          <p className="text-xs text-muted-foreground mb-6 leading-relaxed">
-            {isMeWinner
-              ? `Congratulations! You (Piece ${myRole}) took the win.`
-              : isDraw
-              ? "Both sides played evenly to a draw."
-              : `Piece ${winner} connected 5. Ready for the next round?`}
-          </p>
+        {/* Description */}
+        <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-6 max-w-xs leading-relaxed">
+          {isMeWinner
+            ? `Congratulations! You (Piece ${myRole}) took the win.`
+            : isDraw
+            ? "Both sides played evenly to a draw."
+            : `Piece ${winner} connected 5. Ready for the next round?`}
+        </p>
 
-          {/* Action Buttons */}
-          <div className="w-full flex flex-col gap-2">
-            {isRematchRequestedByOpponent ? (
-              <Button
-                variant="default"
-                size="default"
-                onClick={() => data?.onAcceptRematch?.()}
-                className="w-full gap-2"
-              >
-                <RotateCcw className="w-4 h-4" />
-                <span>Accept Rematch</span>
-              </Button>
-            ) : isRematchRequestedByMe ? (
-              <Button
-                variant="subtle"
-                size="default"
-                disabled
-                className="w-full gap-2 text-muted-foreground"
-              >
-                <span className="w-2 h-2 rounded-full bg-primary animate-ping" />
-                <span>Waiting for opponent...</span>
-              </Button>
-            ) : (
-              <Button
-                variant="default"
-                size="default"
-                onClick={() => data?.onRequestRematch?.()}
-                className="w-full gap-2"
-              >
-                <RotateCcw className="w-4 h-4" />
-                <span>Request Rematch</span>
-              </Button>
-            )}
+        {/* Action Buttons */}
+        <div className="w-full flex flex-col gap-2">
+          {isRematchRequestedByOpponent ? (
+            <Button
+              variant="default"
+              size="default"
+              onClick={() => data?.onAcceptRematch?.()}
+              className="w-full gap-2"
+            >
+              <Icons name="rotateccw" size={16} />
+              <span>Accept Rematch</span>
+            </Button>
+          ) : isRematchRequestedByMe ? (
+            <Button
+              variant="subtle"
+              size="default"
+              disabled
+              className="w-full gap-2 text-neutral-400"
+            >
+              <span className="w-2 h-2 rounded-full bg-primary animate-ping" />
+              <span>Waiting for opponent...</span>
+            </Button>
+          ) : (
+            <Button
+              variant="default"
+              size="default"
+              onClick={() => data?.onRequestRematch?.()}
+              className="w-full gap-2"
+            >
+              <Icons name="rotateccw" size={16} />
+              <span>Request Rematch</span>
+            </Button>
+          )}
 
-            <div className="grid grid-cols-2 gap-2 mt-1">
+          <div className="grid grid-cols-2 gap-2 mt-1">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onDismiss}
+              className="w-full text-xs"
+            >
+              Review Board
+            </Button>
+
+            <Link href="/" className="w-full">
               <Button
-                variant="outline"
+                variant="ghost"
                 size="sm"
-                onClick={onDismiss}
-                className="w-full text-xs"
+                className="w-full text-xs gap-1.5"
               >
-                Review Board
+                <Icons name="home" size={14} />
+                <span>Lobby</span>
               </Button>
-
-              <Link href="/" onClick={onDismiss} className="w-full">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full text-xs gap-1.5"
-                >
-                  <Home className="w-3.5 h-3.5" />
-                  <span>Lobby</span>
-                </Button>
-              </Link>
-            </div>
+            </Link>
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 }

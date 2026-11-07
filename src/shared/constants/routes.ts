@@ -1,6 +1,7 @@
 export enum RouteEnum {
   LOBBY = "/",
   CARO_PLAY = "/play/caro/:code",
+  BIDA_PLAY = "/play/bida/:code",
 }
 
 export function formatUrl(

@@ -1,73 +1,77 @@
 "use client";
 
 import Image from "next/image";
-import { Users, ArrowRight } from "lucide-react";
-import { Button } from "@/shared/components/ui/button";
+import { Icons } from "@/shared/icons";
+import { useRipple } from "@/shared/hooks/use-ripple";
 import type { GameMetadata } from "../types";
 
 interface GameCardProps {
   game: GameMetadata;
   onSelect: (game: GameMetadata) => void;
-  playText: string;
+  playText?: string;
 }
 
-export function GameCard({ game, onSelect, playText }: GameCardProps) {
+export function GameCard({ game, onSelect }: GameCardProps) {
+  const { createRipple, RippleContainer } = useRipple<HTMLDivElement>();
+
+  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    createRipple(event);
+    onSelect(game);
+  };
+
   return (
     <div
-      className="group relative flex flex-col justify-between p-6 sm:p-7 rounded-2xl bg-neutral-100 hover:bg-neutral-200/80 dark:bg-neutral-900/80 dark:hover:bg-neutral-900 transition-all cursor-pointer shadow-xs"
-      onClick={() => onSelect(game)}
+      className="group relative flex-1 min-w-[260px] max-w-sm rounded-2xl overflow-hidden bg-white/80 dark:bg-neutral-900/80 shadow-xs hover:shadow-xl transition-all duration-300 cursor-pointer select-none"
+      onClick={handleClick}
     >
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          {game.iconSrc ? (
-            <div className="w-12 h-12 relative rounded-xl overflow-hidden bg-white dark:bg-neutral-800 shadow-xs">
-              <Image
-                src={game.iconSrc}
-                alt={game.title}
-                width={48}
-                height={48}
-                className="w-full h-full object-cover transition-transform group-hover:scale-105"
-              />
-            </div>
-          ) : null}
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] font-semibold tracking-wider text-neutral-500 dark:text-neutral-400 uppercase">
-              {game.tag}
-            </span>
-            <span className="text-neutral-300 dark:text-neutral-600">•</span>
-            <span className="text-[11px] font-medium text-neutral-500 dark:text-neutral-400">
-              {game.badge}
-            </span>
-          </div>
+      <RippleContainer />
+
+      {/* Visual Game Artwork Cover with subtle 16:9 ratio */}
+      <div className="relative w-full aspect-16/9 overflow-hidden bg-neutral-950">
+        {game.iconSrc ? (
+          <Image
+            src={game.iconSrc}
+            alt={game.title}
+            fill
+            sizes="(max-width: 640px) 100vw, 360px"
+            className="object-cover transition-transform duration-700 ease-out group-hover:scale-106"
+          />
+        ) : null}
+
+        {/* Ambient Dark Gradient for Legibility */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30" />
+
+        {/* Top Badges (Subtle Frosted Pill) */}
+        <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between">
+          <span className="text-[10px] font-semibold tracking-wider text-white/90 uppercase px-2 py-0.5 rounded-full bg-black/40 backdrop-blur-md">
+            {game.tag}
+          </span>
+          <span className="text-[10px] font-medium text-white/90 px-2 py-0.5 rounded-full bg-black/40 backdrop-blur-md">
+            {game.badge}
+          </span>
         </div>
 
-        <h3 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 transition-colors mb-2">
-          {game.title}
-        </h3>
-
-        <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
-          {game.description}
-        </p>
+        {/* Floating Quick Action Arrow on Hover */}
+        <div className="absolute bottom-2.5 right-2.5 w-8 h-8 rounded-full bg-white/20 backdrop-blur-md text-white flex items-center justify-center opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200">
+          <Icons name="arrow-right" size={14} />
+        </div>
       </div>
 
-      <div className="mt-6 pt-4 border-t border-neutral-200/60 dark:border-neutral-800/60 flex items-center justify-between">
-        <div className="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400">
-          <Users className="w-3.5 h-3.5" />
-          <span>{game.players}</span>
+      {/* Clean Bottom Label Bar */}
+      <div className="p-3.5 sm:p-4 flex flex-col gap-1">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm sm:text-base font-bold text-neutral-900 dark:text-neutral-100 tracking-tight group-hover:text-primary transition-colors">
+            {game.title}
+          </h3>
+          <span className="flex items-center gap-1 text-[11px] text-neutral-400 dark:text-neutral-500 font-medium">
+            <Icons name="users" size={12} />
+            <span>{game.players}</span>
+          </span>
         </div>
 
-        <Button
-          variant="default"
-          size="sm"
-          onClick={(event) => {
-            event.stopPropagation();
-            onSelect(game);
-          }}
-          className="flex items-center gap-1.5 text-xs"
-        >
-          <span>{playText}</span>
-          <ArrowRight className="w-3.5 h-3.5" />
-        </Button>
+        <p className="text-xs text-neutral-500 dark:text-neutral-400 line-clamp-1 leading-relaxed">
+          {game.description}
+        </p>
       </div>
     </div>
   );

@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, Check } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
+import { Icons } from "@/shared/icons";
 
 interface CopyLinkButtonProps {
   textToCopy?: string;
@@ -21,18 +21,20 @@ export function CopyLinkButton({
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(targetText);
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(targetText);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = targetText;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+      }
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
     } catch {
-      const textArea = document.createElement("textarea");
-      textArea.value = targetText;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand("copy");
-      document.body.removeChild(textArea);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
+      // ignore
     }
   };
 
@@ -45,12 +47,12 @@ export function CopyLinkButton({
     >
       {copied ? (
         <>
-          <Check className="w-3.5 h-3.5 text-emerald-500 animate-in zoom-in-75 duration-150" />
+          <Icons name="check" size={14} className="text-emerald-500 animate-in zoom-in-75 duration-150" />
           <span className="text-emerald-500 font-sans font-medium">Copied!</span>
         </>
       ) : (
         <>
-          <Copy className="w-3.5 h-3.5 text-muted-foreground" />
+          <Icons name="copy" size={14} className="text-muted-foreground" />
           <span className="font-sans">{label}</span>
         </>
       )}

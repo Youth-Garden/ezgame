@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import { PortalRenderer } from "@/shared/components/portal";
 import "./globals.css";
 import { getLocale, getMessages } from "next-intl/server";
@@ -9,6 +9,13 @@ const jakartaSans = Plus_Jakarta_Sans({
   variable: "--font-sans",
   subsets: ["latin", "vietnamese"],
   weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+});
+
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-game",
+  subsets: ["latin", "vietnamese"],
+  weight: ["500", "600", "700"],
   display: "swap",
 });
 
@@ -38,8 +45,8 @@ export const metadata: Metadata = {
     title: "EzGame",
   },
   icons: {
-    icon: "/logo.png",
-    apple: "/logo.png",
+    icon: "/logo.svg",
+    apple: "/logo.svg",
   },
 };
 
@@ -54,7 +61,7 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      className={`${jakartaSans.variable} ${jetbrainsMono.variable} h-full antialiased dark`}
+      className={`${jakartaSans.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} h-full antialiased dark`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans antialiased selection:bg-primary/20">

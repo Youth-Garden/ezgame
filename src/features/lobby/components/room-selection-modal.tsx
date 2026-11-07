@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { X, Sparkles, Plus, ArrowRight, AlertCircle, ShieldAlert } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { formatUrl, RouteEnum } from "@/shared/constants/routes";
-import { PlayerRole } from "@/shared/types/room";
+import { GameType, PlayerRole } from "@/shared/types/room";
+import { Icons } from "@/shared/icons";
 import type { PortalProps } from "@/shared/types/portal.types";
 import type { GameRoomModalData, LobbyLocale } from "../types";
 
@@ -18,7 +18,7 @@ const MODAL_I18N = {
     createBtn: "Tạo phòng ngay",
     creatingBtn: "Đang tạo phòng...",
     inputLabel: "Nhập mã trận đấu",
-    inputPlaceholder: "VD: CR-8892",
+    inputPlaceholder: "VD: 9K8X2M",
     joinRoleNotice: "Bạn sẽ tham gia với vai trò Quân O (Đi sau).",
     joinBtn: "Vào trận",
     joiningBtn: "Đang kết nối...",
@@ -35,7 +35,7 @@ const MODAL_I18N = {
     createBtn: "Create Room",
     creatingBtn: "Creating Room...",
     inputLabel: "Enter Match Code",
-    inputPlaceholder: "e.g. CR-8892",
+    inputPlaceholder: "e.g. 9K8X2M",
     joinRoleNotice: "You will enter the match as Player O (moving second).",
     joinBtn: "Join Match",
     joiningBtn: "Connecting...",
@@ -80,8 +80,12 @@ export function RoomSelectionModal({
       const result = await response.json();
       if (result.success && result.room?.code) {
         onDismiss?.();
+        const routeTarget =
+          gameType === GameType.BIDA
+            ? RouteEnum.BIDA_PLAY
+            : RouteEnum.CARO_PLAY;
         const playUrl = formatUrl(
-          RouteEnum.CARO_PLAY,
+          routeTarget,
           { code: result.room.code },
           { role: PlayerRole.X }
         );
@@ -116,8 +120,12 @@ export function RoomSelectionModal({
 
       if (result.success && result.room) {
         onDismiss?.();
+        const routeTarget =
+          result.room.gameType === GameType.BIDA || cleanCode.startsWith("BD")
+            ? RouteEnum.BIDA_PLAY
+            : RouteEnum.CARO_PLAY;
         const playUrl = formatUrl(
-          RouteEnum.CARO_PLAY,
+          routeTarget,
           { code: cleanCode },
           { role: PlayerRole.O }
         );
@@ -134,29 +142,30 @@ export function RoomSelectionModal({
 
   return (
     <div
-      className={`relative w-full max-w-md mx-4 z-50 rounded-2xl bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 shadow-2xl overflow-hidden transition-all duration-200 ease-out ${
-        isOpen
-          ? "opacity-100 scale-100 translate-y-0"
-          : "opacity-0 scale-95 translate-y-2 pointer-events-none"
+      className={`relative w-[min(calc(100vw-2rem),28rem)] z-50 rounded-2xl bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 shadow-2xl overflow-hidden ${
+        isOpen ? "animate-modal-in" : "animate-modal-out pointer-events-none"
       }`}
     >
+      {/* Modern Floating Close Button */}
+      <button
+        type="button"
+        onClick={onDismiss}
+        className="absolute top-4 right-4 text-neutral-400 hover:text-neutral-700 dark:hover:text-white transition-colors p-1.5 rounded-full hover:bg-neutral-150 dark:hover:bg-neutral-800 cursor-pointer z-10"
+        aria-label="Close dialog"
+      >
+        <Icons name="close" size={16} />
+      </button>
+
       {/* Header - Centered title */}
       <div className="relative px-6 pt-6 pb-2 text-center">
-        <h2 className="text-lg font-bold text-neutral-900 dark:text-neutral-100 tracking-tight">
+        <h2 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-neutral-100 tracking-tight">
           {gameTitle}
         </h2>
-        <button
-          type="button"
-          onClick={onDismiss}
-          className="absolute top-5 right-5 text-neutral-400 hover:text-neutral-700 dark:hover:text-white transition-colors p-1.5 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer"
-        >
-          <X className="w-5 h-5" />
-        </button>
       </div>
 
       <div className="px-6 pt-3 pb-6">
         {/* Animated Sliding Pill Segmented Indicator */}
-        <div className="relative flex p-1 bg-neutral-100 dark:bg-neutral-950/80 rounded-xl mb-5">
+        <div className="relative flex p-1 bg-neutral-100 dark:bg-neutral-950/80 rounded-xl mb-4">
           <div
             className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-lg bg-white dark:bg-neutral-800 shadow-xs transition-transform duration-200 ease-out ${
               activeTab === "create" ? "translate-x-0" : "translate-x-full"
@@ -169,7 +178,7 @@ export function RoomSelectionModal({
               setActiveTab("create");
               setErrorMsg("");
             }}
-            className={`relative z-10 flex-1 py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer text-center ${
+            className={`relative z-10 flex-1 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer text-center ${
               activeTab === "create"
                 ? "text-neutral-900 dark:text-white"
                 : "text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-200"
@@ -183,7 +192,7 @@ export function RoomSelectionModal({
               setActiveTab("join");
               setErrorMsg("");
             }}
-            className={`relative z-10 flex-1 py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer text-center ${
+            className={`relative z-10 flex-1 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer text-center ${
               activeTab === "join"
                 ? "text-neutral-900 dark:text-white"
                 : "text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-200"
@@ -195,7 +204,7 @@ export function RoomSelectionModal({
 
         {errorMsg && (
           <div className="mb-4 p-3 rounded-xl bg-red-500/10 text-red-500 dark:text-red-400 text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
+            <Icons name="alert-circle" size={16} className="shrink-0" />
             <span>{errorMsg}</span>
           </div>
         )}
@@ -206,7 +215,7 @@ export function RoomSelectionModal({
             <div className="p-4 rounded-xl bg-neutral-100/80 dark:bg-neutral-950/50">
               <div className="flex items-start gap-3">
                 <div className="w-8 h-8 rounded-lg bg-white dark:bg-neutral-800 text-primary shadow-xs flex items-center justify-center shrink-0">
-                  <Sparkles className="w-4 h-4" />
+                  <Icons name="sparkles" size={16} />
                 </div>
                 <div>
                   <h3 className="text-xs font-semibold text-neutral-900 dark:text-neutral-200">
@@ -233,7 +242,7 @@ export function RoomSelectionModal({
                 </>
               ) : (
                 <>
-                  <Plus className="w-4 h-4" />
+                  <Icons name="plus" size={16} />
                   <span>{i18n.createBtn}</span>
                 </>
               )}
@@ -261,7 +270,7 @@ export function RoomSelectionModal({
                 maxLength={10}
               />
               <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-2 flex items-center gap-1.5">
-                <ShieldAlert className="w-3.5 h-3.5" />
+                <Icons name="shield-alert" size={14} />
                 {i18n.joinRoleNotice}
               </p>
             </div>
@@ -281,7 +290,7 @@ export function RoomSelectionModal({
               ) : (
                 <>
                   <span>{i18n.joinBtn}</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <Icons name="arrow-right" size={16} />
                 </>
               )}
             </Button>
