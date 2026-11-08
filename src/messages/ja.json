@@ -1,0 +1,144 @@
+{
+  "app": {
+    "name": "EzGame",
+    "tagline": "オンライン対戦"
+  },
+  "nav": {
+    "backToLobby": "ロビーに戻る",
+    "toggleSound": "サウンド切替",
+    "copyRoomCode": "ルームコードをコピー",
+    "copyInviteLink": "招待リンクをコピー",
+    "copyInviteLinkDesc": "友達に招待リンクを共有して対戦"
+  },
+  "lobby": {
+    "tagline": "オンライン対戦",
+    "sectionTitle": "おすすめゲーム",
+    "title": "ゲームを選択",
+    "subtitle": "アカウント登録不要。ルームを作成するかコードを入力して、すぐに友達と対戦できます。",
+    "play": "今すぐプレイ",
+    "realtime": "リアルタイム",
+    "realtimeDesc": "高速WebSocket同期",
+    "noAuth": "ログイン不要",
+    "noAuthDesc": "ワンクリック参加",
+    "share": "簡単シェア",
+    "shareDesc": "招待リンク送信",
+    "footer": "EzGame • シンプルで軽快な対戦ゲームプラットフォーム",
+    "loadMore": "さらに読み込む",
+    "categories": {
+      "all": "すべて",
+      "board": "ボードゲーム",
+      "sports": "スポーツ",
+      "cards": "カードゲーム"
+    }
+  },
+  "games": {
+    "caro": {
+      "title": "五目並べ",
+      "badge": "15x15",
+      "description": "Gomoku 5-in-a-row",
+      "players": "2人プレイ",
+      "tag": "BOARD"
+    },
+    "bida": {
+      "title": "ビリヤード",
+      "badge": "8-BALL",
+      "description": "Pocket Billiards 2D",
+      "players": "2人プレイ",
+      "tag": "SPORTS"
+    }
+  },
+  "modal": {
+    "createTab": "ルーム作成",
+    "joinTab": "ルーム参加",
+    "hostTitle": "対戦ホスト",
+    "hostDesc": "対戦コードが発行されます。相手に招待リンクを共有して対局を開始しましょう。",
+    "createBtn": "ルームを作成する",
+    "creatingBtn": "作成中...",
+    "inputLabel": "対戦コードを入力",
+    "inputPlaceholder": "例: 9K8X2M",
+    "joinRoleNotice": "対戦ロール (X/O) は入室時に自動で割り当てられます。",
+    "joinBtn": "対局に参加",
+    "joiningBtn": "接続中...",
+    "emptyCodeErr": "ルームコードを入力してください。",
+    "notFoundErr": "ルームコードが見つからないか、有効期限が切れています。",
+    "createErr": "ルームの作成に失敗しました。もう一度お試しください。",
+    "connectErr": "サーバーに接続できませんでした。再試行してください。"
+  },
+  "game": {
+    "turn": "ターン",
+    "piece": "駒",
+    "yourTurn": "あなたのターン！",
+    "opponentTurn": "相手のターン",
+    "waitingForOpponent": "対戦相手を待っています...",
+    "surrender": "降伏する",
+    "room": "ルーム",
+    "youAre": "あなたは",
+    "opponent": "対戦相手",
+    "online": "オンライン",
+    "waiting": "待機中...",
+    "inviteFriend": "友達を招待",
+    "offlineMode": "オフラインモード",
+    "matchReady": "対戦準備完了",
+    "gameStarting": "ゲーム開始！",
+    "horizontalView": "横向き表示",
+    "verticalView": "縦向き表示",
+    "power": "パワー",
+    "spin": "スピン",
+    "dragToShoot": "ドラッグしてショット",
+    "releaseToStrike": "指を離してストライク",
+    "opponentAiming": "相手がエイム中...",
+    "ballsRolling": "ボール転がり中...",
+    "cueBallSpin": "スピン調整",
+    "center": "中心 (Center)",
+    "follow": "押し球 (Follow)",
+    "draw": "引き球 (Draw)",
+    "englishRight": "右ヒネリ",
+    "englishLeft": "左ヒネリ",
+    "resetCenter": "リセット",
+    "apply": "適用",
+    "open": "オープン",
+    "solids": "ローボール",
+    "stripes": "ハイボール",
+    "player": "プレイヤー",
+    "waitingForOpponentToJoin": "対戦相手の入室を待っています...",
+    "releaseToShoot": "離してショット",
+    "dragOrSpace": "ドラッグまたはSPACE長押し",
+    "connectingMatch": "対戦セッションに接続中..."
+  },
+  "dialog": {
+    "leaveMatchTitle": "対局を退出しますか？",
+    "leaveMatchDesc": "現在対戦中です。今退出すると降伏とみなされます。",
+    "leaveConfirm": "退出する",
+    "stay": "対戦を続ける",
+    "surrenderTitle": "降伏しますか？",
+    "surrenderDesc": "本当にこの対局を降伏しますか？相手の勝利となります。",
+    "surrenderConfirm": "降伏する",
+    "keepPlaying": "対局を続ける"
+  },
+  "result": {
+    "victory": "勝利！",
+    "draw": "引き分け！",
+    "defeat": "敗北...",
+    "victoryDesc": "おめでとうございます！対局に勝利しました。",
+    "drawDesc": "熱戦の末、引き分けとなりました。",
+    "defeatDesc": "次の対局でリベンジしましょう！",
+    "rematchAccept": "再戦を受け入れる",
+    "rematchPending": "相手の承認を待っています...",
+    "rematchRequest": "再戦を申し込む",
+    "backToLobby": "ロビーに戻る"
+  },
+  "error": {
+    "notFoundTitle": "ルームが見つかりません",
+    "notFoundDesc": "ルームの有効期限が切れたか、既に終了しているか、コードが間違っています。",
+    "backToLobby": "ロビーに戻る",
+    "serverErrorTitle": "システムエラーが発生しました",
+    "serverErrorDesc": "ゲームサーバーとの接続で一時的な問題が発生しました。再試行するかロビーに戻ってください。",
+    "retry": "再試行",
+    "errorCode": "エラーコード"
+  },
+  "common": {
+    "close": "閉じる",
+    "copied": "コピーしました！",
+    "you": "あなた"
+  }
+}

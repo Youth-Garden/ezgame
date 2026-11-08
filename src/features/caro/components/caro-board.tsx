@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { CaroCell } from "./caro-cell";
 import { CaroPlayer, type BoardState, type WinningLine } from "../types";
 import { PlayerRole } from "@/shared/types/room";
+import { Card } from "@/shared/components/ui/card";
 
 interface CaroBoardProps {
   board: BoardState;
@@ -36,38 +37,13 @@ export function CaroBoard({
 
   return (
     <div className="flex flex-col items-center">
-      {/* Turn Banner */}
-      <div className="mb-4 flex items-center justify-between w-full max-w-md px-4 py-2.5 rounded-xl bg-neutral-100 dark:bg-neutral-900 shadow-xs text-xs sm:text-sm">
-        <div className="flex items-center gap-2">
-          <span className="text-neutral-500 dark:text-neutral-400">Turn:</span>
-          <span
-            className={`font-semibold flex items-center gap-1.5 ${
-              currentTurn === CaroPlayer.X ? "text-sky-500" : "text-rose-500"
-            }`}
-          >
-            <span
-              className={`w-2 h-2 rounded-full ${
-                currentTurn === CaroPlayer.X ? "bg-sky-500" : "bg-rose-500"
-              }`}
-            />
-            Piece {currentTurn}
-          </span>
-        </div>
 
-        <div className="text-xs">
-          {canClick ? (
-            <span className="text-emerald-500 font-medium flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Your Turn
-            </span>
-          ) : (
-            <span className="text-neutral-500 dark:text-neutral-400">Waiting for opponent...</span>
-          )}
-        </div>
-      </div>
 
-      {/* Board Outer Card */}
-      <div className="p-3 sm:p-5 rounded-2xl bg-neutral-100/90 dark:bg-neutral-900 shadow-sm max-w-full overflow-x-auto select-none">
+      {/* Board Outer Card using Shared Card Component */}
+      <Card
+        variant="solid"
+        className="p-3 sm:p-5 rounded-2xl shadow-none border-none max-w-full overflow-x-auto select-none"
+      >
         <div className="min-w-fit flex flex-col">
           {/* Top Column Labels (A - O) */}
           <div className="flex ml-6 sm:ml-7 mb-1.5">
@@ -120,7 +96,7 @@ export function CaroBoard({
             ))}
           </div>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

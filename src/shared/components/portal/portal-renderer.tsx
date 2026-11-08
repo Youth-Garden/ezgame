@@ -57,13 +57,13 @@ export const PortalRenderer = () => {
         onPress={handleBackdropPress}
       />
 
-      {/* Render all modal/dialog component instances */}
+      {/* Render all modal/dialog component instances on top of backdrop */}
       {portals.map((instance) => {
         const Component = instance.component;
         return (
           <div
             key={instance.id}
-            className="absolute inset-0 flex items-center justify-center p-4 pointer-events-none"
+            className="absolute inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
           >
             <div className="pointer-events-auto w-full max-w-md flex justify-center">
               <Component

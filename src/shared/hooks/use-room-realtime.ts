@@ -11,6 +11,7 @@ interface UseRoomRealtimeOptions {
   roomCode: string;
   myRole: PlayerRole;
   profile?: PlayerProfile;
+  onRoleAssigned?: (assignedRole: PlayerRole) => void;
   onEventReceived?: (event: RealtimeEvent) => void;
 }
 
@@ -28,6 +29,7 @@ export function useRoomRealtime({
   roomCode,
   myRole,
   profile,
+  onRoleAssigned,
   onEventReceived,
 }: UseRoomRealtimeOptions) {
   const [peers, setPeers] = useState<PlayerPresence[]>([]);
@@ -37,25 +39,73 @@ export function useRoomRealtime({
   const [clientId] = useState(() => getOrCreateClientId());
   const channelRef = useRef<RealtimeChannel | null>(null);
   const eventHandlerRef = useRef(onEventReceived);
+  const onRoleAssignedRef = useRef(onRoleAssigned);
+  const profileRef = useRef(profile);
+  const myRoleRef = useRef(myRole);
+  const disconnectTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Always keep refs synced without triggering channel teardown
+  useEffect(() => {
+    myRoleRef.current = myRole;
+  }, [myRole]);
+
+  useEffect(() => {
+    profileRef.current = profile;
+  }, [profile]);
 
   useEffect(() => {
     eventHandlerRef.current = onEventReceived;
   }, [onEventReceived]);
 
+  useEffect(() => {
+    onRoleAssignedRef.current = onRoleAssigned;
+  }, [onRoleAssigned]);
+
   const expectedOpponentRole: PlayerRole =
     myRole === PlayerRole.X ? PlayerRole.O : PlayerRole.X;
 
-  // Check if opponent is online from peers list directly in render (derived state)
-  const isOpponentOnline = useMemo(() => {
+  // Immediate presence check from active peers
+  const hasOpponentInPeers = useMemo(() => {
     return peers.some(
-      (peer) => peer.role === expectedOpponentRole && peer.id !== clientId
+      (peer) => peer.id !== clientId && (peer.role === expectedOpponentRole || peer.role !== myRole || peers.length >= 2)
     );
-  }, [peers, expectedOpponentRole, clientId]);
+  }, [peers, expectedOpponentRole, myRole, clientId]);
+
+  // Debounced isOpponentOnline with a 4-second grace period to prevent flickering during transient socket drops / F5
+  const [isOpponentOnline, setIsOpponentOnline] = useState(hasOpponentInPeers);
+
+  useEffect(() => {
+    if (hasOpponentInPeers) {
+      if (disconnectTimerRef.current) {
+        clearTimeout(disconnectTimerRef.current);
+        disconnectTimerRef.current = null;
+      }
+      setIsOpponentOnline(true);
+    } else {
+      // Don't immediately drop the game, give 4 seconds grace period for heartbeat / re-sync
+      if (!disconnectTimerRef.current) {
+        disconnectTimerRef.current = setTimeout(() => {
+          setIsOpponentOnline(false);
+          disconnectTimerRef.current = null;
+        }, 4000);
+      }
+    }
+  }, [hasOpponentInPeers]);
+
+  // Clean up timer on unmount
+  useEffect(() => {
+    return () => {
+      if (disconnectTimerRef.current) {
+        clearTimeout(disconnectTimerRef.current);
+      }
+    };
+  }, []);
 
   // Extract opponent profile from presence peers
   const opponentPresence = useMemo(() => {
-    return peers.find(
-      (peer) => peer.role === expectedOpponentRole && peer.id !== clientId
+    return (
+      peers.find((peer) => peer.role === expectedOpponentRole && peer.id !== clientId) ||
+      peers.find((peer) => peer.id !== clientId)
     );
   }, [peers, expectedOpponentRole, clientId]);
 
@@ -93,25 +143,61 @@ export function useRoomRealtime({
 
     channelRef.current = channel;
 
+    const syncPeers = async () => {
+      if (!active) return;
+      const presenceState = channel.presenceState<PlayerPresence>();
+      const currentPeers: PlayerPresence[] = [];
+      Object.values(presenceState).forEach((presences) => {
+        presences.forEach((peer) => currentPeers.push(peer));
+      });
+      setPeers(currentPeers);
+
+      // Auto-assign roles: first arrival gets random X/O, second arrival gets the other role
+      const otherPlayers = currentPeers.filter((p) => p.id !== clientId);
+      const existingPeer = otherPlayers[0];
+
+      if (existingPeer && existingPeer.role) {
+        // There is already a player in the room: give me the opposite role
+        const oppositeRole = existingPeer.role === PlayerRole.X ? PlayerRole.O : PlayerRole.X;
+        if (myRoleRef.current !== oppositeRole && myRoleRef.current !== PlayerRole.SPECTATOR) {
+          onRoleAssignedRef.current?.(oppositeRole);
+          await channel.track({
+            id: clientId,
+            role: oppositeRole,
+            joinedAt: Date.now(),
+            name: profileRef.current?.name,
+            avatarSeed: profileRef.current?.avatarSeed,
+            avatarStyle: profileRef.current?.avatarStyle,
+          });
+        }
+      }
+    };
+
     channel
-      .on("presence", { event: "sync" }, () => {
-        if (!active) return;
-        const presenceState = channel.presenceState<PlayerPresence>();
-        const currentPeers: PlayerPresence[] = [];
-        Object.values(presenceState).forEach((presences) => {
-          presences.forEach((peer) => currentPeers.push(peer));
-        });
-        setPeers(currentPeers);
-      })
+      .on("presence", { event: "sync" }, syncPeers)
       .on("presence", { event: "join" }, ({ newPresences }) => {
         if (!active) return;
+        const incoming = newPresences as unknown as PlayerPresence[];
         setPeers((prev) => {
           const ids = new Set(prev.map((peer) => peer.id));
-          const added = (newPresences as unknown as PlayerPresence[]).filter(
-            (peer) => !ids.has(peer.id)
-          );
+          const added = incoming.filter((peer) => !ids.has(peer.id));
           return [...prev, ...added];
         });
+
+        // Fast handshake role assignment on immediate join
+        const otherPeer = incoming.find((p) => p.id !== clientId);
+        if (otherPeer && otherPeer.role && myRoleRef.current === otherPeer.role) {
+          const oppositeRole = otherPeer.role === PlayerRole.X ? PlayerRole.O : PlayerRole.X;
+          onRoleAssignedRef.current?.(oppositeRole);
+          channel.track({
+            id: clientId,
+            role: oppositeRole,
+            joinedAt: Date.now(),
+            name: profileRef.current?.name,
+            avatarSeed: profileRef.current?.avatarSeed,
+            avatarStyle: profileRef.current?.avatarStyle,
+          }).catch(() => {});
+        }
       })
       .on("presence", { event: "leave" }, ({ leftPresences }) => {
         if (!active) return;
@@ -133,12 +219,20 @@ export function useRoomRealtime({
           setIsChannelReady(true);
           await channel.track({
             id: clientId,
-            role: myRole,
+            role: myRoleRef.current,
             joinedAt: Date.now(),
-            name: profile?.name,
-            avatarSeed: profile?.avatarSeed,
-            avatarStyle: profile?.avatarStyle,
+            name: profileRef.current?.name,
+            avatarSeed: profileRef.current?.avatarSeed,
+            avatarStyle: profileRef.current?.avatarStyle,
           });
+        } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+          // Attempt graceful re-subscribe on connection failure
+          console.warn(`[Realtime] Socket issue (${status}). Retrying subscription...`);
+          setTimeout(() => {
+            if (active && channelRef.current) {
+              channelRef.current.subscribe();
+            }
+          }, 2000);
         }
       });
 
@@ -149,7 +243,7 @@ export function useRoomRealtime({
         channelRef.current = null;
       }
     };
-  }, [roomCode, myRole, isConfigured, clientId, profile?.name, profile?.avatarSeed, profile?.avatarStyle]);
+  }, [roomCode, isConfigured, clientId]);
 
   const sendEvent = useCallback(
     async (event: RealtimeEvent) => {

@@ -49,6 +49,3 @@ export function Icons({ name, size = 16, className, ...props }: IconsProps) {
 }
 
 export { iconRegistry };
-export { FlagVnIcon, FlagUsIcon } from "./svgs/flag-icons";
-export { EzGameLogo } from "./svgs/logo";
-export { VictoryIcon3D, DefeatIcon3D, DrawIcon3D } from "./svgs/game-result-icons";

@@ -226,3 +226,98 @@ export function DrawIcon3D({
     </svg>
   );
 }
+
+/**
+ * 3D / Claymorphic Leave Match / Warning SVG Icon (Clean standalone object, no outer card gradient)
+ */
+export function LeaveMatchIcon3D({
+  size = 72,
+  className,
+  ...props
+}: SVGProps<SVGSVGElement> & { size?: number | string }) {
+  return (
+    <svg
+      viewBox="0 0 100 100"
+      width={size}
+      height={size}
+      className={className}
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      {...props}
+    >
+      <defs>
+        {/* 3D Soft Clay Door Gradients */}
+        <linearGradient id="door-panel-grad" x1="28" y1="16" x2="68" y2="84" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#fee2e2" />
+          <stop offset="30%" stopColor="#fca5a5" />
+          <stop offset="70%" stopColor="#ef4444" />
+          <stop offset="100%" stopColor="#b91c1c" />
+        </linearGradient>
+
+        <linearGradient id="door-frame-grad" x1="20" y1="12" x2="74" y2="88" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#991b1b" />
+          <stop offset="100%" stopColor="#450a0a" />
+        </linearGradient>
+
+        {/* 3D Arrow Gradients */}
+        <linearGradient id="arrow-3d-grad" x1="25" y1="35" x2="85" y2="75" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#ffffff" />
+          <stop offset="40%" stopColor="#fef08a" />
+          <stop offset="100%" stopColor="#f59e0b" />
+        </linearGradient>
+
+        {/* Soft Depth Shadow for 3D Elements */}
+        <filter id="clay-shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="6" stdDeviation="4" floodColor="#000000" floodOpacity="0.35" />
+        </filter>
+      </defs>
+
+      <g filter="url(#clay-shadow)">
+        {/* Open Doorway Inner Portal Frame */}
+        <path
+          d="M 32 82 L 32 20 Q 32 16 36 16 L 68 16 Q 72 16 72 20 L 72 82"
+          stroke="url(#door-frame-grad)"
+          strokeWidth="6"
+          strokeLinecap="round"
+        />
+
+        {/* 3D Slanted Open Door Leaf */}
+        <path
+          d="M 34 20 L 58 26 L 58 76 L 34 82 Z"
+          fill="url(#door-panel-grad)"
+        />
+
+        {/* Door Bevel Highlight */}
+        <path
+          d="M 35 22 L 56 27 L 56 74 L 35 80"
+          stroke="rgba(255, 255, 255, 0.4)"
+          strokeWidth="1.5"
+          fill="none"
+        />
+
+        {/* Gold 3D Door Handle Knob */}
+        <circle cx="53" cy="51" r="3" fill="#fef08a" />
+        <circle cx="53" cy="51" r="1.5" fill="#ca8a04" />
+
+        {/* 3D Dynamic Egress Arrow Bursting Outward */}
+        <path
+          d="M 80 52 L 40 52 M 52 40 L 38 52 L 52 64"
+          stroke="url(#arrow-3d-grad)"
+          strokeWidth="6.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+
+        {/* Arrow Gloss Specular Stroke */}
+        <path
+          d="M 76 50 L 44 50 M 50 43 L 40 51"
+          stroke="#ffffff"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          opacity="0.85"
+        />
+      </g>
+    </svg>
+  );
+}

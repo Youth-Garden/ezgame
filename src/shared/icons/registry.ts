@@ -1,8 +1,8 @@
 import type { ComponentType, SVGProps } from "react";
 import * as LucideIcons from "lucide-react";
-import { FlagVnIcon, FlagUsIcon } from "./svgs/flag-icons";
+import { FlagVnIcon, FlagUsIcon, FlagJpIcon } from "./svgs/flag-icons";
 import { EzGameLogo } from "./svgs/logo";
-import { VictoryIcon3D, DefeatIcon3D, DrawIcon3D } from "./svgs/game-result-icons";
+import { VictoryIcon3D, DefeatIcon3D, DrawIcon3D, LeaveMatchIcon3D } from "./svgs/game-result-icons";
 
 export type IconComponent = ComponentType<SVGProps<SVGSVGElement> & { size?: number | string }>;
 
@@ -15,10 +15,12 @@ export const iconRegistry: Record<string, IconComponent> = {
   "victory-3d": VictoryIcon3D,
   "defeat-3d": DefeatIcon3D,
   "draw-3d": DrawIcon3D,
+  "leave-match-3d": LeaveMatchIcon3D,
 
   // Custom SVG flags
   "flag-vn": FlagVnIcon,
   "flag-us": FlagUsIcon,
+  "flag-jp": FlagJpIcon,
 
   // Common semantic aliases
   search: LucideIcons.Search,
@@ -43,6 +45,7 @@ export const iconRegistry: Record<string, IconComponent> = {
   volume2: LucideIcons.Volume2,
   volumex: LucideIcons.VolumeX,
   rotateccw: LucideIcons.RotateCcw,
+  loader: LucideIcons.Loader2,
   home: LucideIcons.Home,
   copy: LucideIcons.Copy,
   minus: LucideIcons.MinusCircle,

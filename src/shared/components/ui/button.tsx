@@ -45,17 +45,17 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variantStyles = {
       default:
-        "bg-primary text-primary-foreground font-semibold hover:opacity-90 shadow-sm rounded-lg",
+        "bg-primary text-primary-foreground font-semibold hover:opacity-90 shadow-none border-none rounded-full active:scale-[0.99]",
       secondary:
-        "bg-neutral-800 text-neutral-100 hover:bg-neutral-750 dark:bg-neutral-800 dark:hover:bg-neutral-700 rounded-lg",
+        "bg-control-bg text-foreground hover:bg-control-bg-hover shadow-none border-none rounded-full",
       subtle:
-        "bg-muted text-foreground hover:bg-muted/80 rounded-lg",
+        "bg-muted text-foreground hover:bg-secondary shadow-none border-none rounded-full",
       outline:
-        "bg-neutral-100 hover:bg-neutral-200/80 dark:bg-neutral-800 dark:hover:bg-neutral-750 text-foreground rounded-lg shadow-2xs",
+        "bg-control-bg hover:bg-control-bg-hover text-foreground shadow-none border-none rounded-full",
       ghost:
-        "text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg",
+        "text-muted-foreground hover:text-foreground hover:bg-control-bg-hover shadow-none border-none rounded-full",
       destructive:
-        "bg-destructive/15 text-destructive hover:bg-destructive/25 rounded-lg",
+        "bg-destructive text-destructive-foreground font-semibold hover:bg-destructive/90 shadow-none border-none rounded-full active:scale-[0.99]",
     };
 
     const sizeStyles = {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, type MouseEvent } from "react";
+import { useState, useCallback, useRef, type MouseEvent } from "react";
 
 export interface Ripple {
   x: number;
@@ -11,8 +11,16 @@ export interface Ripple {
 
 export function useRipple<T extends HTMLElement = HTMLElement>() {
   const [ripples, setRipples] = useState<Ripple[]>([]);
+  const lastRippleTimeRef = useRef(0);
 
   const createRipple = useCallback((event: MouseEvent<T>) => {
+    const now = Date.now();
+    // Throttle ripple trigger to at most once every 180ms to prevent spamming
+    if (now - lastRippleTimeRef.current < 180) {
+      return;
+    }
+    lastRippleTimeRef.current = now;
+
     const element = event.currentTarget;
     const rect = element.getBoundingClientRect();
     const x = event.clientX - rect.left;
@@ -20,18 +28,17 @@ export function useRipple<T extends HTMLElement = HTMLElement>() {
 
     // Calculate maximum radius to cover the entire element bounds
     const size = Math.max(rect.width, rect.height) * 2;
-    const newRipple: Ripple = { x, y, id: Date.now() + Math.random(), size };
+    const rippleId = now + Math.random();
+    const newRipple: Ripple = { x, y, id: rippleId, size };
 
-    setRipples((prev) => [...prev, newRipple]);
+    // Keep at most 2 active ripples concurrently
+    setRipples((prev) => [...prev.slice(-1), newRipple]);
+
+    // Automatically remove after animation finishes (500ms)
+    setTimeout(() => {
+      setRipples((prev) => prev.filter((r) => r.id !== rippleId));
+    }, 500);
   }, []);
-
-  useEffect(() => {
-    if (ripples.length === 0) return;
-    const timer = setTimeout(() => {
-      setRipples((prev) => prev.slice(1));
-    }, 600);
-    return () => clearTimeout(timer);
-  }, [ripples]);
 
   const RippleContainer = useCallback(
     ({ className }: { className?: string } = {}) => {

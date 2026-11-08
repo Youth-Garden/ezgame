@@ -17,19 +17,19 @@ export function EzGameLogo({
     >
       <defs>
         <linearGradient id="ez-bg-comp" x1="16" y1="16" x2="112" y2="112" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stop-color="#27272a" />
-          <stop offset="100%" stop-color="#09090b" />
+          <stop offset="0%" stopColor="#27272a" />
+          <stop offset="100%" stopColor="#09090b" />
         </linearGradient>
 
         <linearGradient id="ez-bolt-comp" x1="28" y1="28" x2="100" y2="100" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stop-color="#38bdf8" />
-          <stop offset="50%" stop-color="#2563eb" />
-          <stop offset="100%" stop-color="#4f46e5" />
+          <stop offset="0%" stopColor="#38bdf8" />
+          <stop offset="50%" stopColor="#2563eb" />
+          <stop offset="100%" stopColor="#4f46e5" />
         </linearGradient>
 
         <linearGradient id="ez-coral-comp" x1="80" y1="36" x2="104" y2="60" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stop-color="#fb7185" />
-          <stop offset="100%" stop-color="#e11d48" />
+          <stop offset="0%" stopColor="#fb7185" />
+          <stop offset="100%" stopColor="#e11d48" />
         </linearGradient>
       </defs>
 

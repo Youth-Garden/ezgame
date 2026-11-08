@@ -1,23 +1,33 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/shared/components/ui/button";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/shared/components/ui/tooltip";
 import { Icons } from "@/shared/icons";
 
 interface CopyLinkButtonProps {
   textToCopy?: string;
   url?: string;
   label?: string;
+  tooltipText?: string;
   className?: string;
 }
 
 export function CopyLinkButton({
   textToCopy,
   url,
-  label = "Copy invite link",
+  label,
+  tooltipText,
+  className,
 }: CopyLinkButtonProps) {
+  const tNav = useTranslations("nav");
+  const tCommon = useTranslations("common");
   const [copied, setCopied] = useState(false);
   const targetText = textToCopy || url || "";
+
+  const defaultLabel = label ?? tNav("copyInviteLink");
+  const defaultTooltip = tooltipText ?? (copied ? tCommon("copied") : tNav("copyInviteLinkDesc"));
 
   const handleCopy = async () => {
     try {
@@ -39,23 +49,32 @@ export function CopyLinkButton({
   };
 
   return (
-    <Button
-      variant="outline"
-      size="sm"
-      onClick={handleCopy}
-      className="gap-2 font-mono text-xs"
-    >
-      {copied ? (
-        <>
-          <Icons name="check" size={14} className="text-emerald-500 animate-in zoom-in-75 duration-150" />
-          <span className="text-emerald-500 font-sans font-medium">Copied!</span>
-        </>
-      ) : (
-        <>
-          <Icons name="copy" size={14} className="text-muted-foreground" />
-          <span className="font-sans">{label}</span>
-        </>
-      )}
-    </Button>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={handleCopy}
+          className={`gap-2 font-mono text-xs ${className || ""}`}
+          aria-label={defaultLabel}
+        >
+          {copied ? (
+            <>
+              <Icons name="check" size={14} className="text-emerald-500 animate-in zoom-in-75 duration-150" />
+              <span className="text-emerald-500 font-sans font-medium">{tCommon("copied")}</span>
+            </>
+          ) : (
+            <>
+              <Icons name="copy" size={14} className="text-muted-foreground" />
+              <span className="font-sans">{defaultLabel}</span>
+            </>
+          )}
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent side="bottom" align="end">
+        {defaultTooltip}
+      </TooltipContent>
+    </Tooltip>
   );
 }
+

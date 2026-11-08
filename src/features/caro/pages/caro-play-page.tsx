@@ -1,208 +1,110 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
-import { useParams, useSearchParams } from "next/navigation";
+import { useCallback, useEffect } from "react";
 import { CaroBoard } from "../components/caro-board";
-import { checkWin, createEmptyBoard } from "../utils/check-win";
-import { CaroPlayer, GameWinner, type CaroGameState } from "../types";
-import { useRoomRealtime } from "@/shared/hooks/use-room-realtime";
+import { CaroScoreboard } from "../components/caro-scoreboard";
+import { CaroPlayer, GameWinner } from "../types";
 import { RoomHeader } from "@/shared/components/room-header";
-import { ResultDialog, type ResultDialogData } from "@/shared/components/result-dialog";
-import { usePortal } from "@/shared/components/portal";
-import { sounds } from "@/shared/lib/sound-effects";
 import { Button } from "@/shared/components/ui/button";
 import { PlayerRole, RealtimeEventType, type RealtimeEvent } from "@/shared/types/room";
-import { usePlayerProfile } from "@/shared/hooks/use-player-profile";
 import { Icons } from "@/shared/icons";
+import { GameBoard } from "@/shared/components/game-board";
+import { GameType } from "@/shared/types/room";
+import { useCaroGame } from "../hooks/use-caro-game";
+import { useGameRoom } from "@/shared/hooks/use-game-room";
 
 export function CaroPlayPage() {
-  const routeParams = useParams();
-  const searchParams = useSearchParams();
-
-  // Guest Player Profile with DiceBear avatar
-  const { profile: myProfile, randomizeAvatar } = usePlayerProfile();
-
-  const rawCode = (routeParams?.code as string) || "CR-DEMO";
-  const roomCode = rawCode.toUpperCase();
-
-  const roleParam = searchParams?.get("role")?.toUpperCase();
-  const initialRole =
-    roleParam === "O"
-      ? PlayerRole.O
-      : roleParam === "SPECTATOR"
-      ? PlayerRole.SPECTATOR
-      : PlayerRole.X;
-
-  // My Role (X, O, or SPECTATOR)
-  const [myRole, setMyRole] = useState<PlayerRole>(initialRole);
-
-  // Game state
-  const [gameState, setGameState] = useState<CaroGameState>({
-    board: createEmptyBoard(),
-    currentTurn: CaroPlayer.X,
-    lastMove: null,
-    winner: null,
-    winningLine: null,
-    moveCount: 0,
-  });
-
-  // Portal Dialog Hook from Lumen architecture
-  const [presentResultDialog, dismissResultDialog] =
-    usePortal<ResultDialogData>(ResultDialog);
-
-  // Mutable refs to decouple callbacks without closure staleness or render mutations
-  const stateRef = useRef({
-    gameState,
+  // Encapsulated shared room realtime, presence, profiles, and portal dialogs
+  const {
+    roomCode,
     myRole,
+    myProfile,
+    randomizeAvatar,
+    isOpponentOnline,
+    opponentProfile,
+    expectedOpponentRole,
+    isSupabaseConfigured,
+    sendEvent,
+    sendEventRef,
+    showResultDialog,
+    dismissResultDialog,
+    promptSurrender,
+  } = useGameRoom({
+    gameTitle: "Caro 15x15",
+    defaultRoomCode: "CR-DEMO",
+    onEventReceived: (event: RealtimeEvent) => handleRealtimeEvent(event),
+    onSurrenderConfirmed: async () => {
+      const winner: GameWinner =
+        myRole === PlayerRole.X ? GameWinner.O : GameWinner.X;
+      setGameState((prev) => ({ ...prev, winner }));
+      showResultDialog(winner, false, false);
+      await sendEvent({
+        type: RealtimeEventType.PLAYER_SURRENDER,
+        payload: { player: myRole },
+      });
+    },
   });
 
-  const sendEventRef = useRef<(event: RealtimeEvent) => Promise<void>>(
-    async () => {}
-  );
-
-  const showDialogRef = useRef<
-    (
-      currentWinner: GameWinner | null,
-      isRequestedByMe: boolean,
-      isRequestedByOpponent: boolean
-    ) => void
-  >(() => {});
-
-  // Reset board helper
-  const resetGame = useCallback(
-    (nextTurn: CaroPlayer = CaroPlayer.X) => {
-      setGameState({
-        board: createEmptyBoard(),
-        currentTurn: nextTurn,
-        lastMove: null,
-        winner: null,
-        winningLine: null,
-        moveCount: 0,
-      });
-      dismissResultDialog();
-      sounds.playRematchSound();
-    },
-    [dismissResultDialog]
-  );
-
-  // Show result dialog with current action handlers
-  const showResultDialog = useCallback(
-    (
-      currentWinner: GameWinner | null,
-      isRequestedByMe: boolean,
-      isRequestedByOpponent: boolean
-    ) => {
-      presentResultDialog({
-        winner: currentWinner,
-        myRole: stateRef.current.myRole,
-        isRematchRequestedByMe: isRequestedByMe,
-        isRematchRequestedByOpponent: isRequestedByOpponent,
-        onRequestRematch: async () => {
-          const { myRole: role, gameState: current } = stateRef.current;
-
-          showDialogRef.current(current.winner, true, false);
-          await sendEventRef.current({
-            type: RealtimeEventType.REMATCH_REQUEST,
-            payload: { from: role },
-          });
-        },
-        onAcceptRematch: async () => {
-          const { myRole: role } = stateRef.current;
-          resetGame(CaroPlayer.X);
-
-          await sendEventRef.current({
-            type: RealtimeEventType.REMATCH_ACCEPT,
-            payload: { acceptedBy: role },
-          });
-        },
-      });
-    },
-    [presentResultDialog, resetGame]
-  );
-
-  // Synchronize refs safely in effect
-  useEffect(() => {
-    stateRef.current = { gameState, myRole };
-    showDialogRef.current = showResultDialog;
-  }, [gameState, myRole, showResultDialog]);
+  // Custom Caro game hook encapsulating move state, win calculation, and sounds
+  const {
+    gameState,
+    setGameState,
+    resetGame,
+    applyMove,
+    handleCellClick,
+  } = useCaroGame({
+    myRole,
+    sendEvent: async (e) => sendEventRef.current(e),
+    onShowResultDialog: (winner) => showResultDialog(winner),
+    onDismissResultDialog: dismissResultDialog,
+  });
 
   // Handle incoming broadcast events from peer
   const handleRealtimeEvent = useCallback(
     (event: RealtimeEvent) => {
       switch (event.type) {
-        case RealtimeEventType.GAME_MOVE: {
-          const { row, col, player } = event.payload;
-          const caroPlayer =
-            player === PlayerRole.X ? CaroPlayer.X : CaroPlayer.O;
-
-          setGameState((prev) => {
-            if (prev.board[row][col] || prev.winner) return prev;
-
-            const nextBoard = prev.board.map((rowCells, rowIndex) =>
-              rowIndex === row
-                ? rowCells.map((cellValue, colIndex) =>
-                    colIndex === col ? caroPlayer : cellValue
-                  )
-                : rowCells
-            );
-
-            const nextMoveCount = prev.moveCount + 1;
-            const { winner, winningLine } = checkWin(
-              nextBoard,
-              row,
-              col,
-              caroPlayer,
-              nextMoveCount
-            );
-
-            sounds.playMoveSound(caroPlayer as unknown as "X" | "O");
-
-            return {
-              board: nextBoard,
-              currentTurn:
-                caroPlayer === CaroPlayer.X ? CaroPlayer.O : CaroPlayer.X,
-              lastMove: [row, col],
-              winner,
-              winningLine,
-              moveCount: nextMoveCount,
-            };
-          });
-
-          // Check win from updated values
-          const updatedState = stateRef.current.gameState;
-          const updatedBoard = updatedState.board.map((r, rIdx) =>
-            rIdx === row
-              ? r.map((c, cIdx) => (cIdx === col ? caroPlayer : c))
-              : r
-          );
-          const outcome = checkWin(
-            updatedBoard,
-            row,
-            col,
-            caroPlayer,
-            updatedState.moveCount + 1
-          );
-
-          if (outcome.winner) {
-            showResultDialog(outcome.winner, false, false);
+        case RealtimeEventType.REQUEST_ROOM_SYNC: {
+          // A peer joined or refreshed: send them current authoritative board state
+          if (gameState.moveCount > 0) {
+            sendEventRef.current({
+              type: RealtimeEventType.RESPONSE_CARO_SYNC,
+              payload: {
+                board: gameState.board,
+                currentTurn: gameState.currentTurn,
+                lastMove: gameState.lastMove,
+                winner: gameState.winner,
+                winningLine: gameState.winningLine,
+                moveCount: gameState.moveCount,
+                timestamp: Date.now(),
+              },
+            });
           }
           break;
         }
 
-        case RealtimeEventType.PLAYER_SURRENDER: {
-          const { player } = event.payload;
-          const winner =
-            player === PlayerRole.X ? GameWinner.O : GameWinner.X;
-          setGameState((prev) => ({
-            ...prev,
-            winner,
-          }));
-          showResultDialog(winner, false, false);
+        case RealtimeEventType.RESPONSE_CARO_SYNC: {
+          const { board, currentTurn, lastMove, winner, winningLine, moveCount } = event.payload;
+          setGameState({
+            board: board as CaroPlayer[][],
+            currentTurn: currentTurn as CaroPlayer,
+            lastMove,
+            winner: winner as GameWinner | null,
+            winningLine,
+            moveCount,
+          });
+          break;
+        }
+
+        case RealtimeEventType.GAME_MOVE: {
+          const { row, col, player } = event.payload;
+          const caroPlayer =
+            player === PlayerRole.X ? CaroPlayer.X : CaroPlayer.O;
+          applyMove(row, col, caroPlayer);
           break;
         }
 
         case RealtimeEventType.REMATCH_REQUEST: {
-          showResultDialog(stateRef.current.gameState.winner, false, true);
+          showResultDialog(gameState.winner, false, true);
           break;
         }
 
@@ -211,111 +113,28 @@ export function CaroPlayPage() {
           break;
         }
 
+        case RealtimeEventType.PLAYER_SURRENDER: {
+          const winner =
+            event.payload.player === PlayerRole.X ? GameWinner.O : GameWinner.X;
+          setGameState((prev) => ({ ...prev, winner }));
+          showResultDialog(winner, false, false);
+          break;
+        }
+
         default:
           break;
       }
     },
-    [resetGame, showResultDialog]
+    [applyMove, gameState, resetGame, setGameState, showResultDialog, sendEventRef]
   );
 
-  // Hook into Realtime (Broadcast + Presence)
-  const {
-    isOpponentOnline,
-    opponentProfile,
-    sendEvent,
-    isSupabaseConfigured,
-    expectedOpponentRole,
-  } = useRoomRealtime({
-    roomCode,
-    myRole,
-    profile: myProfile,
-    onEventReceived: handleRealtimeEvent,
-  });
+  // Turn permission calculation
+  const isMyTurn =
+    (gameState.currentTurn === CaroPlayer.X && myRole === PlayerRole.X) ||
+    (gameState.currentTurn === CaroPlayer.O && myRole === PlayerRole.O);
 
-  useEffect(() => {
-    sendEventRef.current = sendEvent;
-  }, [sendEvent]);
-
-  // Check if current client is allowed to place a stone
   const canClick =
-    !gameState.winner &&
-    (myRole as unknown as CaroPlayer) === gameState.currentTurn;
-
-  // Handle cell click
-  const handleCellClick = useCallback(
-    async (row: number, col: number) => {
-      if (!canClick || gameState.board[row][col] || gameState.winner) return;
-
-      const playerToPlace: CaroPlayer = myRole as unknown as CaroPlayer;
-
-      const nextBoard = gameState.board.map((rowCells, rowIndex) =>
-        rowIndex === row
-          ? rowCells.map((cellValue, colIndex) =>
-              colIndex === col ? playerToPlace : cellValue
-            )
-          : rowCells
-      );
-      const nextMoveCount = gameState.moveCount + 1;
-      const { winner, winningLine } = checkWin(
-        nextBoard,
-        row,
-        col,
-        playerToPlace,
-        nextMoveCount
-      );
-
-      sounds.playMoveSound(playerToPlace as unknown as "X" | "O");
-
-      setGameState({
-        board: nextBoard,
-        currentTurn:
-          playerToPlace === CaroPlayer.X ? CaroPlayer.O : CaroPlayer.X,
-        lastMove: [row, col],
-        winner,
-        winningLine,
-        moveCount: nextMoveCount,
-      });
-
-      if (winner) {
-        showResultDialog(winner, false, false);
-      }
-
-      await sendEvent({
-        type: RealtimeEventType.GAME_MOVE,
-        payload: {
-          row,
-          col,
-          player:
-            playerToPlace === CaroPlayer.X ? PlayerRole.X : PlayerRole.O,
-          timestamp: Date.now(),
-        },
-      });
-    },
-    [canClick, gameState, myRole, sendEvent, showResultDialog]
-  );
-
-  // Surrender Handler
-  const handleSurrender = async () => {
-    if (gameState.winner || myRole === PlayerRole.SPECTATOR) return;
-    const confirmSurrender = window.confirm(
-      "Are you sure you want to surrender this match?"
-    );
-    if (!confirmSurrender) return;
-
-    const winner: GameWinner =
-      myRole === PlayerRole.X ? GameWinner.O : GameWinner.X;
-    setGameState((prev) => ({
-      ...prev,
-      winner,
-    }));
-
-    showResultDialog(winner, false, false);
-
-    await sendEvent({
-      type: RealtimeEventType.PLAYER_SURRENDER,
-      payload: { player: myRole },
-    });
-  };
+    isMyTurn && isOpponentOnline && !gameState.winner && (myRole as PlayerRole) !== PlayerRole.SPECTATOR;
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-game">
@@ -323,6 +142,7 @@ export function CaroPlayPage() {
       <RoomHeader
         roomCode={roomCode}
         gameTitle="Caro 15x15"
+        gameType="caro"
         myRole={myRole}
         myProfile={myProfile}
         opponentProfile={opponentProfile}
@@ -330,54 +150,49 @@ export function CaroPlayPage() {
         isOpponentOnline={isOpponentOnline}
         expectedOpponentRole={expectedOpponentRole}
         isSupabaseConfigured={isSupabaseConfigured}
+        isGameActive={!gameState.winner && isOpponentOnline}
       />
 
       {/* Main Game Stage */}
       <main className="flex-1 flex flex-col items-center justify-center p-3 sm:p-6 max-w-6xl mx-auto w-full">
         {/* Game Tools & Quick Actions */}
-        <div className="w-full max-w-md flex items-center justify-between gap-2 mb-3">
-          <div className="flex items-center gap-2">
+        <div className="w-full max-w-[620px] flex items-center justify-end gap-2 mb-3">
+          {!gameState.winner && (
             <Button
-              variant="outline"
+              variant="destructive"
               size="sm"
-              onClick={() =>
-                setMyRole((prev) =>
-                  prev === PlayerRole.X ? PlayerRole.O : PlayerRole.X
-                )
-              }
+              onClick={promptSurrender}
               className="text-xs gap-1.5"
-              title="Switch role for testing"
             >
-              <Icons name="arrow-left-right" size={14} />
-              <span>Switch to {myRole === PlayerRole.X ? "O" : "X"}</span>
+              <Icons name="flag" size={14} />
+              <span>Surrender</span>
             </Button>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {!gameState.winner && (
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={handleSurrender}
-                className="text-xs gap-1.5"
-              >
-                <Icons name="flag" size={14} />
-                <span>Surrender</span>
-              </Button>
-            )}
-          </div>
+          )}
         </div>
 
-        {/* Board Component */}
-        <CaroBoard
-          board={gameState.board}
-          lastMove={gameState.lastMove}
-          winningLine={gameState.winningLine}
-          canClick={canClick}
-          myRole={myRole}
-          currentTurn={gameState.currentTurn}
-          onCellClick={handleCellClick}
-        />
+        {/* Live Caro Scoreboard directly on table */}
+        <div className="mb-4 w-full max-w-[620px]">
+          <CaroScoreboard
+            currentTurn={gameState.currentTurn}
+            myRole={myRole}
+            myProfile={myProfile}
+            opponentProfile={opponentProfile}
+            isOpponentOnline={isOpponentOnline}
+          />
+        </div>
+
+        {/* Board Component wrapped in GameBoard Strategy container */}
+        <GameBoard gameType={GameType.CARO}>
+          <CaroBoard
+            board={gameState.board}
+            lastMove={gameState.lastMove}
+            winningLine={gameState.winningLine}
+            canClick={canClick}
+            myRole={myRole}
+            currentTurn={gameState.currentTurn}
+            onCellClick={handleCellClick}
+          />
+        </GameBoard>
       </main>
     </div>
   );

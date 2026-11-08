@@ -1,91 +1,144 @@
 {
   "app": {
     "name": "EzGame",
-    "tagline": "Casual Web Gaming Platform"
+    "tagline": "Online PvP Gaming"
   },
   "nav": {
-    "backToLobby": "Back to Lobby"
-  },
-  "hero": {
-    "badge": "No Account Needed • Join and Play Instantly",
-    "title": "Casual Battle Platform",
-    "titleAccent": "Blazing Fast Realtime",
-    "subtitle": "Create a room with one click, send the link via Zalo or Messenger to friends for a showdown. No installation needed, no tedious registration."
+    "backToLobby": "Back to Lobby",
+    "toggleSound": "Toggle Sound",
+    "copyRoomCode": "Copy room code",
+    "copyInviteLink": "Copy invite link",
+    "copyInviteLinkDesc": "Share invite link with your friend"
   },
   "lobby": {
-    "selectGame": "Choose a Game",
-    "variousCategories": "Various Categories",
-    "gameCaro": "Caro Board (Gomoku)",
-    "gameCaroDesc": "Classic 5-in-a-row rules on a 15x15 board. Real-time brain battle at its peak!",
-    "gamePlayers": "2 Players",
-    "gameReady": "Ready to Play",
-    "gameComingSoon": "Coming Soon",
-    "gameTicTacToe": "Tic-Tac-Toe (3x3)",
-    "gameTicTacToeDesc": "Classic 3x3 game, play fast win fast in 30 seconds.",
-    "createRoom": "Create New Room",
-    "createRoomDesc": "You play as <strong>X (Go First)</strong>. Get a link to share with friends.",
-    "creatingRoom": "Creating room...",
-    "createRoomNow": "Create Room Now",
-    "joinRoom": "Join Room",
-    "joinRoomDesc": "Enter the shared room code to play as <strong>O (Go Second)</strong>.",
-    "joinRoomPlaceholder": "e.g. CR-7821",
-    "joining": "Joining...",
-    "enterMatch": "Enter Match",
-    "featureRealtime": "Supabase Realtime P2P",
-    "featureRealtimeDesc": "Send moves in milliseconds via Broadcast Channel, identify online opponents via Presence.",
-    "featureNoAuth": "Convenient No-Auth",
-    "featureNoAuthDesc": "No personal info stored, no passwords, only minimal room codes kept in DB.",
-    "featureShare": "One-Click Share",
-    "featureShareDesc": "Copy the link to send via messages so friends can open directly on phone or computer.",
-    "errors": {
-      "createFailed": "Failed to create room. Please try again!",
-      "serverError": "Server connection error. Please try again!",
-      "emptyCode": "Please enter a room code!",
-      "roomNotFound": "Room code not found or expired!",
-      "joinFailed": "Failed to connect to room!"
+    "tagline": "Online PvP Gaming",
+    "sectionTitle": "Featured Games",
+    "title": "Choose a Game",
+    "subtitle": "No registration needed. Create a room or enter a code to play with friends instantly.",
+    "play": "Play Now",
+    "realtime": "Real-time",
+    "realtimeDesc": "WebSocket Sync",
+    "noAuth": "No Login Required",
+    "noAuthDesc": "Instant Join",
+    "share": "1-Click Share",
+    "shareDesc": "Fast Invite Link",
+    "footer": "EzGame • Minimalist Realtime Online Battle Platform",
+    "loadMore": "Load More",
+    "categories": {
+      "all": "All Games",
+      "board": "Board Games",
+      "sports": "Sports",
+      "cards": "Card Games"
     }
+  },
+  "games": {
+    "caro": {
+      "title": "CARO",
+      "badge": "15x15",
+      "description": "Gomoku 5-in-a-row",
+      "players": "2 Players",
+      "tag": "BOARD"
+    },
+    "bida": {
+      "title": "BIDA",
+      "badge": "8-BALL",
+      "description": "Pocket Billiards 2D",
+      "players": "2 Players",
+      "tag": "SPORTS"
+    }
+  },
+  "modal": {
+    "createTab": "Create Room",
+    "joinTab": "Join Room",
+    "hostTitle": "Host Game",
+    "hostDesc": "A match code will be generated. Send the invite link to your opponent to begin.",
+    "createBtn": "Create Room",
+    "creatingBtn": "Creating Room...",
+    "inputLabel": "Enter Match Code",
+    "inputPlaceholder": "e.g. 9K8X2M",
+    "joinRoleNotice": "Roles (X/O) will be dynamically assigned upon joining.",
+    "joinBtn": "Join Match",
+    "joiningBtn": "Connecting...",
+    "emptyCodeErr": "Please enter a room code!",
+    "notFoundErr": "Room code not found or has expired.",
+    "createErr": "Failed to create room. Please try again.",
+    "connectErr": "Unable to connect to the server. Please try again."
   },
   "game": {
     "turn": "Turn",
     "piece": "Piece",
     "yourTurn": "Your Turn!",
+    "opponentTurn": "Opponent Turn",
     "waitingForOpponent": "Waiting for opponent...",
-    "localMode": "Local Mode",
-    "switchRole": "Switch role for testing",
     "surrender": "Surrender",
-    "newRound": "New Round",
-    "surrenderConfirm": "Are you sure you want to surrender this match?",
     "room": "Room",
     "youAre": "You are",
     "opponent": "Opponent",
     "online": "Online",
     "waiting": "Waiting...",
     "inviteFriend": "Invite Friend",
-    "soundOn": "Turn off sound",
-    "soundOff": "Turn on sound",
-    "devMode": "Tab-to-Tab Dev Mode"
+    "offlineMode": "Offline Mode",
+    "matchReady": "Match Ready",
+    "gameStarting": "Game Starting!",
+    "horizontalView": "Horizontal View",
+    "verticalView": "Vertical View",
+    "power": "Power",
+    "spin": "Spin",
+    "dragToShoot": "DRAG & PULL TO SHOOT",
+    "releaseToStrike": "RELEASE TO STRIKE",
+    "opponentAiming": "Opponent is aiming...",
+    "ballsRolling": "Balls rolling...",
+    "cueBallSpin": "Cue Ball Spin",
+    "center": "Center",
+    "follow": "Follow (Top)",
+    "draw": "Draw (Bottom)",
+    "englishRight": "Right English",
+    "englishLeft": "Left English",
+    "resetCenter": "Reset Center",
+    "apply": "Apply",
+    "open": "Open",
+    "solids": "Solids",
+    "stripes": "Stripes",
+    "player": "Player",
+    "waitingForOpponentToJoin": "Waiting for opponent to join room...",
+    "releaseToShoot": "RELEASE TO SHOOT",
+    "dragOrSpace": "DRAG & PULL or HOLD SPACE",
+    "connectingMatch": "Connecting match session..."
+  },
+  "dialog": {
+    "leaveMatchTitle": "Leave Current Match?",
+    "leaveMatchDesc": "A match is currently in progress. Leaving now will count as a surrender.",
+    "leaveConfirm": "Leave Match",
+    "stay": "Stay",
+    "surrenderTitle": "Surrender Match?",
+    "surrenderDesc": "Are you sure you want to surrender this match? Your opponent will be awarded the victory.",
+    "surrenderConfirm": "Surrender",
+    "keepPlaying": "Keep Playing"
   },
   "result": {
     "victory": "Victory!",
     "draw": "Draw Game!",
     "defeat": "Defeat!",
-    "victoryDesc": "Congratulations! You (Piece {role}) have won this match.",
-    "drawDesc": "Both sides fought hard and the match ended in a draw.",
-    "defeatDesc": "Piece {winner} got 5 in a row. Seek revenge in the next round!",
-    "rematchAccept": "Opponent wants a rematch! Accept",
-    "rematchPending": "Waiting for opponent confirmation...",
-    "rematchRequest": "Request Rematch New Round",
-    "reviewBoard": "Review Board",
+    "victoryDesc": "Congratulations! You took the win.",
+    "drawDesc": "Both sides played evenly to a draw.",
+    "defeatDesc": "Ready for the next round?",
+    "rematchAccept": "Accept Rematch",
+    "rematchPending": "Waiting for confirmation...",
+    "rematchRequest": "Rematch",
     "backToLobby": "Back to Lobby"
   },
-  "api": {
-    "createRoomFailed": "Failed to create room",
-    "missingCode": "Missing room code",
-    "roomNotFound": "Room not found or expired",
-    "checkFailed": "Failed to check room"
+  "error": {
+    "notFoundTitle": "Game Room Not Found",
+    "notFoundDesc": "The game link may have expired, the match has finished, or the room code is incorrect.",
+    "backToLobby": "Back to Lobby",
+    "serverErrorTitle": "System Error Occurred",
+    "serverErrorDesc": "The game server connection encountered a temporary issue. You can try reconnecting or return to the lobby.",
+    "retry": "Try Again",
+    "errorCode": "Error Code"
   },
   "common": {
     "close": "Close",
-    "copied": "Copied!"
+    "copied": "Copied!",
+    "you": "You"
   }
 }

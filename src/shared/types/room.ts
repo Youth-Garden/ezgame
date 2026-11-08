@@ -41,9 +41,50 @@ export enum RealtimeEventType {
   PLAYER_SURRENDER = "PLAYER_SURRENDER",
   BIDA_SHOT = "BIDA_SHOT",
   BIDA_STATE_SYNC = "BIDA_STATE_SYNC",
+  REQUEST_ROOM_SYNC = "REQUEST_ROOM_SYNC",
+  RESPONSE_CARO_SYNC = "RESPONSE_CARO_SYNC",
+  RESPONSE_BIDA_SYNC = "RESPONSE_BIDA_SYNC",
 }
 
 export type RealtimeEvent =
+  | {
+      type: RealtimeEventType.REQUEST_ROOM_SYNC;
+      payload: {
+        from: PlayerRole;
+        clientId: string;
+      };
+    }
+  | {
+      type: RealtimeEventType.RESPONSE_CARO_SYNC;
+      payload: {
+        board: (string | null)[][];
+        currentTurn: string;
+        lastMove: [number, number] | null;
+        winner: string | null;
+        winningLine: [number, number][] | null;
+        moveCount: number;
+        timestamp: number;
+      };
+    }
+  | {
+      type: RealtimeEventType.RESPONSE_BIDA_SYNC;
+      payload: {
+        balls: Array<{
+          id: number;
+          x: number;
+          y: number;
+          isPocketed: boolean;
+        }>;
+        currentTurn: PlayerRole.X | PlayerRole.O;
+        assignedGroups?: {
+          [PlayerRole.X]: string | null;
+          [PlayerRole.O]: string | null;
+        };
+        winner?: PlayerRole | null;
+        foulMessage?: string | null;
+        timestamp: number;
+      };
+    }
   | {
       type: RealtimeEventType.GAME_MOVE;
       payload: {
@@ -85,6 +126,8 @@ export type RealtimeEvent =
         power: number;
         cueBallX: number;
         cueBallY: number;
+        englishX?: number;
+        englishY?: number;
         timestamp: number;
       };
     }
@@ -98,6 +141,10 @@ export type RealtimeEvent =
           isPocketed: boolean;
         }>;
         currentTurn: PlayerRole.X | PlayerRole.O;
+        assignedGroups?: {
+          [PlayerRole.X]: string | null;
+          [PlayerRole.O]: string | null;
+        };
         winner?: PlayerRole | null;
         foulMessage?: string | null;
         timestamp: number;

@@ -64,3 +64,24 @@ export function FlagUsIcon({
     </svg>
   );
 }
+
+export function FlagJpIcon({
+  width = 18,
+  height = 13,
+  className,
+  ...props
+}: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      viewBox="0 0 30 20"
+      width={width}
+      height={height}
+      className={className}
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <rect width="30" height="20" fill="#ffffff" rx="2.5" />
+      <circle cx="15" cy="10" r="6" fill="#bc002d" />
+    </svg>
+  );
+}

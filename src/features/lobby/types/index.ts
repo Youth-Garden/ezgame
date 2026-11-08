@@ -9,12 +9,11 @@ export interface GameMetadata {
   isAvailable: boolean;
   tag: string;
   iconSrc?: string;
+  gradient?: string;
+  playingCount?: number;
 }
-
-export type LobbyLocale = "en" | "vi";
 
 export interface GameRoomModalData {
   gameType: GameType;
   gameTitle: string;
-  locale?: LobbyLocale;
 }

@@ -1,21 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { Plus_Jakarta_Sans, JetBrains_Mono, Space_Grotesk } from "next/font/google";
-import { PortalRenderer } from "@/shared/components/portal";
+import { Baloo_2, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { getLocale, getMessages } from "next-intl/server";
-import { Providers } from "./providers";
+import { Providers } from "@/shared/components/providers";
 
-const jakartaSans = Plus_Jakarta_Sans({
+const baloo2 = Baloo_2({
   variable: "--font-sans",
   subsets: ["latin", "vietnamese"],
   weight: ["400", "500", "600", "700", "800"],
-  display: "swap",
-});
-
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-game",
-  subsets: ["latin", "vietnamese"],
-  weight: ["500", "600", "700"],
   display: "swap",
 });
 
@@ -61,14 +53,16 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      className={`${jakartaSans.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} h-full antialiased dark`}
+      className={`${baloo2.variable} ${jetbrainsMono.variable} h-full antialiased dark`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col bg-background text-foreground font-sans antialiased selection:bg-primary/20">
+      <body
+        className="min-h-full flex flex-col bg-background text-foreground font-sans antialiased selection:bg-primary/20"
+        suppressHydrationWarning
+      >
         <Providers messages={messages} locale={locale}>
           {children}
         </Providers>
-        <PortalRenderer />
       </body>
     </html>
   );

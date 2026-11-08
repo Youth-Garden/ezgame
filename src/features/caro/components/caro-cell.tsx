@@ -45,13 +45,17 @@ export const CaroCell = memo(function CaroCell({
       aria-label={`Row ${row + 1}, Column ${col + 1}${value ? `, piece ${value}` : ""}`}
       className={cn(
         "relative w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 flex items-center justify-center transition-colors duration-100 select-none group",
-        "border-r border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/90",
-        !value && canClick && "hover:bg-neutral-100 dark:hover:bg-neutral-800/80 cursor-pointer",
+        "border-r border-b border-border/40 bg-card",
+        !value && canClick && "hover:bg-secondary/40 cursor-pointer",
         !value && !canClick && "cursor-default",
         value && "cursor-default",
         isWinningCell &&
           "bg-amber-500/20 dark:bg-amber-500/25 z-10 animate-pulse",
-        isLastMove && !isWinningCell && "bg-sky-500/15 dark:bg-sky-500/20"
+        isLastMove && !isWinningCell && (
+          value === CaroPlayer.O
+            ? "bg-rose-500/15 dark:bg-rose-500/20"
+            : "bg-sky-500/15 dark:bg-sky-500/20"
+        )
       )}
     >
       {/* Tengen / Hoshi points on Go board (Traditional 15x15 markers) */}
@@ -129,7 +133,12 @@ export const CaroCell = memo(function CaroCell({
 
       {/* Small marker for last placed move */}
       {isLastMove && !isWinningCell && (
-        <span className="absolute bottom-0.5 right-0.5 w-1 h-1 rounded-full bg-sky-500 animate-ping" />
+        <span
+          className={cn(
+            "absolute bottom-0.5 right-0.5 w-1 h-1 rounded-full animate-ping",
+            value === CaroPlayer.O ? "bg-rose-500" : "bg-sky-500"
+          )}
+        />
       )}
     </button>
   );

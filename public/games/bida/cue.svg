@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 28" width="600" height="28">
+  <defs>
+    <!-- Cue Shaft Wood Gradient (Maple Taper) -->
+    <linearGradient id="maple-shaft" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stopColor="#fef3c7"/>
+      <stop offset="35%" stopColor="#ffffff"/>
+      <stop offset="70%" stopColor="#fde68a"/>
+      <stop offset="100%" stopColor="#d97706"/>
+    </linearGradient>
+
+    <!-- Polished Rosewood Forearm -->
+    <linearGradient id="wood-forearm" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stopColor="#78350f"/>
+      <stop offset="30%" stopColor="#9a3412"/>
+      <stop offset="60%" stopColor="#78350f"/>
+      <stop offset="100%" stopColor="#451a03"/>
+    </linearGradient>
+
+    <!-- Linen Wrap Handle (Midnight Irish Linen) -->
+    <linearGradient id="irish-linen" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stopColor="#27272a"/>
+      <stop offset="30%" stopColor="#3f3f46"/>
+      <stop offset="70%" stopColor="#18181b"/>
+      <stop offset="100%" stopColor="#09090b"/>
+    </linearGradient>
+
+    <!-- Chrome Joint Rings -->
+    <linearGradient id="silver-chrome" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stopColor="#94a3b8"/>
+      <stop offset="30%" stopColor="#f8fafc"/>
+      <stop offset="70%" stopColor="#e2e8f0"/>
+      <stop offset="100%" stopColor="#475569"/>
+    </linearGradient>
+
+    <!-- Blue Master Chalk Tip -->
+    <linearGradient id="chalk-tip" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stopColor="#0284c7"/>
+      <stop offset="40%" stopColor="#38bdf8"/>
+      <stop offset="100%" stopColor="#0369a1"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 1. Master Chalk Leather Tip (Leftmost, hits ball) -->
+  <path d="M 12 11 Q 2 14 12 17 Z" fill="url(#chalk-tip)"/>
+
+  <!-- 2. White Ivorine Ferrule -->
+  <polygon points="12,11 28,11.2 28,16.8 12,17" fill="#f8fafc" stroke="#cbd5e1" stroke-width="0.5"/>
+
+  <!-- 3. Canadian Rock Maple Shaft (Tapers from 12mm to 18mm) -->
+  <polygon points="28,11.2 320,8.5 320,19.5 28,16.8" fill="url(#maple-shaft)"/>
+
+  <!-- 4. Stainless Steel Joint Collar & Rings -->
+  <polygon points="320,8.5 330,8.3 330,19.7 320,19.5" fill="url(#silver-chrome)"/>
+  <rect x="330" y="8.3" width="4" height="11.4" fill="#09090b"/>
+  <polygon points="334,8.2 344,8.1 344,19.9 334,19.8" fill="url(#silver-chrome)"/>
+
+  <!-- 5. Exotic Hardwood Forearm with 4 Inlay Splices -->
+  <polygon points="344,8.1 430,7.2 430,20.8 344,19.9" fill="url(#wood-forearm)"/>
+
+  <!-- Splice Diamond Inlays -->
+  <polygon points="350,14 375,10 400,14 375,18" fill="#fef08a" opacity="0.85"/>
+
+  <!-- 6. Dual Accent Rings -->
+  <rect x="430" y="7.2" width="6" height="13.6" fill="url(#silver-chrome)"/>
+
+  <!-- 7. Irish Linen Pressed Wrap Handle -->
+  <polygon points="436,7.1 550,6.0 550,22.0 436,20.9" fill="url(#irish-linen)"/>
+
+  <!-- Grip Texture Lines -->
+  <line x1="450" y1="7.0" x2="450" y2="21.0" stroke="#52525b" stroke-width="1" opacity="0.4"/>
+  <line x1="480" y1="6.7" x2="480" y2="21.3" stroke="#52525b" stroke-width="1" opacity="0.4"/>
+  <line x1="510" y1="6.4" x2="510" y2="21.6" stroke="#52525b" stroke-width="1" opacity="0.4"/>
+
+  <!-- 8. Butt Sleeve & Rubber Bumper -->
+  <polygon points="550,6.0 588,5.5 588,22.5 550,22.0" fill="url(#wood-forearm)"/>
+  <path d="M 588,5.5 Q 598,5.5 598,14 Q 598,22.5 588,22.5 Z" fill="#18181b"/>
+</svg>

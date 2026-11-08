@@ -30,6 +30,7 @@ export function Dialog({ open = false, onOpenChange, children }: DialogProps) {
     setMounted(true);
   }
 
+
   React.useEffect(() => {
     if (!open && mounted) {
       const timer = setTimeout(() => setMounted(false), 200);
@@ -113,10 +114,8 @@ export function DialogContent({
       data-slot="dialog-content"
       onClick={handleStopPropagation}
       className={cn(
-        "relative z-50 w-full max-w-md rounded-2xl bg-card p-6 text-card-foreground shadow-2xl transition-all duration-200 ease-out",
-        open
-          ? "opacity-100 scale-100 translate-y-0"
-          : "opacity-0 scale-95 translate-y-2 pointer-events-none",
+        "relative z-50 w-full max-w-sm rounded-2xl bg-card p-6 text-card-foreground shadow-2xl border-none",
+        open ? "animate-modal-in" : "animate-modal-out pointer-events-none",
         className
       )}
       {...props}
@@ -127,7 +126,7 @@ export function DialogContent({
         <button
           type="button"
           onClick={() => onOpenChange?.(false)}
-          className="absolute top-4 right-4 rounded-lg p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors focus:outline-none"
+          className="absolute top-4 right-4 rounded-lg p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors focus:outline-none cursor-pointer"
           aria-label="Close"
         >
           <X className="h-4 w-4" />
@@ -144,7 +143,7 @@ export function DialogHeader({
   return (
     <div
       data-slot="dialog-header"
-      className={cn("flex flex-col gap-1.5 text-center sm:text-left", className)}
+      className={cn("flex flex-col gap-1.5 text-center items-center", className)}
       {...props}
     />
   );
