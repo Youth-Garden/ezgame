@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { useCopyToClipboard } from "@uidotdev/usehooks";
 import { Button } from "@/shared/components/ui/button";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/shared/components/ui/tooltip";
 import { Icons } from "@/shared/icons";
@@ -23,6 +24,7 @@ export function CopyLinkButton({
 }: CopyLinkButtonProps) {
   const tNav = useTranslations("nav");
   const tCommon = useTranslations("common");
+  const [, copyToClipboard] = useCopyToClipboard();
   const [copied, setCopied] = useState(false);
   const targetText = textToCopy || url || "";
 
@@ -31,16 +33,7 @@ export function CopyLinkButton({
 
   const handleCopy = async () => {
     try {
-      if (navigator.clipboard) {
-        await navigator.clipboard.writeText(targetText);
-      } else {
-        const textArea = document.createElement("textarea");
-        textArea.value = targetText;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand("copy");
-        document.body.removeChild(textArea);
-      }
+      await copyToClipboard(targetText);
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
     } catch {

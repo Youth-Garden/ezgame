@@ -4,6 +4,12 @@ export enum PlayerRole {
   SPECTATOR = "SPECTATOR",
 }
 
+export enum GameWinner {
+  X = "X",
+  O = "O",
+  DRAW = "DRAW",
+}
+
 export enum RoomStatus {
   WAITING = "WAITING",
   PLAYING = "PLAYING",

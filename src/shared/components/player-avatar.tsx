@@ -11,6 +11,7 @@ interface PlayerAvatarProps {
   size?: "default" | "sm";
   align?: "left" | "right";
   subBadge?: React.ReactNode;
+  contentBelow?: React.ReactNode;
 }
 
 export function PlayerAvatar({
@@ -23,6 +24,7 @@ export function PlayerAvatar({
   size = "default",
   align = "left",
   subBadge,
+  contentBelow,
 }: PlayerAvatarProps) {
   const isRight = align === "right";
 
@@ -101,6 +103,8 @@ export function PlayerAvatar({
             {roleText}
           </span>
         )}
+
+        {contentBelow}
       </div>
     </div>
   );

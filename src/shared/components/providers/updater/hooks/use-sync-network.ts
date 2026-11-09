@@ -1,37 +1,29 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useNetworkState } from "@uidotdev/usehooks";
 
 export interface NetworkState {
   online: boolean | null;
 }
 
 export function useSyncNetwork(): NetworkState {
-  const [isOnline, setIsOnline] = useState<boolean | null>(true);
+  const network = useNetworkState();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    setIsOnline(navigator.onLine);
-
-    const handleOnline = () => {
-      setIsOnline(true);
-      console.log("[NetworkSync] Internet connection restored.");
-    };
-
-    const handleOffline = () => {
-      setIsOnline(false);
-      console.warn("[NetworkSync] Internet connection lost.");
-    };
-
-    window.addEventListener("online", handleOnline);
-    window.addEventListener("offline", handleOffline);
-
-    return () => {
-      window.removeEventListener("online", handleOnline);
-      window.removeEventListener("offline", handleOffline);
-    };
+    setMounted(true);
   }, []);
 
-  return { online: isOnline };
+  useEffect(() => {
+    if (!mounted) return;
+    if (network.online === true) {
+      console.log("[NetworkSync] Internet connection restored.");
+    } else if (network.online === false) {
+      console.warn("[NetworkSync] Internet connection lost.");
+    }
+  }, [network.online, mounted]);
+
+  // SSR-safe default to true until mounted
+  return { online: mounted ? (network.online ?? true) : true };
 }

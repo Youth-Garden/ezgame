@@ -1,12 +1,10 @@
+import { GameWinner } from "@/shared/types/room";
+
+export { GameWinner };
+
 export enum CaroPlayer {
   X = "X",
   O = "O",
-}
-
-export enum GameWinner {
-  X = "X",
-  O = "O",
-  DRAW = "DRAW",
 }
 
 export type CellValue = CaroPlayer | null;

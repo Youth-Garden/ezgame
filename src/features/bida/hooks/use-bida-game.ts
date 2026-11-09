@@ -1,7 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import { PlayerRole, RealtimeEventType, type RealtimeEvent } from "@/shared/types/room";
+import { PlayerRole, RealtimeEventType, GameWinner, type RealtimeEvent } from "@/shared/types/room";
 import { sounds } from "@/shared/lib/sound-effects";
-import { GameWinner } from "@/features/caro/types";
 import { BidaBall, BidaBallType, BidaTurnState } from "../types";
 import { createInitialRack } from "../utils/bida-physics";
 import {

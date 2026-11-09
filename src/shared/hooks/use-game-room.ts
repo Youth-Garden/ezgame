@@ -8,8 +8,7 @@ import { MatchStartVsDialog, type MatchStartVsDialogData } from "@/shared/compon
 import { ConfirmDialog, type ConfirmDialogData } from "@/shared/components/confirm-dialog";
 import { usePlayerProfile } from "@/shared/hooks/use-player-profile";
 import { useRoomRealtime } from "@/shared/hooks/use-room-realtime";
-import { PlayerRole, RealtimeEventType, type RealtimeEvent } from "@/shared/types/room";
-import { GameWinner } from "@/features/caro/types";
+import { PlayerRole, RealtimeEventType, GameWinner, type RealtimeEvent } from "@/shared/types/room";
 
 interface UseGameRoomParams {
   gameTitle: string;
