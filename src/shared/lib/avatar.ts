@@ -8,6 +8,12 @@ export const AvatarStyles = [
   "glass",
   "fun-emoji",
   "identicon",
+  "adventurer",
+  "avataaars",
+  "big-smile",
+  "lorelei",
+  "notionists",
+  "rings",
 ] as const;
 
 export type AvatarStyle = (typeof AvatarStyles)[number];

@@ -62,7 +62,13 @@
     "emptyCodeErr": "ルームコードを入力してください。",
     "notFoundErr": "ルームコードが見つからないか、有効期限が切れています。",
     "createErr": "ルームの作成に失敗しました。もう一度お試しください。",
-    "connectErr": "サーバーに接続できませんでした。再試行してください。"
+    "connectErr": "サーバーに接続できませんでした。再試行してください。",
+    "matchSettings": "対戦設定",
+    "turnTimeLimit": "ターン制限時間",
+    "boardSize": "盤面サイズ",
+    "ruleStandard": "標準ルール",
+    "rule8Ball": "エイトボール",
+    "ruleCaro": "5目並べ"
   },
   "game": {
     "turn": "ターン",
@@ -99,6 +105,7 @@
     "open": "オープン",
     "solids": "ローボール",
     "stripes": "ハイボール",
+    "you": "あなた",
     "player": "プレイヤー",
     "waitingForOpponentToJoin": "対戦相手の入室を待っています...",
     "releaseToShoot": "離してショット",
@@ -140,5 +147,24 @@
     "close": "閉じる",
     "copied": "コピーしました！",
     "you": "あなた"
+  },
+  "profile": {
+    "title": "プレイヤープロフィール",
+    "guest": "ゲスト",
+    "guestDesc": "ブラウザに一時保存されたアカウントです",
+    "playerId": "プレイヤーID",
+    "nickname": "ニックネーム",
+    "nicknamePlaceholder": "ニックネームを入力...",
+    "randomName": "名前をランダム生成",
+    "avatarSection": "アバターのカスタマイズ",
+    "avatarStyle": "アバタースタイル",
+    "avatarSeed": "シード値 (Seed)",
+    "avatarSeedPlaceholder": "シードキーワードを入力...",
+    "randomSeed": "シードをランダム生成",
+    "save": "変更を保存",
+    "cancel": "キャンセル",
+    "menuTitle": "プロフィール",
+    "editProfile": "プロフィール編集",
+    "quickRandomAvatar": "アバターをランダム変更"
   }
 }

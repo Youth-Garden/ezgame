@@ -62,7 +62,13 @@
     "emptyCodeErr": "Vui lòng nhập mã phòng!",
     "notFoundErr": "Mã phòng không tồn tại hoặc đã hết hạn.",
     "createErr": "Không thể tạo phòng. Vui lòng thử lại.",
-    "connectErr": "Không thể kết nối đến máy chủ. Vui lòng thử lại."
+    "connectErr": "Không thể kết nối đến máy chủ. Vui lòng thử lại.",
+    "matchSettings": "Cấu hình trận đấu",
+    "turnTimeLimit": "Thời gian mỗi lượt",
+    "boardSize": "Kích thước bàn cờ",
+    "ruleStandard": "Quy tắc tiêu chuẩn",
+    "rule8Ball": "Bida lỗ 8 bóng",
+    "ruleCaro": "5 ô liên tiếp"
   },
   "game": {
     "turn": "Lượt",
@@ -99,6 +105,7 @@
     "open": "Bàn mở",
     "solids": "Bi trơn",
     "stripes": "Bi sọc",
+    "you": "Bạn",
     "player": "Người chơi",
     "waitingForOpponentToJoin": "Đang đợi đối thủ vào phòng...",
     "releaseToShoot": "BUÔNG TAY ĐỂ BẮN",
@@ -140,5 +147,24 @@
     "close": "Đóng",
     "copied": "Đã sao chép!",
     "you": "Bạn"
+  },
+  "profile": {
+    "title": "Hồ sơ người chơi",
+    "guest": "Khách",
+    "guestDesc": "Tài khoản tạm thời lưu trên trình duyệt của bạn",
+    "playerId": "Mã ID",
+    "nickname": "Tên người chơi",
+    "nicknamePlaceholder": "Nhập biệt danh của bạn...",
+    "randomName": "Tạo tên ngẫu nhiên",
+    "avatarSection": "Tuỳ biến Avatar",
+    "avatarStyle": "Phong cách Avatar",
+    "avatarSeed": "Hạt giống Avatar (Seed)",
+    "avatarSeedPlaceholder": "Nhập từ khóa hạt giống...",
+    "randomSeed": "Ngẫu nhiên hạt giống",
+    "save": "Lưu thay đổi",
+    "cancel": "Hủy",
+    "menuTitle": "Hồ sơ",
+    "editProfile": "Chỉnh sửa hồ sơ",
+    "quickRandomAvatar": "Đổi nhanh Avatar"
   }
 }

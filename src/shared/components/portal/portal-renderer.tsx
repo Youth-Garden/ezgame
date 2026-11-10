@@ -63,9 +63,9 @@ export const PortalRenderer = () => {
         return (
           <div
             key={instance.id}
-            className="absolute inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
+            className="absolute inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 pointer-events-none"
           >
-            <div className="pointer-events-auto w-full max-w-md flex justify-center">
+            <div className="pointer-events-auto w-full sm:w-auto flex justify-center">
               <Component
                 id={instance.id}
                 data={instance.data}

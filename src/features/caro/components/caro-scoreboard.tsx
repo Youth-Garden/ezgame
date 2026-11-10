@@ -17,6 +17,8 @@ interface CaroScoreboardProps {
     role: PlayerRole;
   } | null;
   isOpponentOnline?: boolean;
+  timeLeft?: number;
+  isTimerWarning?: boolean;
 }
 
 export function CaroScoreboard({
@@ -25,6 +27,8 @@ export function CaroScoreboard({
   myProfile,
   opponentProfile,
   isOpponentOnline = false,
+  timeLeft,
+  isTimerWarning = false,
 }: CaroScoreboardProps) {
   const isMyTurn = (currentTurn as unknown as PlayerRole) === myRole;
 
@@ -35,7 +39,7 @@ export function CaroScoreboard({
   return (
     <Card
       variant="solid"
-      className="w-full flex items-center justify-between gap-3 px-5 py-3 rounded-2xl shadow-none border-none select-none transition-all"
+      className="w-full flex items-center justify-between gap-1 sm:gap-3 px-2 sm:px-5 py-2 sm:py-3 transition-all"
     >
       {/* Player X (Blue) */}
       <PlayerAvatar
@@ -46,21 +50,37 @@ export function CaroScoreboard({
         isActiveTurn={currentTurn === CaroPlayer.X}
         activeColor="primary"
         align="left"
+        size="sm"
       />
 
-      {/* Turn indicator in the middle */}
-      <div className="flex flex-col items-center justify-center shrink-0">
+      {/* Turn indicator & Countdown Timer in the middle */}
+      <div className="flex flex-col items-center justify-center shrink-0 gap-1 px-1">
         {!isOpponentOnline ? (
-          <Badge variant="warning">
-            Waiting for Opponent...
+          <Badge variant="warning" size="sm" className="whitespace-nowrap text-[9px] sm:text-[11px] px-2 sm:px-3">
+            Waiting...
           </Badge>
         ) : (
-          <Badge
-            variant={isMyTurn ? "success" : "secondary"}
-            className={isMyTurn ? "animate-pulse" : ""}
-          >
-            {isMyTurn ? "Your turn" : "Opponent turn"}
-          </Badge>
+          <div className="flex items-center gap-1 sm:gap-2">
+            <Badge
+              variant={isMyTurn ? "success" : "secondary"}
+              size="sm"
+              className={`whitespace-nowrap text-[9px] sm:text-[11px] px-2 sm:px-3 ${isMyTurn ? "animate-pulse" : ""}`}
+            >
+              {isMyTurn ? "Your turn" : "Opponent"}
+            </Badge>
+
+            {typeof timeLeft === "number" && (
+              <Badge
+                variant={isTimerWarning ? "destructive" : "secondary"}
+                size="sm"
+                className={`font-mono font-bold tracking-normal transition-all text-[9px] sm:text-[11px] px-1.5 sm:px-2 ${
+                  isTimerWarning ? "animate-bounce" : ""
+                }`}
+              >
+                ⏱️ {timeLeft}s
+              </Badge>
+            )}
+          </div>
         )}
       </div>
 
@@ -73,6 +93,7 @@ export function CaroScoreboard({
         isActiveTurn={currentTurn === CaroPlayer.O}
         activeColor="destructive"
         align="right"
+        size="sm"
       />
     </Card>
   );

@@ -1,14 +1,31 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useNetworkState } from "@uidotdev/usehooks";
+import { useEffect, useState, useSyncExternalStore } from "react";
 
 export interface NetworkState {
   online: boolean | null;
 }
 
+function subscribe(callback: () => void) {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener("online", callback);
+  window.addEventListener("offline", callback);
+  return () => {
+    window.removeEventListener("online", callback);
+    window.removeEventListener("offline", callback);
+  };
+}
+
+function getSnapshot() {
+  return typeof navigator !== "undefined" ? navigator.onLine : true;
+}
+
+function getServerSnapshot() {
+  return true;
+}
+
 export function useSyncNetwork(): NetworkState {
-  const network = useNetworkState();
+  const isOnline = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -17,13 +34,12 @@ export function useSyncNetwork(): NetworkState {
 
   useEffect(() => {
     if (!mounted) return;
-    if (network.online === true) {
+    if (isOnline) {
       console.log("[NetworkSync] Internet connection restored.");
-    } else if (network.online === false) {
+    } else {
       console.warn("[NetworkSync] Internet connection lost.");
     }
-  }, [network.online, mounted]);
+  }, [isOnline, mounted]);
 
-  // SSR-safe default to true until mounted
-  return { online: mounted ? (network.online ?? true) : true };
+  return { online: isOnline };
 }

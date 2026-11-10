@@ -1,26 +1,16 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useTransition } from 'react';
+import { useLocale } from 'next-intl';
 import { cookieUtils } from '@/shared/utils/cookie';
 
 const LOCALE_KEY = 'ezgame_locale';
 
 export function useSyncLocale() {
-  const [currentLocale, setCurrentLocale] = useState<string>('en');
+  const currentLocale = useLocale();
   const router = useRouter();
-
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(LOCALE_KEY) || cookieUtils.get('NEXT_LOCALE');
-      if (stored) {
-        setCurrentLocale(stored);
-        cookieUtils.set('NEXT_LOCALE', stored);
-      }
-    } catch {
-      // LocalStorage access may be restricted
-    }
-  }, []);
+  const [, startTransition] = useTransition();
 
   const changeLocale = useCallback(
     (newLocale: string) => {
@@ -30,9 +20,9 @@ export function useSyncLocale() {
       } catch {
         // Ignore
       }
-      setCurrentLocale(newLocale);
-      // Soft-refresh the current route through Next.js App Router (zero page flicker)
-      router.refresh();
+      startTransition(() => {
+        router.refresh();
+      });
     },
     [router],
   );

@@ -125,13 +125,13 @@ export function updateAimAndCue(
       ghostMaterial.color.setHex(isIllegalTarget ? 0xf43f5e : 0xffffff);
       ghostMaterial.opacity = isIllegalTarget ? 0.75 : 0.5;
     }
-    ghostBallMesh.visible = true;
+    ghostBallMesh.visible = false;
 
     // Show/hide Foul Warning Ring Marker over the illegal target ball
     if (foulMarkerMesh) {
       if (isIllegalTarget) {
         foulMarkerMesh.position.set(targetBall.x - TABLE_WIDTH / 2, -(targetBall.y - TABLE_HEIGHT / 2), BALL_RADIUS + 0.5);
-        foulMarkerMesh.visible = true;
+        foulMarkerMesh.visible = false;
       } else {
         foulMarkerMesh.visible = false;
       }
@@ -190,7 +190,8 @@ export function updateAimAndCue(
     if (foulMarkerMesh) foulMarkerMesh.visible = false;
   }
 
-  // Position and angle cue stick (offset slightly by english/spin)
+  // Position and angle cue stick with 3D elevation (elevation angle ~6.5 degrees, 0.115 rad)
+  // The cue tip is near the ball while the butt elevates naturally above table cushions (Z reaches 60-80px)
   const pullOffset = BALL_RADIUS + 4 + power * 0.85;
   const perpCueX = -sinA * (englishX * 7);
   const perpCueY = cosA * (englishX * 7);
@@ -198,8 +199,13 @@ export function updateAimAndCue(
   cueMesh.position.set(
     startVec.x - Math.cos(cueAngle) * pullOffset + perpCueX,
     startVec.y + Math.sin(cueAngle) * pullOffset - perpCueY,
-    BALL_RADIUS + 2 + englishY * 3
+    BALL_RADIUS + 4 + englishY * 3
   );
+
+  // Rotate cue in 3D: Yaw to match aiming direction, Pitch to elevate butt upward
+  cueMesh.rotation.order = "ZYX";
   cueMesh.rotation.z = -cueAngle + Math.PI / 2;
+  cueMesh.rotation.x = -0.11; // ~6.3 degrees elevation angle upward so butt clears table rails
+  cueMesh.rotation.y = 0;
   cueMesh.visible = true;
 }

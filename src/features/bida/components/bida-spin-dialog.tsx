@@ -66,7 +66,7 @@ export function BidaSpinDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onDismiss?.()}>
-      <DialogContent showCloseButton={true} className="w-full max-w-sm rounded-[28px] p-6 flex flex-col items-center gap-5">
+      <DialogContent showCloseButton={true} className="sm:max-w-sm flex flex-col items-center gap-5">
         <DialogHeader className="w-full text-center sm:text-center items-center justify-center">
           <DialogTitle className="text-sm font-bold uppercase tracking-wider text-foreground text-center w-full">
             {t("cueBallSpin")}

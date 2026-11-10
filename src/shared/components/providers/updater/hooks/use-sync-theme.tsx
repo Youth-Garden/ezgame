@@ -1,22 +1,49 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from "react";
+import { cookieUtils } from "@/shared/utils/cookie";
 
-const THEME_KEY = "ezgame_theme";
+export type ThemeMode = "dark" | "light";
 
-export function useSyncTheme() {
-  const [theme, setThemeState] = useState<"dark" | "light">("dark");
+export const THEME_COOKIE_KEY = "ezgame_theme";
 
+interface ThemeContextValue {
+  theme: ThemeMode;
+  setTheme: (theme: ThemeMode, clickCoordinates?: { clientX: number; clientY: number }) => void;
+  toggleTheme: (event?: React.MouseEvent) => void;
+}
+
+const ThemeContext = createContext<ThemeContextValue>({
+  theme: "dark",
+  setTheme: () => {},
+  toggleTheme: () => {},
+});
+
+export function ThemeProvider({
+  children,
+  initialTheme = "dark",
+}: {
+  children: ReactNode;
+  initialTheme?: ThemeMode;
+}) {
+  const [theme, setThemeState] = useState<ThemeMode>(initialTheme);
+
+  // Sync to cookie and DOM on mount if different or missing
   useEffect(() => {
     try {
-      const stored = localStorage.getItem(THEME_KEY) as "dark" | "light" | null;
-      const initial = stored || "dark";
-      setThemeState(initial);
-      const root = document.documentElement;
-      if (initial === "dark") {
-        root.classList.add("dark");
-      } else {
-        root.classList.remove("dark");
+      const stored = (cookieUtils.get(THEME_COOKIE_KEY) || localStorage.getItem(THEME_COOKIE_KEY)) as ThemeMode | null;
+      if (stored && (stored === "dark" || stored === "light")) {
+        setThemeState(stored);
+        const root = document.documentElement;
+        if (stored === "dark") {
+          root.classList.add("dark");
+          root.style.colorScheme = "dark";
+          root.style.backgroundColor = "#09090b";
+        } else {
+          root.classList.remove("dark");
+          root.style.colorScheme = "light";
+          root.style.backgroundColor = "#edf1f7";
+        }
       }
     } catch {
       // Ignore
@@ -24,15 +51,20 @@ export function useSyncTheme() {
   }, []);
 
   const setTheme = useCallback(
-    (newTheme: "dark" | "light", clickCoordinates?: { clientX: number; clientY: number }) => {
+    (newTheme: ThemeMode, clickCoordinates?: { clientX: number; clientY: number }) => {
       const applyTheme = () => {
         try {
-          localStorage.setItem(THEME_KEY, newTheme);
+          cookieUtils.set(THEME_COOKIE_KEY, newTheme);
+          localStorage.setItem(THEME_COOKIE_KEY, newTheme);
           const root = document.documentElement;
           if (newTheme === "dark") {
             root.classList.add("dark");
+            root.style.colorScheme = "dark";
+            root.style.backgroundColor = "#09090b";
           } else {
             root.classList.remove("dark");
+            root.style.colorScheme = "light";
+            root.style.backgroundColor = "#edf1f7";
           }
         } catch {
           // Ignore
@@ -96,9 +128,13 @@ export function useSyncTheme() {
     [theme, setTheme]
   );
 
-  return {
-    theme,
-    toggleTheme,
-    setTheme,
-  };
+  return (
+    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+
+export function useSyncTheme() {
+  return useContext(ThemeContext);
 }

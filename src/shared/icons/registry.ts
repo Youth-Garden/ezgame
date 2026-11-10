@@ -50,4 +50,11 @@ export const iconRegistry: Record<string, IconComponent> = {
   copy: LucideIcons.Copy,
   minus: LucideIcons.MinusCircle,
   frown: LucideIcons.Frown,
+  dices: LucideIcons.Dices,
+  refresh: LucideIcons.RefreshCw,
+  user: LucideIcons.User,
+  edit: LucideIcons.Pencil,
+  settings: LucideIcons.SlidersHorizontal,
+  timer: LucideIcons.Timer,
+  grid: LucideIcons.Grid,
 };

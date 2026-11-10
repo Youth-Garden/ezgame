@@ -7,12 +7,14 @@ export function usePlayerProfile() {
   const randomizeAvatar = usePlayerStore((state) => state.randomizeAvatar);
   const setName = usePlayerStore((state) => state.setName);
   const setAvatarStyle = usePlayerStore((state) => state.setAvatarStyle);
+  const updateProfile = usePlayerStore((state) => state.updateProfile);
 
   return {
     profile,
     randomizeAvatar,
     setName,
     setAvatarStyle,
+    updateProfile,
   };
 }
 

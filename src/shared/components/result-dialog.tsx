@@ -65,7 +65,7 @@ export function ResultDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onDismiss?.()}>
-      <DialogContent showCloseButton={false} className="text-center">
+      <DialogContent showCloseButton={false} className="sm:max-w-sm flex flex-col items-center text-center">
         <DialogHeader className="items-center text-center">
           {/* 3D / Cartoon Game Result Illustration (Zero-border, Standalone) */}
           <div className="mb-3 transform hover:scale-105 transition-transform duration-200">

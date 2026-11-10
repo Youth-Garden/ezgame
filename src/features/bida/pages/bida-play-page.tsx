@@ -11,7 +11,9 @@ import { BidaTable } from "../components/bida-table";
 import { BidaScoreboard } from "../components/bida-scoreboard";
 import { useBidaGame } from "../hooks/use-bida-game";
 import { useGameRoom } from "@/shared/hooks/use-game-room";
-import type { BidaBall } from "../types";
+import { DEFAULT_BIDA_CONFIG } from "../config/bida-config";
+import { useTurnTimer } from "@/shared/hooks/use-turn-timer";
+import { BidaTurnState, type BidaBall } from "../types";
 
 export function BidaPlayPage() {
   const t = useTranslations("game");
@@ -33,8 +35,8 @@ export function BidaPlayPage() {
     dismissResultDialog,
     promptSurrender,
   } = useGameRoom({
-    gameTitle: "Pocket Billiards (8-Ball)",
-    defaultRoomCode: "BD-DEMO",
+    gameTitle: DEFAULT_BIDA_CONFIG.title,
+    defaultRoomCode: DEFAULT_BIDA_CONFIG.defaultRoomCode,
     onEventReceived: (event: RealtimeEvent) => handleRealtimeEvent(event),
     onSurrenderConfirmed: async () => {
       const winner: GameWinner =
@@ -59,6 +61,7 @@ export function BidaPlayPage() {
     applyShot,
     applyAuthoritativeSync,
     fireShot,
+    passTurnTimeout,
   } = useBidaGame({
     myRole,
     sendEvent: async (e) => sendEventRef.current(e),
@@ -142,6 +145,8 @@ export function BidaPlayPage() {
         showResultDialog(null, false, true);
       } else if (event.type === RealtimeEventType.REMATCH_ACCEPT) {
         resetGame(event.payload.acceptedBy === PlayerRole.X ? PlayerRole.O : PlayerRole.X);
+      } else if (event.type === RealtimeEventType.GAME_TIMEOUT_PASS_TURN) {
+        passTurnTimeout(event.payload.nextTurn);
       } else if (event.type === RealtimeEventType.PLAYER_SURRENDER) {
         const winner =
           event.payload.player === PlayerRole.X ? GameWinner.O : GameWinner.X;
@@ -158,6 +163,32 @@ export function BidaPlayPage() {
     ]
   );
 
+  // Turn Countdown Timer
+  const isMyTurn = currentTurn === myRole;
+  const isGameActive = isOpponentOnline && turnState === BidaTurnState.AIMING;
+
+  const { timeLeft, isWarning: isTimerWarning } = useTurnTimer({
+    currentTurn,
+    isGameActive,
+    timeLimitSeconds: DEFAULT_BIDA_CONFIG.turnTimeLimitSeconds,
+    warningThresholdSeconds: DEFAULT_BIDA_CONFIG.warningThresholdSeconds,
+    onTimeOut: () => {
+      // Turn timeout: switch turn to opponent without losing
+      if (isMyTurn && isGameActive) {
+        const nextTurn = myRole === PlayerRole.X ? PlayerRole.O : PlayerRole.X;
+        passTurnTimeout(nextTurn);
+        sendEvent({
+          type: RealtimeEventType.GAME_TIMEOUT_PASS_TURN,
+          payload: {
+            player: myRole,
+            nextTurn,
+            timestamp: Date.now(),
+          },
+        }).catch(() => {});
+      }
+    },
+  });
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-game">
       {/* Header with players and room code */}
@@ -173,10 +204,11 @@ export function BidaPlayPage() {
         expectedOpponentRole={expectedOpponentRole}
         isSupabaseConfigured={isSupabaseConfigured}
         isGameActive={isOpponentOnline}
+        onSurrender={promptSurrender}
       />
 
       {/* Main Play Area */}
-      <main className="flex-1 flex flex-col items-center justify-center p-2 sm:p-3 max-w-[1440px] mx-auto w-full gap-2.5 sm:gap-3">
+      <main className="flex-1 flex flex-col items-center justify-start p-2 sm:p-3 max-w-[1440px] mx-auto w-full gap-2.5 sm:gap-3">
         {/* Game Tools & Quick Actions */}
         <div className="w-full max-w-[1360px] flex items-center justify-between gap-2">
           <Button
@@ -212,6 +244,8 @@ export function BidaPlayPage() {
             myProfile={myProfile}
             opponentProfile={opponentProfile}
             isOpponentOnline={isOpponentOnline}
+            timeLeft={timeLeft}
+            isTimerWarning={isTimerWarning}
           />
         </div>
 

@@ -62,7 +62,13 @@
     "emptyCodeErr": "Please enter a room code!",
     "notFoundErr": "Room code not found or has expired.",
     "createErr": "Failed to create room. Please try again.",
-    "connectErr": "Unable to connect to the server. Please try again."
+    "connectErr": "Unable to connect to the server. Please try again.",
+    "matchSettings": "Match Settings",
+    "turnTimeLimit": "Turn Time Limit",
+    "boardSize": "Board Size",
+    "ruleStandard": "Standard Rules",
+    "rule8Ball": "Standard 8-Ball",
+    "ruleCaro": "5 in a row"
   },
   "game": {
     "turn": "Turn",
@@ -99,6 +105,7 @@
     "open": "Open",
     "solids": "Solids",
     "stripes": "Stripes",
+    "you": "You",
     "player": "Player",
     "waitingForOpponentToJoin": "Waiting for opponent to join room...",
     "releaseToShoot": "RELEASE TO SHOOT",
@@ -140,5 +147,24 @@
     "close": "Close",
     "copied": "Copied!",
     "you": "You"
+  },
+  "profile": {
+    "title": "Player Profile",
+    "guest": "Guest",
+    "guestDesc": "Temporary account stored in your browser",
+    "playerId": "Player ID",
+    "nickname": "Nickname",
+    "nicknamePlaceholder": "Enter your nickname...",
+    "randomName": "Random Name",
+    "avatarSection": "Avatar Customization",
+    "avatarStyle": "Avatar Style",
+    "avatarSeed": "Avatar Seed",
+    "avatarSeedPlaceholder": "Enter seed keyword...",
+    "randomSeed": "Random Seed",
+    "save": "Save Changes",
+    "cancel": "Cancel",
+    "menuTitle": "Profile",
+    "editProfile": "Edit Profile",
+    "quickRandomAvatar": "Quick Random Avatar"
   }
 }

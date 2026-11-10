@@ -207,10 +207,11 @@
 }
 
 /* Modal pop animations */
+/* Desktop Center Dialog Scale Animations */
 @keyframes modal-scale-in {
   0% {
     opacity: 0;
-    transform: scale(0.8) translateY(6px);
+    transform: scale(0.92) translateY(8px);
   }
   100% {
     opacity: 1;
@@ -225,16 +226,46 @@
   }
   100% {
     opacity: 0;
-    transform: scale(0.8) translateY(6px);
+    transform: scale(0.92) translateY(8px);
   }
 }
 
+/* Mobile Bottom Sheet Slide Animations */
+@keyframes sheet-slide-in {
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes sheet-slide-out {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+/* Default Mobile: Bottom sheet slide from bottom screen edge */
 .animate-modal-in {
-  animation: modal-scale-in 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: sheet-slide-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .animate-modal-out {
-  animation: modal-scale-out 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: sheet-slide-out 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Desktop (sm+): Dialog centered with crisp scale & spring */
+@media (min-width: 640px) {
+  .animate-modal-in {
+    animation: modal-scale-in 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .animate-modal-out {
+    animation: modal-scale-out 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
 }
 ::-webkit-scrollbar {
   width: 6px;

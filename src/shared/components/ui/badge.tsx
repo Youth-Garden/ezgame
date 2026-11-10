@@ -5,6 +5,7 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?:
     | "default"
     | "secondary"
+    | "subtle"
     | "warning"
     | "success"
     | "destructive"
@@ -21,21 +22,22 @@ export function Badge({
   ...props
 }: BadgeProps) {
   const variantStyles = {
-    // Subtle, modern tones - not harsh, highly legible
-    default: "bg-primary/10 text-primary",
-    secondary: "bg-muted text-muted-foreground",
-    warning: "bg-amber-400/10 text-amber-300",
-    success: "bg-emerald-400/10 text-emerald-300",
-    destructive: "bg-rose-400/10 text-rose-300",
-    solids: "bg-amber-400/10 text-amber-300",
-    stripes: "bg-sky-400/10 text-sky-300",
+    // Subtle modern tones without any borders
+    default: "bg-primary/15 text-primary font-semibold",
+    secondary: "bg-muted text-muted-foreground font-medium",
+    subtle: "bg-muted/80 text-foreground font-medium",
+    warning: "bg-amber-500/15 text-amber-700 dark:text-amber-400 font-bold",
+    success: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 font-bold",
+    destructive: "bg-rose-500/15 text-rose-700 dark:text-rose-400 font-bold",
+    solids: "bg-amber-500/15 text-amber-700 dark:text-amber-400 font-bold",
+    stripes: "bg-sky-500/15 text-sky-700 dark:text-sky-400 font-bold",
     ghost: "bg-transparent text-foreground",
   };
 
   const sizeStyles = {
-    sm: "px-2 py-0.5 text-[10px]",
-    default: "px-3 py-1 text-[11px]",
-    lg: "px-4 py-1.5 text-xs",
+    sm: "px-2.5 py-0.5 text-[10px]",
+    default: "px-3.5 py-1 text-[11px]",
+    lg: "px-4.5 py-1.5 text-xs",
   };
 
   return (

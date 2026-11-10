@@ -249,6 +249,11 @@ export function useBidaGame({
     lastFoul,
     assignedGroups,
     isBreakShot,
+    passTurnTimeout: (nextTurnPlayer: PlayerRole.X | PlayerRole.O) => {
+      setCurrentTurn(nextTurnPlayer);
+      setLastFoul("Lượt chuyển do hết thời gian");
+      setTurnState(BidaTurnState.AIMING);
+    },
     resetGame,
     applyShot,
     applyAuthoritativeSync,

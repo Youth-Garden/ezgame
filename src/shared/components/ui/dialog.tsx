@@ -30,7 +30,6 @@ export function Dialog({ open = false, onOpenChange, children }: DialogProps) {
     setMounted(true);
   }
 
-
   React.useEffect(() => {
     if (!open && mounted) {
       const timer = setTimeout(() => setMounted(false), 200);
@@ -114,12 +113,19 @@ export function DialogContent({
       data-slot="dialog-content"
       onClick={handleStopPropagation}
       className={cn(
-        "relative z-50 w-full max-w-sm rounded-2xl bg-card p-6 text-card-foreground shadow-2xl border-none",
+        "relative z-50 w-full bg-card p-6 text-card-foreground shadow-2xl border-none transition-all duration-300 ease-out select-none",
+        // Mobile Bottom Sheet styling: full width, dính 2 mép điện thoại, chỉ bo 2 góc trên, 2 góc dưới thẳng tắp 0px
+        "rounded-t-[28px] rounded-b-none max-h-[92vh] overflow-y-auto pb-8",
+        // Desktop Dialog: căn giữa, modal nổi bo góc đều đặn
+        "sm:rounded-2xl sm:max-w-md sm:pb-6",
         open ? "animate-modal-in" : "animate-modal-out pointer-events-none",
         className
       )}
       {...props}
     >
+      {/* Mobile drag handle pull pill */}
+      <div className="w-10 h-1 rounded-full bg-muted mx-auto -mt-2 mb-4 sm:hidden shrink-0" />
+
       {children}
 
       {showCloseButton && (

@@ -50,9 +50,18 @@ export enum RealtimeEventType {
   REQUEST_ROOM_SYNC = "REQUEST_ROOM_SYNC",
   RESPONSE_CARO_SYNC = "RESPONSE_CARO_SYNC",
   RESPONSE_BIDA_SYNC = "RESPONSE_BIDA_SYNC",
+  GAME_TIMEOUT_PASS_TURN = "GAME_TIMEOUT_PASS_TURN",
 }
 
 export type RealtimeEvent =
+  | {
+      type: RealtimeEventType.GAME_TIMEOUT_PASS_TURN;
+      payload: {
+        player: PlayerRole;
+        nextTurn: PlayerRole.X | PlayerRole.O;
+        timestamp: number;
+      };
+    }
   | {
       type: RealtimeEventType.REQUEST_ROOM_SYNC;
       payload: {

@@ -44,8 +44,8 @@ export const CaroCell = memo(function CaroCell({
       disabled={Boolean(value) || !canClick}
       aria-label={`Row ${row + 1}, Column ${col + 1}${value ? `, piece ${value}` : ""}`}
       className={cn(
-        "relative w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 flex items-center justify-center transition-colors duration-100 select-none group",
-        "border-r border-b border-border/40 bg-card",
+        "relative w-[calc((100vw-36px)/15)] h-[calc((100vw-36px)/15)] max-w-[42px] max-h-[42px] min-w-[20px] min-h-[20px] sm:w-8 sm:h-8 md:w-9 md:h-9 flex items-center justify-center transition-colors duration-100 select-none group shrink-0",
+        "border-r border-b border-neutral-200 dark:border-neutral-800 bg-card",
         !value && canClick && "hover:bg-secondary/40 cursor-pointer",
         !value && !canClick && "cursor-default",
         value && "cursor-default",

@@ -1,52 +1,20 @@
+import Image from "next/image";
 import type { SVGProps } from "react";
 
 export function EzGameLogo({
   size = 32,
-  className,
-  ...props
+  className = "",
 }: SVGProps<SVGSVGElement> & { size?: number | string }) {
+  const numericSize = typeof size === "number" ? size : parseInt(String(size), 10) || 32;
+
   return (
-    <svg
-      viewBox="0 0 128 128"
-      width={size}
-      height={size}
-      className={className}
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      {...props}
-    >
-      <defs>
-        <linearGradient id="ez-bg-comp" x1="16" y1="16" x2="112" y2="112" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#27272a" />
-          <stop offset="100%" stopColor="#09090b" />
-        </linearGradient>
-
-        <linearGradient id="ez-bolt-comp" x1="28" y1="28" x2="100" y2="100" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#38bdf8" />
-          <stop offset="50%" stopColor="#2563eb" />
-          <stop offset="100%" stopColor="#4f46e5" />
-        </linearGradient>
-
-        <linearGradient id="ez-coral-comp" x1="80" y1="36" x2="104" y2="60" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#fb7185" />
-          <stop offset="100%" stopColor="#e11d48" />
-        </linearGradient>
-      </defs>
-
-      <rect x="8" y="8" width="112" height="112" rx="30" fill="url(#ez-bg-comp)" />
-      <rect x="8" y="8" width="112" height="112" rx="30" stroke="#3f3f46" strokeWidth="2" strokeOpacity="0.4" />
-
-      <circle cx="32" cy="32" r="1.5" fill="#52525b" />
-      <circle cx="96" cy="32" r="1.5" fill="#52525b" />
-      <circle cx="32" cy="96" r="1.5" fill="#52525b" />
-      <circle cx="96" cy="96" r="1.5" fill="#52525b" />
-
-      <path
-        d="M 40 38 L 86 38 C 90 38 92 42 89 45 L 62 72 L 86 72 C 90 72 92 76 89 79 L 52 100 C 47 103 44 98 47 94 L 58 78 L 42 78 C 38 78 36 74 39 71 L 64 46 L 42 46 C 38 46 38 38 40 38 Z"
-        fill="url(#ez-bolt-comp)"
-      />
-
-      <circle cx="92" cy="40" r="5" fill="url(#ez-coral-comp)" />
-    </svg>
+    <Image
+      src="/logo.png"
+      alt="EzGame Logo"
+      width={numericSize}
+      height={numericSize}
+      className={`object-contain select-none pointer-events-none ${className}`}
+      priority
+    />
   );
 }

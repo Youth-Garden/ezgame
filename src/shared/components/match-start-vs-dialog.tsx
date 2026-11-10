@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { type PortalProps } from "@/shared/types/portal.types";
 import { sounds } from "@/shared/lib/sound-effects";
@@ -9,6 +8,7 @@ import {
   Dialog,
   DialogContent,
 } from "@/shared/components/ui/dialog";
+import { Avatar, AvatarImage, AvatarFallback } from "@/shared/components/ui/avatar";
 
 export interface MatchStartVsDialogData {
   playerXName: string;
@@ -44,7 +44,7 @@ export function MatchStartVsDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onDismiss?.()}>
-      <DialogContent showCloseButton={false} className="max-w-lg bg-card/95 border-none p-6 text-center select-none shadow-2xl">
+      <DialogContent showCloseButton={false} className="sm:max-w-lg text-center">
         {/* Game Title Header */}
         <span className="text-xs sm:text-sm font-extrabold uppercase tracking-widest text-primary mb-6 animate-pulse block">
           {data.gameTitle || t("matchReady")} • {t("gameStarting")}
@@ -54,20 +54,10 @@ export function MatchStartVsDialog({
         <div className="w-full flex items-center justify-between gap-4 px-4 sm:px-8">
           {/* Player X (Left) */}
           <div className="flex-1 flex flex-col items-center gap-3 animate-in slide-in-from-left duration-500">
-            <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-3xl overflow-hidden bg-neutral-900 ring-4 ring-primary shadow-2xl flex items-center justify-center">
-              {data.playerXAvatar ? (
-                <Image
-                  src={data.playerXAvatar}
-                  alt={data.playerXName}
-                  width={96}
-                  height={96}
-                  className="w-full h-full object-cover"
-                  unoptimized
-                />
-              ) : (
-                <span className="text-3xl font-black text-primary">X</span>
-              )}
-            </div>
+            <Avatar size="lg" className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl ring-4 ring-primary shadow-2xl bg-neutral-900">
+              {data.playerXAvatar && <AvatarImage src={data.playerXAvatar} alt={data.playerXName} />}
+              <AvatarFallback className="text-3xl font-black text-primary">X</AvatarFallback>
+            </Avatar>
             <div className="flex flex-col items-center">
               <span className="text-sm sm:text-base font-black text-foreground truncate max-w-[120px]">
                 {data.playerXName}
@@ -89,20 +79,10 @@ export function MatchStartVsDialog({
 
           {/* Player O (Right) */}
           <div className="flex-1 flex flex-col items-center gap-3 animate-in slide-in-from-right duration-500">
-            <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-3xl overflow-hidden bg-neutral-900 ring-4 ring-destructive shadow-2xl flex items-center justify-center">
-              {data.playerOAvatar ? (
-                <Image
-                  src={data.playerOAvatar}
-                  alt={data.playerOName}
-                  width={96}
-                  height={96}
-                  className="w-full h-full object-cover"
-                  unoptimized
-                />
-              ) : (
-                <span className="text-3xl font-black text-destructive">O</span>
-              )}
-            </div>
+            <Avatar size="lg" className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl ring-4 ring-destructive shadow-2xl bg-neutral-900">
+              {data.playerOAvatar && <AvatarImage src={data.playerOAvatar} alt={data.playerOName} />}
+              <AvatarFallback className="text-3xl font-black text-destructive">O</AvatarFallback>
+            </Avatar>
             <div className="flex flex-col items-center">
               <span className="text-sm sm:text-base font-black text-foreground truncate max-w-[120px]">
                 {data.playerOName}

@@ -12,6 +12,8 @@ import { GameBoard } from "@/shared/components/game-board";
 import { GameType } from "@/shared/types/room";
 import { useCaroGame } from "../hooks/use-caro-game";
 import { useGameRoom } from "@/shared/hooks/use-game-room";
+import { DEFAULT_CARO_CONFIG } from "../config/caro-config";
+import { useTurnTimer } from "@/shared/hooks/use-turn-timer";
 
 export function CaroPlayPage() {
   // Encapsulated shared room realtime, presence, profiles, and portal dialogs
@@ -30,8 +32,8 @@ export function CaroPlayPage() {
     dismissResultDialog,
     promptSurrender,
   } = useGameRoom({
-    gameTitle: "Caro 15x15",
-    defaultRoomCode: "CR-DEMO",
+    gameTitle: DEFAULT_CARO_CONFIG.title,
+    defaultRoomCode: DEFAULT_CARO_CONFIG.defaultRoomCode,
     onEventReceived: (event: RealtimeEvent) => handleRealtimeEvent(event),
     onSurrenderConfirmed: async () => {
       const winner: GameWinner =
@@ -113,6 +115,16 @@ export function CaroPlayPage() {
           break;
         }
 
+        case RealtimeEventType.GAME_TIMEOUT_PASS_TURN: {
+          const nextCaroTurn =
+            event.payload.nextTurn === PlayerRole.X ? CaroPlayer.X : CaroPlayer.O;
+          setGameState((prev) => ({
+            ...prev,
+            currentTurn: nextCaroTurn,
+          }));
+          break;
+        }
+
         case RealtimeEventType.PLAYER_SURRENDER: {
           const winner =
             event.payload.player === PlayerRole.X ? GameWinner.O : GameWinner.X;
@@ -136,6 +148,33 @@ export function CaroPlayPage() {
   const canClick =
     isMyTurn && isOpponentOnline && !gameState.winner && (myRole as PlayerRole) !== PlayerRole.SPECTATOR;
 
+  // Turn Countdown Timer
+  const { timeLeft, isWarning: isTimerWarning } = useTurnTimer({
+    currentTurn: gameState.currentTurn,
+    isGameActive: isOpponentOnline && !gameState.winner,
+    timeLimitSeconds: DEFAULT_CARO_CONFIG.turnTimeLimitSeconds,
+    warningThresholdSeconds: DEFAULT_CARO_CONFIG.warningThresholdSeconds,
+    onTimeOut: () => {
+      // Turn timeout: switch turn to opponent without losing
+      if (isMyTurn && !gameState.winner && isOpponentOnline) {
+        const nextTurn = myRole === PlayerRole.X ? PlayerRole.O : PlayerRole.X;
+        const nextCaroTurn = nextTurn === PlayerRole.X ? CaroPlayer.X : CaroPlayer.O;
+        setGameState((prev) => ({
+          ...prev,
+          currentTurn: nextCaroTurn,
+        }));
+        sendEvent({
+          type: RealtimeEventType.GAME_TIMEOUT_PASS_TURN,
+          payload: {
+            player: myRole,
+            nextTurn,
+            timestamp: Date.now(),
+          },
+        }).catch(() => {});
+      }
+    },
+  });
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-game">
       {/* Room Header */}
@@ -151,48 +190,54 @@ export function CaroPlayPage() {
         expectedOpponentRole={expectedOpponentRole}
         isSupabaseConfigured={isSupabaseConfigured}
         isGameActive={!gameState.winner && isOpponentOnline}
+        onSurrender={promptSurrender}
       />
 
       {/* Main Game Stage */}
-      <main className="flex-1 flex flex-col items-center justify-center p-3 sm:p-6 max-w-6xl mx-auto w-full">
-        {/* Game Tools & Quick Actions */}
-        <div className="w-full max-w-[620px] flex items-center justify-end gap-2 mb-3">
-          {!gameState.winner && (
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={promptSurrender}
-              className="text-xs gap-1.5"
-            >
-              <Icons name="flag" size={14} />
-              <span>Surrender</span>
-            </Button>
-          )}
-        </div>
+      <main className="flex-1 flex flex-col items-center justify-start p-2 sm:p-6 w-full">
+        {/* Game Stage Content Container: Fits tightly to the board width so Scoreboard matches the Board */}
+        <div className="w-full sm:w-fit flex flex-col items-center">
+          {/* Desktop Game Tools & Quick Actions */}
+          <div className="hidden sm:flex w-full items-center justify-end gap-2 mb-3">
+            {!gameState.winner && (
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={promptSurrender}
+                className="text-xs gap-1.5"
+              >
+                <Icons name="flag" size={14} />
+                <span>Surrender</span>
+              </Button>
+            )}
+          </div>
 
-        {/* Live Caro Scoreboard directly on table */}
-        <div className="mb-4 w-full max-w-[620px]">
-          <CaroScoreboard
-            currentTurn={gameState.currentTurn}
-            myRole={myRole}
-            myProfile={myProfile}
-            opponentProfile={opponentProfile}
-            isOpponentOnline={isOpponentOnline}
-          />
-        </div>
+          {/* Live Caro Scoreboard directly on table - Perfectly matches board width */}
+          <div className="mb-4 w-full">
+            <CaroScoreboard
+              currentTurn={gameState.currentTurn}
+              myRole={myRole}
+              myProfile={myProfile}
+              opponentProfile={opponentProfile}
+              isOpponentOnline={isOpponentOnline}
+              timeLeft={timeLeft}
+              isTimerWarning={isTimerWarning}
+            />
+          </div>
 
-        {/* Board Component wrapped in GameBoard Strategy container */}
-        <GameBoard gameType={GameType.CARO}>
-          <CaroBoard
-            board={gameState.board}
-            lastMove={gameState.lastMove}
-            winningLine={gameState.winningLine}
-            canClick={canClick}
-            myRole={myRole}
-            currentTurn={gameState.currentTurn}
-            onCellClick={handleCellClick}
-          />
-        </GameBoard>
+          {/* Board Component wrapped in GameBoard Strategy container */}
+          <GameBoard gameType={GameType.CARO}>
+            <CaroBoard
+              board={gameState.board}
+              lastMove={gameState.lastMove}
+              winningLine={gameState.winningLine}
+              canClick={canClick}
+              myRole={myRole}
+              currentTurn={gameState.currentTurn}
+              onCellClick={handleCellClick}
+            />
+          </GameBoard>
+        </div>
       </main>
     </div>
   );

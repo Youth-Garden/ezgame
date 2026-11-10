@@ -8,9 +8,9 @@ import { GameCard } from "../components/game-card";
 import { RoomSelectionDialog } from "../components/room-selection-dialog";
 import type { GameMetadata, GameRoomModalData } from "../types";
 import { Icons } from "@/shared/icons";
-import { useRipple } from "@/shared/hooks/use-ripple";
 import { Button } from "@/shared/components/ui/button";
 import { useSyncLocale, useSyncTheme } from "@/shared/components/providers/updater/hooks";
+import { UserProfileMenu } from "../components/user-profile-menu";
 
 const LANGUAGES = [
   { code: "vi", label: "Tiếng Việt", flagIcon: "flag-vn" },
@@ -28,11 +28,6 @@ export function LobbyPage() {
 
   const [isLangOpen, setIsLangOpen] = useState(false);
   const langDropdownRef = useRef<HTMLDivElement>(null);
-
-  const { createRipple: rippleLang, RippleContainer: RippleLangContainer } =
-    useRipple<HTMLButtonElement>();
-  const { createRipple: rippleTheme, RippleContainer: RippleThemeContainer } =
-    useRipple<HTMLButtonElement>();
 
   const [presentRoomModal] = usePortal<GameRoomModalData>(RoomSelectionDialog);
 
@@ -89,33 +84,34 @@ export function LobbyPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-between bg-background text-foreground font-sans selection:bg-muted transition-colors">
+    <div className="min-h-screen flex flex-col justify-between bg-background text-foreground font-sans selection:bg-muted">
       {/* Top Header */}
-      <header className="w-full bg-background/80 backdrop-blur-md sticky top-0 z-30 px-4 sm:px-6 py-3.5">
-        <div className="max-w-2xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center">
-              <Icons name="logo" size={32} />
+      <header className="w-full bg-background/80 backdrop-blur-md sticky top-0 z-30 px-3 sm:px-6 py-2.5 sm:py-3.5 border-b border-border/40">
+        <div className="max-w-2xl mx-auto flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg overflow-hidden flex items-center justify-center shrink-0">
+              <Icons name="logo" size={28} className="sm:hidden" />
+              <Icons name="logo" size={32} className="hidden sm:block" />
             </div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-base font-bold tracking-tight text-foreground uppercase">
+            <div className="flex items-baseline gap-1.5 sm:gap-2 truncate">
+              <span className="text-sm sm:text-base font-bold tracking-tight text-foreground uppercase truncate">
                 EzGame
               </span>
-              <span className="text-xs text-text-secondary hidden sm:inline font-medium">
+              <span className="text-[11px] sm:text-xs text-text-secondary hidden md:inline font-medium truncate">
                 {tLobby("tagline")}
               </span>
             </div>
           </div>
 
-          {/* Right Actions: Language Dropdown & Theme Toggle */}
-          <div className="flex items-center gap-2">
+          {/* Right Actions: Language Dropdown, Theme Toggle & User Profile */}
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             {/* Language Select Dropdown */}
             <div className="relative" ref={langDropdownRef}>
               <Button
                 variant="secondary"
                 size="sm"
                 onClick={() => setIsLangOpen((prev) => !prev)}
-                className="gap-1.5 h-8 px-3"
+                className="gap-1 sm:gap-1.5 h-8 px-2 sm:px-3"
                 aria-expanded={isLangOpen}
               >
                 <span className="rounded-xs overflow-hidden flex items-center justify-center">
@@ -132,7 +128,7 @@ export function LobbyPage() {
 
               {/* Language Menu */}
               <div
-                className={`absolute right-0 mt-2 w-44 p-1.5 rounded-2xl bg-card border-none text-card-foreground shadow-xl z-50 flex flex-col gap-1 transform origin-top-right transition-all duration-150 ease-out ${
+                className={`absolute right-0 mt-2 w-44 p-1.5 rounded-2xl bg-popover border-none text-popover-foreground shadow-none z-50 flex flex-col gap-1 transform origin-top-right transition-all duration-150 ease-out ${
                   isLangOpen
                     ? "opacity-100 scale-100 pointer-events-auto"
                     : "opacity-0 scale-95 pointer-events-none"
@@ -184,6 +180,9 @@ export function LobbyPage() {
                 <Icons name="moon" size={15} className="text-foreground" />
               )}
             </Button>
+
+            {/* User Profile Avatar Dropdown */}
+            <UserProfileMenu />
           </div>
         </div>
       </header>

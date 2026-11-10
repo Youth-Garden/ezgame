@@ -2,21 +2,25 @@
 
 import { useEffect, useRef, useState, type MouseEvent, type TouchEvent } from "react";
 import * as THREE from "three";
-import {
-  BALL_RADIUS,
-  TABLE_HEIGHT,
-  TABLE_WIDTH,
-} from "../utils/bida-physics";
-import { BidaBall, BidaBallType, BidaTurnState } from "../types";
-import { PlayerRole } from "@/shared/types/room";
-import {
-  initThreeBidaScene,
-  type ThreeBidaScene,
-} from "../utils/bida-3d-scene";
-import { updateAimAndCue } from "../utils/bida-3d-aim";
 import { usePortal } from "@/shared/components/portal";
-import { BidaSpinDialog, type BidaSpinDialogData } from "./bida-spin-dialog";
+import { PlayerRole } from "@/shared/types/room";
+import { BidaBall, BidaBallType, BidaTurnState } from "../types";
+import { updateAimAndCue } from "../utils/bida-3d-aim";
+import { initThreeBidaScene, type ThreeBidaScene } from "../utils/bida-3d-scene";
+import { BALL_RADIUS, POCKETS, TABLE_HEIGHT, TABLE_WIDTH } from "../utils/bida-physics";
 import { BidaActionBar } from "./bida-action-bar";
+import { BidaSpinDialog, type BidaSpinDialogData } from "./bida-spin-dialog";
+
+interface FallingBallAnimation {
+  ballId: number;
+  startX: number;
+  startY: number;
+  startZ: number;
+  pocketX: number;
+  pocketY: number;
+  startTime: number;
+  duration: number;
+}
 
 interface BidaTableProps {
   balls: BidaBall[];
@@ -52,8 +56,10 @@ export function BidaTable({
   const lockedAngleRef = useRef(0);
   const powerRef = useRef(0);
 
-  // Three.js Scene References
+  // Three.js Scene References & Falling Ball Animations
   const threeSceneRef = useRef<ThreeBidaScene | null>(null);
+  const fallingBallsRef = useRef<Map<number, FallingBallAnimation>>(new Map());
+  const prevPocketedRef = useRef<Map<number, boolean>>(new Map());
 
   const cueBall = balls.find((b) => b.type === BidaBallType.CUE && !b.isPocketed);
   const canPlay = isMyTurn && isOpponentOnline && turnState === BidaTurnState.AIMING;
@@ -86,9 +92,48 @@ export function BidaTable({
 
     window.addEventListener("resize", handleResize);
 
-    // Dedicated requestAnimationFrame render loop for smooth 60 FPS V-Sync
+    // Dedicated requestAnimationFrame render loop for smooth 60 FPS V-Sync with Pocket Fall Animation
     let animationFrameId: number;
     const renderLoop = () => {
+      const now = performance.now();
+      const falling = fallingBallsRef.current;
+
+      if (falling.size > 0) {
+        falling.forEach((anim, bId) => {
+          const mesh = threeScene.ballMeshes.get(bId);
+          if (!mesh) {
+            falling.delete(bId);
+            return;
+          }
+
+          const elapsed = now - anim.startTime;
+          const t = Math.min(1, Math.max(0, elapsed / anim.duration));
+
+          // Easing: accelerate downwards (gravity curve)
+          const easeIn = t * t;
+          const curX = anim.startX + (anim.pocketX - anim.startX) * t;
+          const curY = anim.startY + (anim.pocketY - anim.startY) * t;
+          // Z sinks down into the pocket opening (-45px below surface)
+          const curZ = anim.startZ - 60 * easeIn;
+          // Scale smoothly shrinks slightly as it enters the drop pocket
+          const scale = Math.max(0.2, 1 - t * 0.45);
+
+          mesh.position.set(curX, curY, curZ);
+          mesh.scale.set(scale, scale, scale);
+
+          // Rotate tumbling into the pocket
+          mesh.rotation.x += 0.15;
+          mesh.rotation.y += 0.12;
+
+          if (t >= 1) {
+            mesh.visible = false;
+            mesh.scale.set(1, 1, 1);
+            mesh.position.set(0, 0, -900);
+            falling.delete(bId);
+          }
+        });
+      }
+
       threeScene.renderer.render(threeScene.scene, threeScene.camera);
       animationFrameId = requestAnimationFrame(renderLoop);
     };
@@ -287,17 +332,52 @@ export function BidaTable({
     const scene = threeSceneRef.current;
     if (!scene) return;
 
-    // Synchronize 3D pool ball meshes
+    // Synchronize 3D pool ball meshes and trigger pocket fall animations
     balls.forEach((b) => {
       const mesh = scene.ballMeshes.get(b.id);
       if (!mesh) return;
 
+      const wasPocketed = prevPocketedRef.current.get(b.id) ?? false;
+
       if (b.isPocketed) {
-        mesh.visible = false;
-        mesh.position.set(0, 0, -900);
+        if (!wasPocketed) {
+          // Ball just entered pocket! Find closest pocket
+          let closestPocket = POCKETS[0];
+          let minDist = Infinity;
+          POCKETS.forEach((p) => {
+            const dist = Math.hypot(b.x - p.x, b.y - p.y);
+            if (dist < minDist) {
+              minDist = dist;
+              closestPocket = p;
+            }
+          });
+
+          // Register smooth 350ms 3D drop animation
+          fallingBallsRef.current.set(b.id, {
+            ballId: b.id,
+            startX: mesh.position.x,
+            startY: mesh.position.y,
+            startZ: mesh.position.z,
+            pocketX: closestPocket.x - TABLE_WIDTH / 2,
+            pocketY: -(closestPocket.y - TABLE_HEIGHT / 2),
+            startTime: performance.now(),
+            duration: 380,
+          });
+          prevPocketedRef.current.set(b.id, true);
+        } else {
+          // Already pocketed and not falling
+          if (!fallingBallsRef.current.has(b.id)) {
+            mesh.visible = false;
+            mesh.position.set(0, 0, -900);
+          }
+        }
         return;
       }
 
+      // Ball is active on table (e.g. rack reset or active ball)
+      prevPocketedRef.current.set(b.id, false);
+      fallingBallsRef.current.delete(b.id);
+      mesh.scale.set(1, 1, 1);
       mesh.visible = true;
       const targetX = b.x - TABLE_WIDTH / 2;
       const targetY = -(b.y - TABLE_HEIGHT / 2);

@@ -16,8 +16,6 @@ interface CaroBoardProps {
   onCellClick: (row: number, col: number) => void;
 }
 
-const COL_LABELS = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O"];
-
 export function CaroBoard({
   board,
   lastMove,
@@ -36,36 +34,17 @@ export function CaroBoard({
   }, [winningLine]);
 
   return (
-    <div className="flex flex-col items-center">
-
-
+    <div className="w-full flex flex-col items-center">
       {/* Board Outer Card using Shared Card Component */}
       <Card
         variant="solid"
-        className="p-3 sm:p-5 rounded-2xl shadow-none border-none max-w-full overflow-x-auto select-none"
+        className="w-full sm:w-fit p-1.5 sm:p-5 max-w-full overflow-x-auto flex justify-center"
       >
-        <div className="min-w-fit flex flex-col">
-          {/* Top Column Labels (A - O) */}
-          <div className="flex ml-6 sm:ml-7 mb-1.5">
-            {COL_LABELS.map((label) => (
-              <div
-                key={label}
-                className="w-7 sm:w-8 md:w-9 text-center text-[10px] sm:text-xs font-mono font-medium text-neutral-400 dark:text-neutral-500"
-              >
-                {label}
-              </div>
-            ))}
-          </div>
-
-          {/* Board Rows with Left Row Numbers (1 - 15) */}
+        <div className="flex flex-col items-center">
+          {/* Board Grid */}
           <div className="flex flex-col">
             {board.map((row, rowIndex) => (
               <div key={rowIndex} className="flex items-center">
-                {/* Left Row Number */}
-                <div className="w-6 sm:w-7 text-right pr-2 text-[10px] sm:text-xs font-mono font-medium text-neutral-400 dark:text-neutral-500 select-none">
-                  {rowIndex + 1}
-                </div>
-
                 {/* Row of Cells */}
                 <div className={`flex ${rowIndex === 0 ? "border-t border-neutral-200 dark:border-neutral-800" : ""}`}>
                   {row.map((cellValue, colIndex) => {

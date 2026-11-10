@@ -21,6 +21,7 @@ interface PlayerStoreState {
   randomizeAvatar: () => void;
   setName: (name: string) => void;
   setAvatarStyle: (style: AvatarStyle) => void;
+  updateProfile: (updates: { name?: string; avatarSeed?: string; avatarStyle?: AvatarStyle }) => void;
 }
 
 const STORAGE_KEY = "ezgame_player_profile";
@@ -69,6 +70,22 @@ export const usePlayerStore = create<PlayerStoreState>()(
             avatarUrl: getAvatarUrl(style, state.profile.avatarSeed),
           },
         })),
+
+      updateProfile: (updates) =>
+        set((state) => {
+          const nextName = updates.name !== undefined ? updates.name.trim() || state.profile.name : state.profile.name;
+          const nextStyle = updates.avatarStyle || state.profile.avatarStyle;
+          const nextSeed = updates.avatarSeed !== undefined ? updates.avatarSeed.trim() || state.profile.avatarSeed : state.profile.avatarSeed;
+          return {
+            profile: {
+              ...state.profile,
+              name: nextName,
+              avatarStyle: nextStyle,
+              avatarSeed: nextSeed,
+              avatarUrl: getAvatarUrl(nextStyle, nextSeed),
+            },
+          };
+        }),
     }),
     {
       name: STORAGE_KEY,

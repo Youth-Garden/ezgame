@@ -54,7 +54,7 @@ export function ConfirmDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onDismiss?.()}>
-      <DialogContent showCloseButton={showCloseButton} className="max-w-sm flex flex-col items-center gap-4 text-center p-6">
+      <DialogContent showCloseButton={showCloseButton} className="sm:max-w-sm flex flex-col items-center gap-4 text-center">
         {/* 3D Illustrated Badge (No flat background box) */}
         <div className="transform hover:scale-105 transition-transform duration-200 mt-1">
           <Icons name={icon3D} size={72} />
