@@ -18,6 +18,7 @@ interface CaroScoreboardProps {
   } | null;
   isOpponentOnline?: boolean;
   timeLeft?: number;
+  timeFraction?: number;
   isTimerWarning?: boolean;
 }
 
@@ -28,6 +29,7 @@ export function CaroScoreboard({
   opponentProfile,
   isOpponentOnline = false,
   timeLeft,
+  timeFraction,
   isTimerWarning = false,
 }: CaroScoreboardProps) {
   const isMyTurn = (currentTurn as unknown as PlayerRole) === myRole;
@@ -51,9 +53,13 @@ export function CaroScoreboard({
         activeColor="primary"
         align="left"
         size="sm"
+        timeLeft={currentTurn === CaroPlayer.X ? timeLeft : undefined}
+        timeFraction={currentTurn === CaroPlayer.X ? timeFraction : undefined}
+        totalTime={30}
+        isTimerWarning={currentTurn === CaroPlayer.X && isTimerWarning}
       />
 
-      {/* Turn indicator & Countdown Timer in the middle */}
+      {/* Turn indicator in the middle */}
       <div className="flex flex-col items-center justify-center shrink-0 gap-1 px-1">
         {!isOpponentOnline ? (
           <Badge variant="warning" size="sm" className="whitespace-nowrap text-[9px] sm:text-[11px] px-2 sm:px-3">
@@ -68,18 +74,6 @@ export function CaroScoreboard({
             >
               {isMyTurn ? "Your turn" : "Opponent"}
             </Badge>
-
-            {typeof timeLeft === "number" && (
-              <Badge
-                variant={isTimerWarning ? "destructive" : "secondary"}
-                size="sm"
-                className={`font-mono font-bold tracking-normal transition-all text-[9px] sm:text-[11px] px-1.5 sm:px-2 ${
-                  isTimerWarning ? "animate-bounce" : ""
-                }`}
-              >
-                ⏱️ {timeLeft}s
-              </Badge>
-            )}
           </div>
         )}
       </div>
@@ -94,6 +88,10 @@ export function CaroScoreboard({
         activeColor="destructive"
         align="right"
         size="sm"
+        timeLeft={currentTurn === CaroPlayer.O ? timeLeft : undefined}
+        timeFraction={currentTurn === CaroPlayer.O ? timeFraction : undefined}
+        totalTime={30}
+        isTimerWarning={currentTurn === CaroPlayer.O && isTimerWarning}
       />
     </Card>
   );

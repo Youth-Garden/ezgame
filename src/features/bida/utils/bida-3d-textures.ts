@@ -126,3 +126,41 @@ export function createPoolBallMaterial(id: number): THREE.MeshStandardMaterial {
     metalness: 0.04,
   });
 }
+
+/**
+ * Creates a canvas texture containing a clean prohibited / ban icon (circle with diagonal slash)
+ * for rendering over illegal target balls.
+ */
+export function createBanIconTexture(): THREE.CanvasTexture {
+  const canvas = document.createElement("canvas");
+  canvas.width = 128;
+  canvas.height = 128;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return new THREE.CanvasTexture(canvas);
+
+  const cx = 64;
+  const cy = 64;
+  const r = 44;
+  const lw = 12;
+
+  ctx.clearRect(0, 0, 128, 128);
+
+  // Outer red circle
+  ctx.strokeStyle = "#ef4444";
+  ctx.lineWidth = lw;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Diagonal slash from top-left to bottom-right
+  ctx.beginPath();
+  const angle = Math.PI / 4;
+  const offset = r - lw / 2;
+  ctx.moveTo(cx - offset * Math.cos(angle), cy - offset * Math.sin(angle));
+  ctx.lineTo(cx + offset * Math.cos(angle), cy + offset * Math.sin(angle));
+  ctx.stroke();
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}

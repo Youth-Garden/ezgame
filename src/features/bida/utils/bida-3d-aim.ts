@@ -127,11 +127,15 @@ export function updateAimAndCue(
     }
     ghostBallMesh.visible = false;
 
-    // Show/hide Foul Warning Ring Marker over the illegal target ball
+    // Show/hide Small Prohibition/Ban Icon right next to the illegal target ball along the aim line
     if (foulMarkerMesh) {
       if (isIllegalTarget) {
-        foulMarkerMesh.position.set(targetBall.x - TABLE_WIDTH / 2, -(targetBall.y - TABLE_HEIGHT / 2), BALL_RADIUS + 0.5);
-        foulMarkerMesh.visible = false;
+        // Place the small icon on the aim line right in front of the target ball
+        const iconOffsetDist = BALL_RADIUS + 9;
+        const iconX = targetBall.x - cosA * iconOffsetDist - TABLE_WIDTH / 2;
+        const iconY = -(targetBall.y - sinA * iconOffsetDist - TABLE_HEIGHT / 2);
+        foulMarkerMesh.position.set(iconX, iconY, BALL_RADIUS + 1);
+        foulMarkerMesh.visible = true;
       } else {
         foulMarkerMesh.visible = false;
       }

@@ -19,38 +19,59 @@ export function useTurnTimer({
   onTimeOut,
 }: UseTurnTimerProps) {
   const [timeLeft, setTimeLeft] = useState(timeLimitSeconds);
+  const [timeFraction, setTimeFraction] = useState(1);
   const onTimeOutRef = useRef(onTimeOut);
   onTimeOutRef.current = onTimeOut;
+  const lastTickSoundSecRef = useRef<number>(-1);
 
   // Reset timer whenever the turn changes or game pauses/starts
   useEffect(() => {
     setTimeLeft(timeLimitSeconds);
+    setTimeFraction(1);
+    lastTickSoundSecRef.current = -1;
   }, [currentTurn, isGameActive, timeLimitSeconds]);
 
   useEffect(() => {
     if (!isGameActive || timeLimitSeconds <= 0) return;
 
-    const interval = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          onTimeOutRef.current?.();
-          return 0;
-        }
+    const startTime = performance.now();
+    const durationMs = timeLimitSeconds * 1000;
+    let animId: number;
 
-        const next = prev - 1;
-        if (next <= warningThresholdSeconds) {
-          sounds.playTimerTickSound();
-        }
-        return next;
-      });
-    }, 1000);
+    const tick = (now: number) => {
+      const elapsedMs = now - startTime;
+      const remainingMs = Math.max(0, durationMs - elapsedMs);
+      const fraction = remainingMs / durationMs;
+      const remainingSec = Math.ceil(remainingMs / 1000);
 
-    return () => clearInterval(interval);
+      setTimeFraction(fraction);
+      setTimeLeft(remainingSec);
+
+      // Play tick sound once per second when entering warning zone
+      if (remainingSec <= warningThresholdSeconds && remainingSec > 0 && remainingSec !== lastTickSoundSecRef.current) {
+        lastTickSoundSecRef.current = remainingSec;
+        sounds.playTimerTickSound();
+      }
+
+      if (remainingMs <= 0) {
+        setTimeFraction(0);
+        setTimeLeft(0);
+        onTimeOutRef.current?.();
+        return;
+      }
+
+      animId = requestAnimationFrame(tick);
+    };
+
+    animId = requestAnimationFrame(tick);
+
+    return () => cancelAnimationFrame(animId);
   }, [currentTurn, isGameActive, timeLimitSeconds, warningThresholdSeconds]);
 
   const resetTimer = useCallback(() => {
     setTimeLeft(timeLimitSeconds);
+    setTimeFraction(1);
+    lastTickSoundSecRef.current = -1;
   }, [timeLimitSeconds]);
 
   const isWarning = timeLeft <= warningThresholdSeconds && timeLeft > 0;
@@ -58,6 +79,7 @@ export function useTurnTimer({
 
   return {
     timeLeft,
+    timeFraction,
     isWarning,
     isExpired,
     resetTimer,

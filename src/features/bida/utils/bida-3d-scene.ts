@@ -5,7 +5,7 @@ import {
   TABLE_HEIGHT,
   TABLE_WIDTH,
 } from "./bida-physics";
-import { createPoolBallMaterial } from "./bida-3d-textures";
+import { createPoolBallMaterial, createBanIconTexture } from "./bida-3d-textures";
 
 export interface ThreeBidaScene {
   scene: THREE.Scene;
@@ -224,16 +224,17 @@ export function initThreeBidaScene(container: HTMLDivElement, isVertical: boolea
   cueBallGuideLine.visible = false;
   scene.add(cueBallGuideLine);
 
-  // Illegal Target Warning Marker (Ring indicator that appears over opponent balls / illegal targets)
-  const foulMarkerGeo = new THREE.RingGeometry(BALL_RADIUS + 3, BALL_RADIUS + 7, 32);
+  // Illegal Target Warning Marker (Small prohibition / ban icon next to the ball along aim line)
+  const banTexture = createBanIconTexture();
+  const foulMarkerGeo = new THREE.PlaneGeometry(16, 16);
   const foulMarkerMat = new THREE.MeshBasicMaterial({
-    color: 0xf43f5e,
-    side: THREE.DoubleSide,
+    map: banTexture,
     transparent: true,
-    opacity: 0.9,
+    opacity: 0.95,
+    depthTest: false,
   });
   const foulMarkerMesh = new THREE.Mesh(foulMarkerGeo, foulMarkerMat);
-  foulMarkerMesh.rotation.x = 0;
+  foulMarkerMesh.renderOrder = 998;
   foulMarkerMesh.visible = false;
   scene.add(foulMarkerMesh);
 

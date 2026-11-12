@@ -7,23 +7,18 @@ import { GameType } from "@/shared/types/room";
 import { GameCard } from "../components/game-card";
 import { RoomSelectionDialog } from "../components/room-selection-dialog";
 import type { GameMetadata, GameRoomModalData } from "../types";
+import { GAME_CATALOG_CONFIGS, SUPPORTED_LANGUAGES } from "../constants/lobby-config";
 import { Icons } from "@/shared/icons";
 import { Button } from "@/shared/components/ui/button";
 import { useSyncLocale, useSyncTheme } from "@/shared/components/providers/updater/hooks";
 import { UserProfileMenu } from "../components/user-profile-menu";
-
-const LANGUAGES = [
-  { code: "vi", label: "Tiếng Việt", flagIcon: "flag-vn" },
-  { code: "en", label: "English", flagIcon: "flag-us" },
-  { code: "ja", label: "日本語", flagIcon: "flag-jp" },
-] as const;
 
 export function LobbyPage() {
   const tLobby = useTranslations("lobby");
   const tGames = useTranslations("games");
 
   const { currentLocale, changeLocale } = useSyncLocale();
-  const currentLang = LANGUAGES.find((item) => item.code === currentLocale) || LANGUAGES[1];
+  const currentLang = SUPPORTED_LANGUAGES.find((item) => item.code === currentLocale) || SUPPORTED_LANGUAGES[1];
   const { theme, toggleTheme } = useSyncTheme();
 
   const [isLangOpen, setIsLangOpen] = useState(false);
@@ -31,34 +26,21 @@ export function LobbyPage() {
 
   const [presentRoomModal] = usePortal<GameRoomModalData>(RoomSelectionDialog);
 
-  // Dynamic games catalog derived from i18n
+  // Dynamic games catalog derived from centralized constants & i18n
   const games: GameMetadata[] = useMemo(
-    () => [
-      {
-        id: GameType.CARO,
-        title: tGames("caro.title"),
-        badge: tGames("caro.badge"),
-        description: tGames("caro.description"),
-        players: tGames("caro.players"),
-        isAvailable: true,
-        tag: tGames("caro.tag"),
-        iconSrc: "/games/caro.jpg",
-        gradient: "bg-gradient-to-b from-[#2B6CFF] to-[#00B4FF]",
-        playingCount: 2048,
-      },
-      {
-        id: GameType.BIDA,
-        title: tGames("bida.title"),
-        badge: tGames("bida.badge"),
-        description: tGames("bida.description"),
-        players: tGames("bida.players"),
-        isAvailable: true,
-        tag: tGames("bida.tag"),
-        iconSrc: "/games/bida.jpg",
-        gradient: "bg-gradient-to-b from-[#7B3FF2] via-[#C03CF0] to-[#FF4D4D]",
-        playingCount: 1850,
-      },
-    ],
+    () =>
+      GAME_CATALOG_CONFIGS.map((item) => ({
+        id: item.id,
+        title: tGames(item.titleKey),
+        badge: tGames(item.badgeKey),
+        description: tGames(item.descriptionKey),
+        players: tGames(item.playersKey),
+        isAvailable: item.isAvailable,
+        tag: tGames(item.tagKey),
+        iconSrc: item.iconSrc,
+        gradient: item.gradient,
+        playingCount: item.defaultPlayingCount,
+      })),
     [tGames]
   );
 
@@ -138,7 +120,7 @@ export function LobbyPage() {
                   Language
                 </div>
 
-                {LANGUAGES.map((item) => {
+                {SUPPORTED_LANGUAGES.map((item) => {
                   const isSelected = currentLocale === item.code;
                   return (
                     <button

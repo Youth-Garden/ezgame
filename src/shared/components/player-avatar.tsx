@@ -13,6 +13,7 @@ interface PlayerAvatarProps {
   subBadge?: React.ReactNode;
   contentBelow?: React.ReactNode;
   timeLeft?: number;
+  timeFraction?: number;
   totalTime?: number;
   isTimerWarning?: boolean;
 }
@@ -51,6 +52,7 @@ export function PlayerAvatar({
   subBadge,
   contentBelow,
   timeLeft,
+  timeFraction,
   totalTime = 45,
   isTimerWarning = false,
 }: PlayerAvatarProps) {
@@ -64,9 +66,11 @@ export function PlayerAvatar({
   const radius = (ringSize - strokeWidth * 2) / 2;
   const circumference = 2 * Math.PI * radius;
 
-  // Calculate timer fraction (1.0 down to 0)
+  // Calculate timer fraction (1.0 down to 0) continuously
   const fraction =
-    typeof timeLeft === "number" && totalTime > 0
+    typeof timeFraction === "number"
+      ? Math.max(0, Math.min(1, timeFraction))
+      : typeof timeLeft === "number" && totalTime > 0
       ? Math.max(0, Math.min(1, timeLeft / totalTime))
       : 1;
   const strokeDashoffset = circumference * (1 - fraction);
@@ -122,7 +126,6 @@ export function PlayerAvatar({
               strokeDasharray={circumference}
               strokeDashoffset={strokeDashoffset}
               transform={`rotate(-90 ${ringSize / 2} ${ringSize / 2})`}
-              className="transition-[stroke-dashoffset,stroke] duration-300 ease-linear"
             />
           </svg>
         )}

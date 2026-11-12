@@ -167,7 +167,7 @@ export function BidaPlayPage() {
   const isMyTurn = currentTurn === myRole;
   const isGameActive = isOpponentOnline && turnState === BidaTurnState.AIMING;
 
-  const { timeLeft, isWarning: isTimerWarning } = useTurnTimer({
+  const { timeLeft, timeFraction, isWarning: isTimerWarning } = useTurnTimer({
     currentTurn,
     isGameActive,
     timeLimitSeconds: DEFAULT_BIDA_CONFIG.turnTimeLimitSeconds,
@@ -245,6 +245,7 @@ export function BidaPlayPage() {
             opponentProfile={opponentProfile}
             isOpponentOnline={isOpponentOnline}
             timeLeft={timeLeft}
+            timeFraction={timeFraction}
             isTimerWarning={isTimerWarning}
           />
         </div>

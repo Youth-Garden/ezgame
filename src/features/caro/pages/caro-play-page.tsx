@@ -149,7 +149,7 @@ export function CaroPlayPage() {
     isMyTurn && isOpponentOnline && !gameState.winner && (myRole as PlayerRole) !== PlayerRole.SPECTATOR;
 
   // Turn Countdown Timer
-  const { timeLeft, isWarning: isTimerWarning } = useTurnTimer({
+  const { timeLeft, timeFraction, isWarning: isTimerWarning } = useTurnTimer({
     currentTurn: gameState.currentTurn,
     isGameActive: isOpponentOnline && !gameState.winner,
     timeLimitSeconds: DEFAULT_CARO_CONFIG.turnTimeLimitSeconds,
@@ -221,6 +221,7 @@ export function CaroPlayPage() {
               opponentProfile={opponentProfile}
               isOpponentOnline={isOpponentOnline}
               timeLeft={timeLeft}
+              timeFraction={timeFraction}
               isTimerWarning={isTimerWarning}
             />
           </div>

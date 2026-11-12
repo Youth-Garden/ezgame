@@ -23,6 +23,7 @@ interface BidaScoreboardProps {
   } | null;
   isOpponentOnline?: boolean;
   timeLeft?: number;
+  timeFraction?: number;
   isTimerWarning?: boolean;
 }
 
@@ -58,6 +59,7 @@ export function BidaScoreboard({
   opponentProfile,
   isOpponentOnline = false,
   timeLeft,
+  timeFraction,
   isTimerWarning = false,
 }: BidaScoreboardProps) {
   const t = useTranslations("game");
@@ -107,6 +109,7 @@ export function BidaScoreboard({
         activeColor="amber"
         align="left"
         timeLeft={currentTurn === PlayerRole.X ? timeLeft : undefined}
+        timeFraction={currentTurn === PlayerRole.X ? timeFraction : undefined}
         totalTime={45}
         isTimerWarning={currentTurn === PlayerRole.X && isTimerWarning}
         subBadge={
@@ -169,6 +172,7 @@ export function BidaScoreboard({
         activeColor="sky"
         align="right"
         timeLeft={currentTurn === PlayerRole.O ? timeLeft : undefined}
+        timeFraction={currentTurn === PlayerRole.O ? timeFraction : undefined}
         totalTime={45}
         isTimerWarning={currentTurn === PlayerRole.O && isTimerWarning}
         subBadge={
