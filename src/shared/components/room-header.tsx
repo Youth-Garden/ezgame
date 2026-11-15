@@ -57,7 +57,6 @@ export function RoomHeader({
         title: "Leave Current Match?",
         description: "A match is currently in progress. Leaving now will count as a surrender and your opponent will win.",
         confirmText: "Leave Match",
-        cancelText: "Stay in Match",
         variant: "destructive",
         icon3D: "leave-match-3d",
         showCloseButton: true,

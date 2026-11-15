@@ -188,6 +188,111 @@ class SoundManager {
       // Audio playback failed silently
     }
   }
+
+  /**
+   * Sound effect for moving a chess / xiangqi piece (wooden clack on board)
+   */
+  public playPieceDropSound() {
+    if (!this.enabled) return;
+    try {
+      const ctx = this.getContext();
+      if (!ctx) return;
+
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(240, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(60, ctx.currentTime + 0.06);
+
+      gain.gain.setValueAtTime(0.35, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.07);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start();
+      osc.stop(ctx.currentTime + 0.07);
+    } catch {
+      // Audio playback failed silently
+    }
+  }
+
+  /**
+   * Sound effect for capturing an opponent piece (stronger impact)
+   */
+  public playPieceCaptureSound() {
+    if (!this.enabled) return;
+    try {
+      const ctx = this.getContext();
+      if (!ctx) return;
+
+      // Primary punch
+      const osc1 = ctx.createOscillator();
+      const gain1 = ctx.createGain();
+      osc1.type = "triangle";
+      osc1.frequency.setValueAtTime(320, ctx.currentTime);
+      osc1.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.1);
+
+      gain1.gain.setValueAtTime(0.4, ctx.currentTime);
+      gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+
+      osc1.connect(gain1);
+      gain1.connect(ctx.destination);
+
+      osc1.start();
+      osc1.stop(ctx.currentTime + 0.12);
+
+      // Higher crack snap
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.type = "sine";
+      osc2.frequency.setValueAtTime(700, ctx.currentTime);
+      osc2.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.05);
+
+      gain2.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.06);
+
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+
+      osc2.start();
+      osc2.stop(ctx.currentTime + 0.06);
+    } catch {
+      // Audio playback failed silently
+    }
+  }
+
+  /**
+   * Alert chime when a King/General is in Check (Chiếu tướng)
+   */
+  public playCheckAlertSound() {
+    if (!this.enabled) return;
+    try {
+      const ctx = this.getContext();
+      if (!ctx) return;
+
+      [600, 750].forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        const start = ctx.currentTime + idx * 0.08;
+
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, start);
+
+        gain.gain.setValueAtTime(0.25, start);
+        gain.gain.exponentialRampToValueAtTime(0.001, start + 0.15);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(start);
+        osc.stop(start + 0.15);
+      });
+    } catch {
+      // Audio playback failed silently
+    }
+  }
 }
 
 export const sounds = new SoundManager();

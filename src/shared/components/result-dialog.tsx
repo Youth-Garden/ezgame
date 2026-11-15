@@ -8,6 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/shared/components/ui/dialog';
+import { cn } from '@/shared/lib/utils';
 import { RouteEnum } from '@/shared/constants/routes';
 import { Icons } from '@/shared/icons';
 import { sounds } from '@/shared/lib/sound-effects';
@@ -20,6 +21,7 @@ import { useEffect } from 'react';
 export interface ResultDialogData {
   winner: GameWinner | null;
   myRole: PlayerRole;
+  reason?: "normal" | "opponent_left";
   isRematchRequestedByMe?: boolean;
   isRematchRequestedByOpponent?: boolean;
   onRequestRematch?: () => void;
@@ -34,6 +36,7 @@ export function ResultDialog({
   const router = useRouter();
   const winner = data?.winner ?? null;
   const myRole = data?.myRole ?? PlayerRole.X;
+  const reason = data?.reason ?? "normal";
   const isRematchRequestedByMe = data?.isRematchRequestedByMe ?? false;
   const isRematchRequestedByOpponent =
     data?.isRematchRequestedByOpponent ?? false;
@@ -48,9 +51,9 @@ export function ResultDialog({
       sounds.playWinFanfare();
       try {
         confetti({
-          particleCount: 100,
-          spread: 60,
-          origin: { y: 0.6 },
+          particleCount: 120,
+          spread: 70,
+          origin: { y: 0.5 },
         });
       } catch {
         // Confetti silently handled
@@ -68,64 +71,75 @@ export function ResultDialog({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onDismiss?.()}>
       <DialogContent
         showCloseButton={false}
-        className="sm:max-w-sm flex flex-col items-center text-center"
+        className="sm:w-[460px] sm:max-w-[460px] flex flex-col items-center text-center p-6 sm:p-9 relative overflow-visible bg-transparent backdrop-blur-none rounded-3xl border-none shadow-none"
       >
-        <DialogHeader className="items-center text-center">
-          <div className="mb-3 transform hover:scale-105 transition-transform duration-200">
-            {isMeWinner ? (
-              <Icons name="victory-3d" size={80} />
-            ) : isDraw ? (
-              <Icons name="draw-3d" size={72} />
-            ) : (
-              <Icons name="defeat-3d" size={80} />
-            )}
+        <DialogHeader className="items-center text-center relative z-10 w-full">
+          {/* Trophy / Icon container - Clean and focused */}
+          <div className="relative mb-4 flex items-center justify-center mx-auto">
+            {/* Icon enlarged and perfectly centered in container */}
+            <div className="transform hover:scale-105 transition-all duration-300 drop-shadow-md relative z-10 flex items-center justify-center">
+              {isMeWinner ? (
+                <Icons name="victory-3d" size={120} />
+              ) : isDraw ? (
+                <Icons name="draw-3d" size={100} />
+              ) : (
+                <Icons name="defeat-3d" size={120} />
+              )}
+            </div>
           </div>
 
-          <DialogTitle className="text-xl font-bold uppercase tracking-tight mb-1 font-game">
-            {isMeWinner ? 'Victory!' : isDraw ? 'Game Draw!' : 'Defeat!'}
+          <DialogTitle
+            className={cn(
+              "text-3xl sm:text-4xl font-extrabold tracking-tight mb-8 font-game select-none",
+              isMeWinner &&
+                "bg-gradient-to-b from-amber-300 via-amber-400 to-amber-600 bg-clip-text text-transparent drop-shadow-[0_2px_12px_rgba(245,158,11,0.5)]",
+              isDraw &&
+                "bg-gradient-to-b from-slate-200 via-slate-400 to-slate-500 bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(148,163,184,0.4)]",
+              !isMeWinner &&
+                !isDraw &&
+                "bg-gradient-to-b from-rose-300 via-rose-500 to-rose-600 bg-clip-text text-transparent drop-shadow-[0_2px_12px_rgba(244,63,94,0.45)]"
+            )}
+          >
+            {isMeWinner ? "Chiến Thắng!" : isDraw ? "Hòa Trận!" : "Thất Bại!"}
           </DialogTitle>
-
-          <DialogDescription className="text-xs text-text-secondary mb-4 max-w-xs leading-relaxed font-medium">
-            {isMeWinner
-              ? `Congratulations! You (Piece ${myRole}) took the win.`
-              : isDraw
-                ? 'Both sides played evenly to a draw.'
-                : `Piece ${winner} connected 5. Ready for the next round?`}
-          </DialogDescription>
         </DialogHeader>
 
         {/* Action Buttons */}
-        <div className="w-full flex flex-col gap-2">
-          {isRematchRequestedByOpponent ? (
-            <Button
-              variant="default"
-              size="default"
-              onClick={() => data?.onAcceptRematch?.()}
-              className="w-full gap-2"
-            >
-              <Icons name="rotateccw" size={16} />
-              <span>Accept Rematch</span>
-            </Button>
-          ) : isRematchRequestedByMe ? (
-            <Button
-              variant="subtle"
-              size="default"
-              disabled
-              className="w-full gap-2 text-muted-foreground"
-            >
-              <span className="w-2 h-2 rounded-full bg-primary animate-ping" />
-              <span>Waiting for opponent...</span>
-            </Button>
-          ) : (
-            <Button
-              variant="default"
-              size="default"
-              onClick={() => data?.onRequestRematch?.()}
-              className="w-full gap-2"
-            >
-              <Icons name="rotateccw" size={16} />
-              <span>Request Rematch</span>
-            </Button>
+        <div className="w-full flex flex-col gap-2.5 relative z-10">
+          {reason !== "opponent_left" && (
+            <>
+              {isRematchRequestedByOpponent ? (
+                <Button
+                  variant="default"
+                  size="default"
+                  onClick={() => data?.onAcceptRematch?.()}
+                  className="w-full gap-2"
+                >
+                  <Icons name="rotateccw" size={16} />
+                  <span>Chấp nhận đấu lại</span>
+                </Button>
+              ) : isRematchRequestedByMe ? (
+                <Button
+                  variant="subtle"
+                  size="default"
+                  disabled
+                  className="w-full gap-2 text-muted-foreground"
+                >
+                  <span className="w-2 h-2 rounded-full bg-primary animate-ping" />
+                  <span>Đang chờ đối thủ đồng ý...</span>
+                </Button>
+              ) : (
+                <Button
+                  variant="default"
+                  size="default"
+                  onClick={() => data?.onRequestRematch?.()}
+                  className="w-full gap-2"
+                >
+                  <Icons name="rotateccw" size={16} />
+                  <span>Yêu cầu đấu lại</span>
+                </Button>
+              )}
+            </>
           )}
 
           <Button
@@ -135,10 +149,10 @@ export function ResultDialog({
               onDismiss?.();
               router.push(RouteEnum.LOBBY);
             }}
-            className="w-full gap-2 mt-1"
+            className="w-full gap-2"
           >
             <Icons name="home" size={16} />
-            <span>Back to Lobby</span>
+            <span>Về sảnh chính</span>
           </Button>
         </div>
       </DialogContent>

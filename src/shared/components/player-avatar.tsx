@@ -148,18 +148,26 @@ export function PlayerAvatar({
         )}
       >
         {/* Name and optional beside badge */}
-        <div className="flex items-center gap-1.5 max-w-[140px] sm:max-w-[180px]">
+        <div className="flex items-center gap-1 max-w-[70px] xs:max-w-[95px] sm:max-w-[150px] min-w-0">
           {isRight && badgePosition === "beside" && subBadge}
-          <span className="text-[11px] sm:text-xs font-bold text-foreground truncate">
+          <span className="text-[11px] sm:text-xs font-bold text-foreground truncate min-w-0">
             {name || fallbackText}
           </span>
           {!isRight && badgePosition === "beside" && subBadge}
         </div>
 
-        {/* SubBadge placed below the name */}
-        {badgePosition === "below" && subBadge && (
-          <div className="mt-0.5 shrink-0 flex items-center">
-            {subBadge}
+        {/* SubBadge placed below the name or along with contentBelow */}
+        {(badgePosition === "below" && subBadge || contentBelow) && (
+          <div
+            className={cn(
+              "mt-0.5 flex items-center gap-1.5 min-w-0",
+              isRight && "flex-row-reverse"
+            )}
+          >
+            {badgePosition === "below" && subBadge && (
+              <div className="shrink-0 flex items-center">{subBadge}</div>
+            )}
+            {contentBelow}
           </div>
         )}
 
@@ -168,8 +176,6 @@ export function PlayerAvatar({
             {roleText}
           </span>
         )}
-
-        {contentBelow}
       </div>
     </div>
   );

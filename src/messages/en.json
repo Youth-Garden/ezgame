@@ -120,7 +120,8 @@
     "dragOrSpace": "DRAG & PULL or HOLD SPACE",
     "connectingMatch": "Connecting match session...",
     "red": "Red",
-    "black": "Black"
+    "black": "Black",
+    "matchOver": "Match Over"
   },
   "dialog": {
     "leaveMatchTitle": "Leave Current Match?",

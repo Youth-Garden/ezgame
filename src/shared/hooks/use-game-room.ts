@@ -26,6 +26,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface UseGameRoomParams {
   gameTitle: string;
+  gameType?: "caro" | "bida" | "tictactoe" | "xiangqi";
   defaultRoomCode?: string;
   onEventReceived?: (event: RealtimeEvent) => void;
   onSurrenderConfirmed?: () => Promise<void> | void;
@@ -33,6 +34,7 @@ interface UseGameRoomParams {
 
 export function useGameRoom({
   gameTitle,
+  gameType = "caro",
   defaultRoomCode = 'ROOM-DEMO',
   onEventReceived,
   onSurrenderConfirmed,
@@ -93,6 +95,8 @@ export function useGameRoom({
   const [presentConfirmDialog] = usePortal<ConfirmDialogData>(ConfirmDialog);
 
   const hasShownVsModalRef = useRef(false);
+  const hasOpponentEverJoinedRef = useRef(false);
+  const isGameOverRef = useRef(false);
   const sendEventRef = useRef<(event: RealtimeEvent) => Promise<void>>(
     async () => {},
   );
@@ -104,10 +108,15 @@ export function useGameRoom({
       isRequestedByOpponent: boolean = false,
       onRequestRematch?: () => void,
       onAcceptRematch?: () => void,
+      reason?: "normal" | "opponent_left",
     ) => {
+      if (currentWinner) {
+        isGameOverRef.current = true;
+      }
       presentResultDialog({
         winner: currentWinner,
         myRole,
+        reason: reason || "normal",
         isRematchRequestedByMe: isRequestedByMe,
         isRematchRequestedByOpponent: isRequestedByOpponent,
         onRequestRematch,
@@ -156,6 +165,10 @@ export function useGameRoom({
 
   // Auto trigger Match VS Dialog when opponent connects to room
   useEffect(() => {
+    if (isOpponentOnline && opponentProfile) {
+      hasOpponentEverJoinedRef.current = true;
+    }
+
     if (isOpponentOnline && opponentProfile && !hasShownVsModalRef.current) {
       hasShownVsModalRef.current = true;
 
@@ -165,11 +178,12 @@ export function useGameRoom({
         myRole === PlayerRole.O ? myProfile : opponentProfile;
 
       presentVsDialog({
-        playerXName: playerXProfile?.name || 'Player X',
+        playerXName: playerXProfile?.name || 'Player 1',
         playerXAvatar: playerXProfile?.avatarUrl || '',
-        playerOName: playerOProfile?.name || 'Player O',
+        playerOName: playerOProfile?.name || 'Player 2',
         playerOAvatar: playerOProfile?.avatarUrl || '',
         gameTitle,
+        gameType,
       });
     }
   }, [
@@ -180,6 +194,30 @@ export function useGameRoom({
     presentVsDialog,
     gameTitle,
   ]);
+
+  // When opponent leaves / disconnects during an active game:
+  // Award immediate win to the remaining player and pop up victory dialog!
+  useEffect(() => {
+    if (
+      !isOpponentOnline &&
+      hasOpponentEverJoinedRef.current &&
+      !isGameOverRef.current &&
+      myRole !== PlayerRole.SPECTATOR
+    ) {
+      // Current player wins automatically
+      const winRole: GameWinner =
+        myRole === PlayerRole.X ? GameWinner.X : GameWinner.O;
+      isGameOverRef.current = true;
+      showResultDialog(
+        winRole,
+        false,
+        false,
+        undefined,
+        undefined,
+        "opponent_left",
+      );
+    }
+  }, [isOpponentOnline, myRole, showResultDialog]);
 
   // Unified Surrender Confirmation Dialog
   const promptSurrender = useCallback(() => {

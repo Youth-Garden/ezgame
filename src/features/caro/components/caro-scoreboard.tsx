@@ -1,15 +1,16 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { PlayerRole } from "@/shared/types/room";
 import { CaroPlayer } from "../types";
 import { type PlayerProfile } from "@/shared/hooks/use-player-profile";
-import { Card } from "@/shared/components/ui/card";
 import { Badge } from "@/shared/components/ui/badge";
-import { PlayerAvatar } from "@/shared/components/player-avatar";
+import { GameScoreboard } from "@/shared/components/game-scoreboard";
 
 interface CaroScoreboardProps {
   currentTurn: CaroPlayer;
   myRole: PlayerRole;
+  winner?: CaroPlayer | null;
   myProfile?: PlayerProfile;
   opponentProfile?: {
     name: string;
@@ -25,6 +26,7 @@ interface CaroScoreboardProps {
 export function CaroScoreboard({
   currentTurn,
   myRole,
+  winner,
   myProfile,
   opponentProfile,
   isOpponentOnline = false,
@@ -32,67 +34,66 @@ export function CaroScoreboard({
   timeFraction,
   isTimerWarning = false,
 }: CaroScoreboardProps) {
-  const isMyTurn = (currentTurn as unknown as PlayerRole) === myRole;
+  const t = useTranslations("game");
+  const isGameFinished = Boolean(winner);
+  const isMyTurn = !isGameFinished && (currentTurn as unknown as PlayerRole) === myRole;
 
-  // Profile mapping: Player X vs Player O
-  const playerXProfile = myRole === PlayerRole.X ? myProfile : opponentProfile;
-  const playerOProfile = myRole === PlayerRole.O ? myProfile : opponentProfile;
+  const isMeX = myRole !== PlayerRole.O;
+  const myTurnRole = isMeX ? CaroPlayer.X : CaroPlayer.O;
+  const opponentTurnRole = isMeX ? CaroPlayer.O : CaroPlayer.X;
+
+  const isMeActiveTurn = !isGameFinished && currentTurn === myTurnRole;
+  const isOpponentActiveTurn = !isGameFinished && currentTurn === opponentTurnRole;
+
+  const myName = myProfile?.name || t("you");
+  const opponentName = opponentProfile?.name || t("opponent");
 
   return (
-    <Card
-      variant="solid"
-      className="w-full flex items-center justify-between gap-1 sm:gap-3 px-2 sm:px-5 py-2 sm:py-3 transition-all"
-    >
-      {/* Player X (Blue) */}
-      <PlayerAvatar
-        name={playerXProfile?.name}
-        avatarUrl={playerXProfile?.avatarUrl}
-        roleText="Player X"
-        fallbackText="X"
-        isActiveTurn={currentTurn === CaroPlayer.X}
-        activeColor="primary"
-        align="left"
+    <GameScoreboard.Root>
+      {/* Player (You) */}
+      <GameScoreboard.Left
+        name={myName}
+        avatarUrl={myProfile?.avatarUrl}
+        roleText={isMeX ? "Player X" : "Player O"}
+        fallbackText={isMeX ? "X" : "O"}
+        isActiveTurn={isMeActiveTurn}
+        activeColor={isMeX ? "primary" : "destructive"}
         size="sm"
-        timeLeft={currentTurn === CaroPlayer.X ? timeLeft : undefined}
-        timeFraction={currentTurn === CaroPlayer.X ? timeFraction : undefined}
-        totalTime={30}
-        isTimerWarning={currentTurn === CaroPlayer.X && isTimerWarning}
+        timer={!isGameFinished ? { timeLeft, timeFraction, isWarning: isTimerWarning, totalTime: 30 } : undefined}
       />
 
       {/* Turn indicator in the middle */}
-      <div className="flex flex-col items-center justify-center shrink-0 gap-1 px-1">
-        {!isOpponentOnline ? (
-          <Badge variant="warning" size="sm" className="whitespace-nowrap text-[9px] sm:text-[11px] px-2 sm:px-3">
-            Waiting...
-          </Badge>
-        ) : (
-          <div className="flex items-center gap-1 sm:gap-2">
+      <GameScoreboard.Center
+        isWaiting={!isOpponentOnline && !isGameFinished}
+        waitingText={t("waiting")}
+        turnText={
+          isGameFinished ? (
+            <span className="text-xs font-bold text-muted-foreground">{t("matchOver", { defaultMessage: "Kết thúc" })}</span>
+          ) : (
             <Badge
               variant={isMyTurn ? "success" : "secondary"}
               size="sm"
-              className={`whitespace-nowrap text-[9px] sm:text-[11px] px-2 sm:px-3 ${isMyTurn ? "animate-pulse" : ""}`}
+              className={`whitespace-nowrap text-[9px] sm:text-[11px] px-2 sm:px-3 ${
+                isMyTurn ? "animate-pulse" : ""
+              }`}
             >
-              {isMyTurn ? "Your turn" : "Opponent"}
+              {isMyTurn ? t("yourTurn") : t("opponentTurn")}
             </Badge>
-          </div>
-        )}
-      </div>
-
-      {/* Player O (Red) */}
-      <PlayerAvatar
-        name={playerOProfile?.name}
-        avatarUrl={playerOProfile?.avatarUrl}
-        roleText="Player O"
-        fallbackText="O"
-        isActiveTurn={currentTurn === CaroPlayer.O}
-        activeColor="destructive"
-        align="right"
-        size="sm"
-        timeLeft={currentTurn === CaroPlayer.O ? timeLeft : undefined}
-        timeFraction={currentTurn === CaroPlayer.O ? timeFraction : undefined}
-        totalTime={30}
-        isTimerWarning={currentTurn === CaroPlayer.O && isTimerWarning}
+          )
+        }
       />
-    </Card>
+
+      {/* Opponent */}
+      <GameScoreboard.Right
+        name={opponentName}
+        avatarUrl={opponentProfile?.avatarUrl}
+        roleText={isMeX ? "Player O" : "Player X"}
+        fallbackText={isMeX ? "O" : "X"}
+        isActiveTurn={isOpponentActiveTurn}
+        activeColor={isMeX ? "destructive" : "primary"}
+        size="sm"
+        timer={!isGameFinished ? { timeLeft, timeFraction, isWarning: isTimerWarning, totalTime: 30 } : undefined}
+      />
+    </GameScoreboard.Root>
   );
 }

@@ -44,17 +44,17 @@ export const CaroCell = memo(function CaroCell({
       disabled={Boolean(value) || !canClick}
       aria-label={`Row ${row + 1}, Column ${col + 1}${value ? `, piece ${value}` : ""}`}
       className={cn(
-        "relative w-[calc((100vw-36px)/15)] h-[calc((100vw-36px)/15)] max-w-[42px] max-h-[42px] min-w-[20px] min-h-[20px] sm:w-8 sm:h-8 md:w-9 md:h-9 flex items-center justify-center transition-colors duration-100 select-none group shrink-0",
-        "border-r border-b border-neutral-200 dark:border-neutral-800 bg-card",
-        !value && canClick && "hover:bg-secondary/40 cursor-pointer",
+        "relative w-[calc((100vw-36px)/15)] h-[calc((100vw-36px)/15)] max-w-[40px] max-h-[40px] min-w-[20px] min-h-[20px] sm:w-8 sm:h-8 md:w-9 md:h-9 flex items-center justify-center transition-colors duration-100 select-none group shrink-0",
+        "bg-transparent",
+        !value && canClick && "hover:bg-amber-600/10 dark:hover:bg-amber-400/10 cursor-pointer",
         !value && !canClick && "cursor-default",
         value && "cursor-default",
         isWinningCell &&
-          "bg-amber-500/20 dark:bg-amber-500/25 z-10 animate-pulse",
+          "bg-amber-500/30 dark:bg-amber-500/35 z-10 animate-pulse",
         isLastMove && !isWinningCell && (
           value === CaroPlayer.O
-            ? "bg-rose-500/15 dark:bg-rose-500/20"
-            : "bg-sky-500/15 dark:bg-sky-500/20"
+            ? "bg-rose-500/20 dark:bg-rose-500/25"
+            : "bg-sky-500/20 dark:bg-sky-500/25"
         )
       )}
     >

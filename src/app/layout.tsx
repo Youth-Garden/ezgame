@@ -4,7 +4,9 @@ import "./globals.css";
 import { getLocale, getMessages } from "next-intl/server";
 import { cookies } from "next/headers";
 import { Providers } from "@/shared/components/providers";
-import { THEME_COOKIE_KEY, type ThemeMode } from "@/shared/components/providers/updater/hooks/use-sync-theme";
+import { type ThemeMode } from "@/shared/components/providers/updater/hooks/use-sync-theme";
+
+const THEME_COOKIE_NAME = "theme";
 
 const baloo2 = Baloo_2({
   variable: "--font-sans",
@@ -52,7 +54,7 @@ export default async function RootLayout({
   const locale = await getLocale();
   const messages = await getMessages();
   const cookieStore = await cookies();
-  const themeCookie = cookieStore.get(THEME_COOKIE_KEY)?.value;
+  const themeCookie = cookieStore.get(THEME_COOKIE_NAME)?.value;
   const initialTheme: ThemeMode = themeCookie === "light" ? "light" : "dark";
   const isDark = initialTheme === "dark";
 
@@ -60,16 +62,12 @@ export default async function RootLayout({
     <html
       lang={locale}
       className={`${baloo2.variable} ${jetbrainsMono.variable} h-full antialiased ${isDark ? "dark" : ""}`}
-      style={{
-        colorScheme: isDark ? "dark" : "light",
-        backgroundColor: isDark ? "#09090b" : "#edf1f7",
-      }}
       suppressHydrationWarning
     >
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var m=document.cookie.match(/(?:^|; )${THEME_COOKIE_KEY}=([^;]*)/);var t=m?decodeURIComponent(m[1]):null;var d=document.documentElement;if(t==="light"){d.classList.remove("dark");d.style.colorScheme="light";d.style.backgroundColor="#edf1f7";}else{d.classList.add("dark");d.style.colorScheme="dark";d.style.backgroundColor="#09090b";}}catch(e){}})();`,
+            __html: `(function(){try{var m=document.cookie.match(/(?:^|; )theme=([^;]*)/);var t=m?decodeURIComponent(m[1]):null;var d=document.documentElement;if(t==="dark"){d.classList.add("dark");}else if(t==="light"){d.classList.remove("dark");}}catch(e){}})();`,
           }}
         />
       </head>

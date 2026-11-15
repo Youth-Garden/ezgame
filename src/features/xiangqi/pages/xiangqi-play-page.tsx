@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { RoomHeader } from "@/shared/components/room-header";
 import { GameBoard } from "@/shared/components/game-board";
@@ -35,12 +35,20 @@ export function XiangqiPlayPage() {
     promptSurrender,
   } = useGameRoom({
     gameTitle: DEFAULT_XIANGQI_CONFIG.title,
+    gameType: "xiangqi",
     defaultRoomCode: DEFAULT_XIANGQI_CONFIG.defaultRoomCode,
     onEventReceived: (event: RealtimeEvent) => handleRealtimeEvent(event),
     onSurrenderConfirmed: async () => {
       const gameWinner: GameWinner =
         myRole === PlayerRole.X ? GameWinner.O : GameWinner.X;
-      showResultDialog(gameWinner, false, false);
+      setGameWinner(gameWinner);
+      showResultDialog(
+        gameWinner,
+        false,
+        false,
+        () => handleRequestRematchRef.current(),
+        () => handleAcceptRematchRef.current()
+      );
       await sendEvent({
         type: RealtimeEventType.PLAYER_SURRENDER,
         payload: { player: myRole },
@@ -57,6 +65,7 @@ export function XiangqiPlayPage() {
     capturedByRed,
     capturedByBlack,
     winner,
+    setGameWinner,
     myColor,
     isInCheckColor,
     handleSelectPosition,
@@ -66,12 +75,51 @@ export function XiangqiPlayPage() {
   } = useXiangqiGame({
     myRole,
     sendEvent: async (e) => sendEventRef.current(e),
-    onShowResultDialog: (win) => showResultDialog(win),
+    onShowResultDialog: (win) =>
+      showResultDialog(
+        win,
+        false,
+        false,
+        handleRequestRematch,
+        handleAcceptRematch
+      ),
     onDismissResultDialog: dismissResultDialog,
   });
 
   const latestStateRef = useRef({ board, currentTurn, winner });
   latestStateRef.current = { board, currentTurn, winner };
+
+  const handleRequestRematchRef = useRef<() => void>(() => {});
+  const handleAcceptRematchRef = useRef<() => void>(() => {});
+
+  // Realtime rematch handlers
+  const handleRequestRematch = useCallback(async () => {
+    const currentWinner = latestStateRef.current.winner;
+    showResultDialog(
+      currentWinner,
+      true,
+      false,
+      () => handleRequestRematchRef.current(),
+      () => handleAcceptRematchRef.current()
+    );
+    await sendEventRef.current({
+      type: RealtimeEventType.REMATCH_REQUEST,
+      payload: { from: myRole },
+    });
+  }, [myRole, showResultDialog]);
+
+  const handleAcceptRematch = useCallback(async () => {
+    resetGame();
+    await sendEventRef.current({
+      type: RealtimeEventType.REMATCH_ACCEPT,
+      payload: { acceptedBy: myRole },
+    });
+  }, [resetGame, myRole]);
+
+  useEffect(() => {
+    handleRequestRematchRef.current = handleRequestRematch;
+    handleAcceptRematchRef.current = handleAcceptRematch;
+  }, [handleRequestRematch, handleAcceptRematch]);
 
   const handleRealtimeEvent = useCallback(
     (event: RealtimeEvent) => {
@@ -98,16 +146,44 @@ export function XiangqiPlayPage() {
         }
       } else if (event.type === RealtimeEventType.GAME_RESET) {
         resetGame();
+      } else if (event.type === RealtimeEventType.REMATCH_REQUEST) {
+        const currentWinner = latestStateRef.current.winner;
+        showResultDialog(
+          currentWinner,
+          false,
+          true,
+          () => handleRequestRematchRef.current(),
+          () => handleAcceptRematchRef.current()
+        );
+      } else if (event.type === RealtimeEventType.REMATCH_ACCEPT) {
+        resetGame();
       } else if (event.type === RealtimeEventType.PLAYER_SURRENDER) {
         const surrenderingPlayer = (event.payload as { player: PlayerRole })?.player;
         const gameWinner: GameWinner =
           surrenderingPlayer === PlayerRole.X ? GameWinner.O : GameWinner.X;
-        showResultDialog(gameWinner, false, false);
+        setGameWinner(gameWinner);
+        showResultDialog(
+          gameWinner,
+          false,
+          false,
+          () => handleRequestRematchRef.current(),
+          () => handleAcceptRematchRef.current()
+        );
       } else if (event.type === RealtimeEventType.GAME_TIMEOUT_PASS_TURN) {
         passTurnTimeout();
       }
     },
-    [board, executeMove, passTurnTimeout, resetGame, showResultDialog]
+    [
+      board,
+      executeMove,
+      handleAcceptRematch,
+      handleRequestRematch,
+      passTurnTimeout,
+      resetGame,
+      setGameWinner,
+      showResultDialog,
+      winner,
+    ]
   );
 
   const isMyTurn = myColor !== null && currentTurn === myColor;
@@ -154,9 +230,9 @@ export function XiangqiPlayPage() {
 
       {/* Main Play Area */}
       <main className="flex-1 flex flex-col items-center justify-start p-2 sm:p-4 max-w-[1440px] mx-auto w-full gap-2.5 sm:gap-3">
-        {/* Quick Actions */}
-        <div className="w-full max-w-[520px] flex items-center justify-end gap-2">
-          {!winner && (
+        {/* Quick Actions - Reserved height container (h-8) so rendering the surrender button never shifts content */}
+        <div className="w-full max-w-[520px] h-8 flex items-center justify-end gap-2">
+          {isOpponentOnline && !winner && (
             <Button
               variant="destructive"
               size="sm"
@@ -175,6 +251,7 @@ export function XiangqiPlayPage() {
             currentTurn={currentTurn}
             myRole={myRole}
             myColor={myColor}
+            winner={winner}
             myProfile={myProfile}
             opponentProfile={opponentProfile}
             isOpponentOnline={isOpponentOnline}

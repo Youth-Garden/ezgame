@@ -197,9 +197,9 @@ export function CaroPlayPage() {
       <main className="flex-1 flex flex-col items-center justify-start p-2 sm:p-6 w-full">
         {/* Game Stage Content Container: Fits tightly to the board width so Scoreboard matches the Board */}
         <div className="w-full sm:w-fit flex flex-col items-center">
-          {/* Desktop Game Tools & Quick Actions */}
-          <div className="hidden sm:flex w-full items-center justify-end gap-2 mb-3">
-            {!gameState.winner && (
+          {/* Desktop Game Tools & Quick Actions - Reserved height container (h-8) to prevent layout shifts */}
+          <div className="hidden sm:flex w-full h-8 items-center justify-end gap-2 mb-3">
+            {isOpponentOnline && !gameState.winner && (
               <Button
                 variant="destructive"
                 size="sm"
@@ -217,6 +217,7 @@ export function CaroPlayPage() {
             <CaroScoreboard
               currentTurn={gameState.currentTurn}
               myRole={myRole}
+              winner={gameState.winner ? (gameState.winner === GameWinner.X ? CaroPlayer.X : CaroPlayer.O) : null}
               myProfile={myProfile}
               opponentProfile={opponentProfile}
               isOpponentOnline={isOpponentOnline}

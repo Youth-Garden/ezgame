@@ -36,6 +36,7 @@ export function BidaPlayPage() {
     promptSurrender,
   } = useGameRoom({
     gameTitle: DEFAULT_BIDA_CONFIG.title,
+    gameType: "bida",
     defaultRoomCode: DEFAULT_BIDA_CONFIG.defaultRoomCode,
     onEventReceived: (event: RealtimeEvent) => handleRealtimeEvent(event),
     onSurrenderConfirmed: async () => {
@@ -209,8 +210,8 @@ export function BidaPlayPage() {
 
       {/* Main Play Area */}
       <main className="flex-1 flex flex-col items-center justify-start p-2 sm:p-3 max-w-[1440px] mx-auto w-full gap-2.5 sm:gap-3">
-        {/* Game Tools & Quick Actions */}
-        <div className="w-full max-w-[1360px] flex items-center justify-between gap-2">
+        {/* Game Tools & Quick Actions - Reserved height container (h-8) */}
+        <div className="w-full max-w-[1360px] h-8 flex items-center justify-between gap-2">
           <Button
             variant="secondary"
             size="sm"
@@ -222,15 +223,17 @@ export function BidaPlayPage() {
             <span>{isVertical ? t("horizontalView") : t("verticalView")}</span>
           </Button>
 
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={promptSurrender}
-            className="text-xs gap-1.5"
-          >
-            <Icons name="flag" size={14} />
-            <span>{t("surrender")}</span>
-          </Button>
+          {isOpponentOnline && (
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={promptSurrender}
+              className="text-xs gap-1.5"
+            >
+              <Icons name="flag" size={14} />
+              <span>{t("surrender")}</span>
+            </Button>
+          )}
         </div>
 
         {/* Live Scoreboard */}

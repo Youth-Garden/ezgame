@@ -12,6 +12,16 @@ export const Backdrop = ({ isOpen, onPress, className }: BackdropProps) => {
   return (
     <div
       onClick={onPress}
+      onTouchMove={(e) => {
+        if (isOpen) {
+          e.preventDefault();
+        }
+      }}
+      onWheel={(e) => {
+        if (isOpen) {
+          e.stopPropagation();
+        }
+      }}
       className={cn(
         "fixed inset-0 z-50 bg-black/60 transition-opacity duration-150 ease-out",
         isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none",

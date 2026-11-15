@@ -16,6 +16,7 @@ export interface MatchStartVsDialogData {
   playerOName: string;
   playerOAvatar: string;
   gameTitle?: string;
+  gameType?: "caro" | "bida" | "tictactoe" | "xiangqi";
   onFinish?: () => void;
 }
 
@@ -42,6 +43,29 @@ export function MatchStartVsDialog({
 
   if (!isOpen || !data) return null;
 
+  const isXiangqi = data.gameType === "xiangqi";
+  const isBida = data.gameType === "bida";
+
+  const player1RoleLabel = isXiangqi
+    ? `${t("red")} (先)`
+    : isBida
+    ? t("player") + " 1"
+    : `${t("player")} X`;
+
+  const player2RoleLabel = isXiangqi
+    ? `${t("black")} (後)`
+    : isBida
+    ? t("player") + " 2"
+    : `${t("player")} O`;
+
+  const player1RingColor = isXiangqi
+    ? "ring-rose-500 text-rose-500"
+    : "ring-primary text-primary";
+
+  const player2RingColor = isXiangqi
+    ? "ring-slate-700 dark:ring-slate-400 text-slate-700 dark:text-slate-400"
+    : "ring-destructive text-destructive";
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onDismiss?.()}>
       <DialogContent showCloseButton={false} className="sm:max-w-lg text-center">
@@ -52,20 +76,26 @@ export function MatchStartVsDialog({
 
         {/* 2 Players VS Grid */}
         <div className="w-full flex items-center justify-between gap-4 px-4 sm:px-8">
-          {/* Player X (Left) */}
+          {/* Player 1 (Left) */}
           <div className="flex-1 flex flex-col items-center gap-3 animate-in slide-in-from-left duration-500">
             <Avatar
               size="lg"
               src={data.playerXAvatar}
-              fallback={<span className="text-3xl font-black text-primary">X</span>}
-              className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl ring-4 ring-primary shadow-2xl bg-neutral-900"
+              fallback={
+                <span className={`text-3xl font-black ${isXiangqi ? "text-rose-500" : "text-primary"}`}>
+                  {isXiangqi ? "R" : isBida ? "1" : "X"}
+                </span>
+              }
+              className={`w-20 h-20 sm:w-24 sm:h-24 rounded-3xl ring-4 shadow-2xl bg-neutral-900 ${
+                isXiangqi ? "ring-rose-500" : "ring-primary"
+              }`}
             />
             <div className="flex flex-col items-center">
               <span className="text-sm sm:text-base font-black text-foreground truncate max-w-[120px]">
                 {data.playerXName}
               </span>
-              <span className="text-[11px] font-bold text-primary uppercase">
-                {t("player")} X
+              <span className={`text-[11px] font-bold uppercase ${player1RingColor}`}>
+                {player1RoleLabel}
               </span>
             </div>
           </div>
@@ -79,20 +109,26 @@ export function MatchStartVsDialog({
             </div>
           </div>
 
-          {/* Player O (Right) */}
+          {/* Player 2 (Right) */}
           <div className="flex-1 flex flex-col items-center gap-3 animate-in slide-in-from-right duration-500">
             <Avatar
               size="lg"
               src={data.playerOAvatar}
-              fallback={<span className="text-3xl font-black text-destructive">O</span>}
-              className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl ring-4 ring-destructive shadow-2xl bg-neutral-900"
+              fallback={
+                <span className={`text-3xl font-black ${isXiangqi ? "text-slate-400" : "text-destructive"}`}>
+                  {isXiangqi ? "B" : isBida ? "2" : "O"}
+                </span>
+              }
+              className={`w-20 h-20 sm:w-24 sm:h-24 rounded-3xl ring-4 shadow-2xl bg-neutral-900 ${
+                isXiangqi ? "ring-slate-600 dark:ring-slate-400" : "ring-destructive"
+              }`}
             />
             <div className="flex flex-col items-center">
               <span className="text-sm sm:text-base font-black text-foreground truncate max-w-[120px]">
                 {data.playerOName}
               </span>
-              <span className="text-[11px] font-bold text-destructive uppercase">
-                {t("player")} O
+              <span className={`text-[11px] font-bold uppercase ${player2RingColor}`}>
+                {player2RoleLabel}
               </span>
             </div>
           </div>

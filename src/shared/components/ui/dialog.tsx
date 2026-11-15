@@ -113,19 +113,19 @@ export function DialogContent({
       data-slot="dialog-content"
       onClick={handleStopPropagation}
       className={cn(
-        "relative z-50 w-full bg-card p-6 text-card-foreground shadow-2xl border-none select-none transition-[height] duration-250 ease-[cubic-bezier(0.16,1,0.3,1)]",
+        "relative z-50 w-full p-6 text-card-foreground shadow-2xl border-none select-none transition-[height] duration-250 ease-[cubic-bezier(0.16,1,0.3,1)]",
+        // Default background if not custom styled by caller
+        !className?.includes("bg-") && "bg-card",
         // Mobile Bottom Sheet styling: full width, dính 2 mép điện thoại, chỉ bo 2 góc trên, 2 góc dưới thẳng tắp 0px
         "rounded-t-[28px] rounded-b-none max-h-[92vh] overflow-y-auto pb-8",
-        // Desktop Dialog: căn giữa, modal nổi bo góc đều đặn, khóa cứng width cố định 28rem (448px)
-        "sm:rounded-2xl sm:w-[448px] sm:max-w-[448px] sm:max-h-[90vh] sm:overflow-visible sm:pb-6",
+        // Desktop Dialog: căn giữa, modal nổi bo góc đều đặn, mặc định 448px (cho phép override qua className)
+        "sm:rounded-2xl sm:max-h-[90vh] sm:overflow-visible sm:pb-6",
+        !className?.includes("sm:w-") && !className?.includes("sm:max-w-") && "sm:w-[448px] sm:max-w-[448px]",
         open ? "animate-modal-in" : "animate-modal-out pointer-events-none",
         className
       )}
       {...props}
     >
-      {/* Mobile drag handle pull pill */}
-      <div className="w-10 h-1 rounded-full bg-muted mx-auto -mt-2 mb-4 sm:hidden shrink-0" />
-
       {children}
 
       {showCloseButton && (

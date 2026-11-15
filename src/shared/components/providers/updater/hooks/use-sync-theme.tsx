@@ -5,7 +5,7 @@ import { cookieUtils } from "@/shared/utils/cookie";
 
 export type ThemeMode = "dark" | "light";
 
-export const THEME_COOKIE_KEY = "ezgame_theme";
+export const THEME_COOKIE_KEY = "theme";
 
 interface ThemeContextValue {
   theme: ThemeMode;
@@ -37,12 +37,8 @@ export function ThemeProvider({
         const root = document.documentElement;
         if (stored === "dark") {
           root.classList.add("dark");
-          root.style.colorScheme = "dark";
-          root.style.backgroundColor = "#09090b";
         } else {
           root.classList.remove("dark");
-          root.style.colorScheme = "light";
-          root.style.backgroundColor = "#edf1f7";
         }
       }
     } catch {
@@ -58,12 +54,8 @@ export function ThemeProvider({
           const root = document.documentElement;
           if (newTheme === "dark") {
             root.classList.add("dark");
-            root.style.colorScheme = "dark";
-            root.style.backgroundColor = "#09090b";
           } else {
             root.classList.remove("dark");
-            root.style.colorScheme = "light";
-            root.style.backgroundColor = "#edf1f7";
           }
         } catch {
           // Ignore

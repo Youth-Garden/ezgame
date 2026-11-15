@@ -1,14 +1,14 @@
 import { useTranslations } from "next-intl";
 import { BidaBall, BidaBallType } from "../types";
-import { PlayerRole } from "@/shared/types/room";
+import { PlayerRole, type GameWinner } from "@/shared/types/room";
 import { type PlayerProfile } from "@/shared/hooks/use-player-profile";
 import { Badge } from "@/shared/components/ui/badge";
-import { Card } from "@/shared/components/ui/card";
-import { PlayerAvatar } from "@/shared/components/player-avatar";
+import { GameScoreboard } from "@/shared/components/game-scoreboard";
 
 interface BidaScoreboardProps {
   currentTurn: PlayerRole.X | PlayerRole.O;
   myRole: PlayerRole;
+  winner?: GameWinner | null;
   balls: BidaBall[];
   lastFoul?: string | null;
   assignedGroups?: {
@@ -52,6 +52,7 @@ function ScoreboardBallItem({ ball }: { ball: BidaBall }) {
 export function BidaScoreboard({
   currentTurn,
   myRole,
+  winner,
   balls,
   lastFoul,
   assignedGroups,
@@ -63,12 +64,9 @@ export function BidaScoreboard({
   isTimerWarning = false,
 }: BidaScoreboardProps) {
   const t = useTranslations("game");
-  const isMyTurn = currentTurn === myRole;
+  const isGameFinished = Boolean(winner);
+  const isMyTurn = !isGameFinished && currentTurn === myRole;
 
-  const playerXGroup = assignedGroups?.[PlayerRole.X] ?? null;
-  const playerOGroup = assignedGroups?.[PlayerRole.O] ?? null;
-
-  // Solids (Balls 1-7) & Stripes (Balls 9-15)
   const solidBalls = balls.filter((b) => b.type === BidaBallType.SOLIDS);
   const solidsRemaining = solidBalls.filter((b) => !b.isPocketed).length;
   const stripeBalls = balls.filter((b) => b.type === BidaBallType.STRIPES);
@@ -77,82 +75,67 @@ export function BidaScoreboard({
   const eightBall = balls.find((b) => b.type === BidaBallType.EIGHT_BALL);
   const isEightBallPocketed = eightBall?.isPocketed;
 
-  // Authentic profiles for Player X and Player O
-  const playerXProfile =
-    myRole === PlayerRole.X
-      ? myProfile
-      : opponentProfile?.role === PlayerRole.X
-      ? opponentProfile
-      : opponentProfile;
+  const isMeX = myRole !== PlayerRole.O;
+  const myRoleKey = isMeX ? PlayerRole.X : PlayerRole.O;
+  const opponentRoleKey = isMeX ? PlayerRole.O : PlayerRole.X;
 
-  const playerOProfile =
-    myRole === PlayerRole.O
-      ? myProfile
-      : opponentProfile?.role === PlayerRole.O
-      ? opponentProfile
-      : opponentProfile;
+  const myGroup = assignedGroups?.[myRoleKey] ?? null;
+  const opponentGroup = assignedGroups?.[opponentRoleKey] ?? null;
 
-  const playerXName = playerXProfile?.name || (myRole === PlayerRole.X ? t("you") : t("opponent"));
-  const playerOName = playerOProfile?.name || (myRole === PlayerRole.O ? t("you") : t("opponent"));
+  const myName = myProfile?.name || t("you");
+  const opponentName = opponentProfile?.name || t("opponent");
+
+  const isMyActiveTurn = !isGameFinished && currentTurn === myRoleKey;
+  const isOpponentActiveTurn = !isGameFinished && currentTurn === opponentRoleKey;
 
   return (
-    <Card
-      variant="solid"
-      className="w-full flex items-center justify-between gap-1 sm:gap-4 px-3 sm:px-6 py-2.5 rounded-2xl shadow-none border-none select-none overflow-hidden"
-    >
-      {/* Player X (Left) */}
-      <PlayerAvatar
-        name={playerXName}
-        avatarUrl={playerXProfile?.avatarUrl}
-        fallbackText={playerXName.slice(0, 1).toUpperCase()}
-        isActiveTurn={currentTurn === PlayerRole.X}
+    <GameScoreboard.Root>
+      {/* Player (You) */}
+      <GameScoreboard.Left
+        name={myName}
+        avatarUrl={myProfile?.avatarUrl}
+        fallbackText={myName.slice(0, 1).toUpperCase()}
+        isActiveTurn={isMyActiveTurn}
         activeColor="amber"
-        align="left"
-        badgePosition="below"
-        timeLeft={currentTurn === PlayerRole.X ? timeLeft : undefined}
-        timeFraction={currentTurn === PlayerRole.X ? timeFraction : undefined}
-        totalTime={45}
-        isTimerWarning={currentTurn === PlayerRole.X && isTimerWarning}
-        subBadge={
-          playerXGroup === null ? (
+        timer={!isGameFinished ? { timeLeft, timeFraction, isWarning: isTimerWarning, totalTime: 45 } : undefined}
+        badge={
+          myGroup === null ? (
             <Badge variant="subtle" size="sm" className="shrink-0">
               {t("open")}
             </Badge>
           ) : (
             <Badge
-              variant={playerXGroup === BidaBallType.SOLIDS ? "solids" : "stripes"}
+              variant={myGroup === BidaBallType.SOLIDS ? "solids" : "stripes"}
               size="sm"
               className="shrink-0"
             >
-              {playerXGroup === BidaBallType.SOLIDS
+              {myGroup === BidaBallType.SOLIDS
                 ? `${t("solids")} ${7 - solidsRemaining}/7`
                 : `${t("stripes")} ${7 - stripesRemaining}/7`}
             </Badge>
           )
         }
-        contentBelow={
-          <div className="flex items-center gap-1 sm:gap-1.5 mt-1.5 px-2 py-1 rounded-full bg-secondary/50 dark:bg-muted/40 shrink-0">
-            {(playerXGroup === BidaBallType.STRIPES ? stripeBalls : solidBalls).map((b) => (
-              <ScoreboardBallItem key={b.id} ball={b} />
-            ))}
-          </div>
+      >
+        <div className="flex items-center gap-1 sm:gap-1.5 mt-1.5 px-2 py-1 rounded-full bg-secondary/50 dark:bg-muted/40 shrink-0">
+          {(myGroup === BidaBallType.STRIPES ? stripeBalls : solidBalls).map((b) => (
+            <ScoreboardBallItem key={b.id} ball={b} />
+          ))}
+        </div>
+      </GameScoreboard.Left>
+
+      {/* Center: Turn Info & Foul Notice */}
+      <GameScoreboard.Center
+        isWaiting={!isOpponentOnline && !isGameFinished}
+        waitingText={t("waitingForOpponent")}
+        turnText={
+          isGameFinished
+            ? t("matchOver", { defaultMessage: "Trận đấu kết thúc" })
+            : isMyTurn
+            ? t("yourTurn")
+            : t("opponentAiming")
         }
-      />
-
-      {/* Center Message Only - fixed height to prevent vertical board shift when foul/status appears */}
-      <div className="flex flex-col items-center justify-center shrink-0 px-2 sm:px-4 min-h-[44px]">
-        {!isOpponentOnline ? (
-          <Badge variant="warning">
-            {t("waitingForOpponent")}
-          </Badge>
-        ) : (
-          <span className="text-xs sm:text-sm font-bold text-foreground tracking-tight text-center animate-in fade-in duration-200">
-            {isMyTurn ? t("yourTurn") : t("opponentAiming")}
-          </span>
-        )}
-
-        <div className="h-4 flex items-center justify-center">
-          {isEightBallPocketed ? (
+        notice={
+          isEightBallPocketed ? (
             <span className="text-[10px] font-bold text-rose-500 uppercase">
               🎱 8-Ball Pocketed
             </span>
@@ -160,48 +143,42 @@ export function BidaScoreboard({
             <span className="text-[10px] text-rose-500 dark:text-rose-400 font-bold tracking-tight text-center animate-in fade-in duration-150">
               ⚠️ {lastFoul}
             </span>
-          ) : null}
-        </div>
-      </div>
+          ) : null
+        }
+      />
 
-      {/* Player O (Right) */}
-      <PlayerAvatar
-        name={playerOName}
-        avatarUrl={playerOProfile?.avatarUrl}
-        fallbackText={playerOName.slice(0, 1).toUpperCase()}
-        isActiveTurn={currentTurn === PlayerRole.O}
+      {/* Opponent */}
+      <GameScoreboard.Right
+        name={opponentName}
+        avatarUrl={opponentProfile?.avatarUrl}
+        fallbackText={opponentName.slice(0, 1).toUpperCase()}
+        isActiveTurn={isOpponentActiveTurn}
         activeColor="sky"
-        align="right"
-        badgePosition="below"
-        timeLeft={currentTurn === PlayerRole.O ? timeLeft : undefined}
-        timeFraction={currentTurn === PlayerRole.O ? timeFraction : undefined}
-        totalTime={45}
-        isTimerWarning={currentTurn === PlayerRole.O && isTimerWarning}
-        subBadge={
-          playerOGroup === null ? (
+        timer={!isGameFinished ? { timeLeft, timeFraction, isWarning: isTimerWarning, totalTime: 45 } : undefined}
+        badge={
+          opponentGroup === null ? (
             <Badge variant="subtle" size="sm" className="shrink-0">
               {t("open")}
             </Badge>
           ) : (
             <Badge
-              variant={playerOGroup === BidaBallType.STRIPES ? "stripes" : "solids"}
+              variant={opponentGroup === BidaBallType.STRIPES ? "stripes" : "solids"}
               size="sm"
               className="shrink-0"
             >
-              {playerOGroup === BidaBallType.STRIPES
+              {opponentGroup === BidaBallType.STRIPES
                 ? `${t("stripes")} ${7 - stripesRemaining}/7`
                 : `${t("solids")} ${7 - solidsRemaining}/7`}
             </Badge>
           )
         }
-        contentBelow={
-          <div className="flex items-center gap-1 sm:gap-1.5 mt-1.5 px-2 py-1 rounded-full bg-secondary/50 dark:bg-muted/40 shrink-0">
-            {(playerOGroup === BidaBallType.SOLIDS ? solidBalls : stripeBalls).map((b) => (
-              <ScoreboardBallItem key={b.id} ball={b} />
-            ))}
-          </div>
-        }
-      />
-    </Card>
+      >
+        <div className="flex items-center gap-1 sm:gap-1.5 mt-1.5 px-2 py-1 rounded-full bg-secondary/50 dark:bg-muted/40 shrink-0">
+          {(opponentGroup === BidaBallType.SOLIDS ? solidBalls : stripeBalls).map((b) => (
+            <ScoreboardBallItem key={b.id} ball={b} />
+          ))}
+        </div>
+      </GameScoreboard.Right>
+    </GameScoreboard.Root>
   );
 }
