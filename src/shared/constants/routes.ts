@@ -9,6 +9,8 @@ export enum RouteEnum {
   CARO_PLAY = "/play/caro/:code",
   BIDA_PLAY = "/play/bida/:code",
   XIANGQI_PLAY = "/play/xiangqi/:code",
+  CHESS_PLAY = "/play/chess/:code",
+  ANIMAL_CHESS_PLAY = "/play/animal-chess/:code",
 }
 
 /**
@@ -27,6 +29,10 @@ export function getGamePlayRoute(gameType: GameType | string): RouteEnum {
       return RouteEnum.BIDA_PLAY;
     case GameType.XIANGQI:
       return RouteEnum.XIANGQI_PLAY;
+    case GameType.CHESS:
+      return RouteEnum.CHESS_PLAY;
+    case GameType.ANIMAL_CHESS:
+      return RouteEnum.ANIMAL_CHESS_PLAY;
     case GameType.CARO:
     default:
       return RouteEnum.CARO_PLAY;

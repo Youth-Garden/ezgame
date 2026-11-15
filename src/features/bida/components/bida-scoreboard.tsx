@@ -3,7 +3,11 @@ import { BidaBall, BidaBallType } from "../types";
 import { PlayerRole, type GameWinner } from "@/shared/types/room";
 import { type PlayerProfile } from "@/shared/hooks/use-player-profile";
 import { Badge } from "@/shared/components/ui/badge";
+import { Button } from "@/shared/components/ui/button";
+import { Icons } from "@/shared/icons";
 import { GameScoreboard } from "@/shared/components/game-scoreboard";
+import { SpreadPing } from "@/shared/components/spread-ping";
+import { BidaBallItem } from "./bida-ball-item";
 
 interface BidaScoreboardProps {
   currentTurn: PlayerRole.X | PlayerRole.O;
@@ -25,29 +29,11 @@ interface BidaScoreboardProps {
   timeLeft?: number;
   timeFraction?: number;
   isTimerWarning?: boolean;
+  isGameStarted?: boolean;
+  isHost?: boolean;
+  onStartGame?: () => void;
 }
 
-function ScoreboardBallItem({ ball }: { ball: BidaBall }) {
-  const isPocketed = ball.isPocketed;
-
-  return (
-    <div
-      title={`Ball #${ball.id} ${isPocketed ? "(Pocketed)" : "(On Table)"}`}
-      className={`relative w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
-        isPocketed
-          ? "opacity-20 scale-75 grayscale contrast-50 brightness-75"
-          : "opacity-100 scale-100 hover:scale-110 drop-shadow-[0_1px_3px_rgba(0,0,0,0.25)]"
-      }`}
-    >
-      <img
-        src={`/games/bida/ball-${ball.id}.svg`}
-        alt={`Ball ${ball.id}`}
-        className="w-full h-full object-contain pointer-events-none select-none"
-        loading="eager"
-      />
-    </div>
-  );
-}
 
 export function BidaScoreboard({
   currentTurn,
@@ -62,10 +48,14 @@ export function BidaScoreboard({
   timeLeft,
   timeFraction,
   isTimerWarning = false,
+  isGameStarted = true,
+  isHost = false,
+  onStartGame,
 }: BidaScoreboardProps) {
   const t = useTranslations("game");
   const isGameFinished = Boolean(winner);
-  const isMyTurn = !isGameFinished && currentTurn === myRole;
+  const isReadyToStart = isOpponentOnline && !isGameStarted && !isGameFinished;
+  const isMyTurn = !isGameFinished && isGameStarted && currentTurn === myRole;
 
   const solidBalls = balls.filter((b) => b.type === BidaBallType.SOLIDS);
   const solidsRemaining = solidBalls.filter((b) => !b.isPocketed).length;
@@ -85,8 +75,8 @@ export function BidaScoreboard({
   const myName = myProfile?.name || t("you");
   const opponentName = opponentProfile?.name || t("opponent");
 
-  const isMyActiveTurn = !isGameFinished && currentTurn === myRoleKey;
-  const isOpponentActiveTurn = !isGameFinished && currentTurn === opponentRoleKey;
+  const isMyActiveTurn = !isGameFinished && isGameStarted && currentTurn === myRoleKey;
+  const isOpponentActiveTurn = !isGameFinished && isGameStarted && currentTurn === opponentRoleKey;
 
   return (
     <GameScoreboard.Root>
@@ -97,7 +87,7 @@ export function BidaScoreboard({
         fallbackText={myName.slice(0, 1).toUpperCase()}
         isActiveTurn={isMyActiveTurn}
         activeColor="amber"
-        timer={!isGameFinished ? { timeLeft, timeFraction, isWarning: isTimerWarning, totalTime: 45 } : undefined}
+        timer={!isGameFinished && isGameStarted ? { timeLeft, timeFraction, isWarning: isTimerWarning, totalTime: 45 } : undefined}
         badge={
           myGroup === null ? (
             <Badge variant="subtle" size="sm" className="shrink-0">
@@ -118,7 +108,7 @@ export function BidaScoreboard({
       >
         <div className="flex items-center gap-1 sm:gap-1.5 mt-1.5 px-2 py-1 rounded-full bg-secondary/50 dark:bg-muted/40 shrink-0">
           {(myGroup === BidaBallType.STRIPES ? stripeBalls : solidBalls).map((b) => (
-            <ScoreboardBallItem key={b.id} ball={b} />
+            <BidaBallItem key={b.id} id={b.id} ball={b} size="sm" />
           ))}
         </div>
       </GameScoreboard.Left>
@@ -128,21 +118,46 @@ export function BidaScoreboard({
         isWaiting={!isOpponentOnline && !isGameFinished}
         waitingText={t("waitingForOpponent")}
         turnText={
-          isGameFinished
-            ? t("matchOver", { defaultMessage: "Trận đấu kết thúc" })
-            : isMyTurn
-            ? t("yourTurn")
-            : t("opponentAiming")
+          isGameFinished ? (
+            t("matchOver", { defaultMessage: "Trận đấu kết thúc" })
+          ) : isReadyToStart ? (
+            isHost ? (
+              <Button
+                variant="default"
+                size="sm"
+                onClick={onStartGame}
+                className="text-[11px] sm:text-xs font-bold gap-1 px-3 py-1 shadow-md hover:scale-105 transition-transform"
+              >
+                <Icons name="check" size={13} />
+                <span>{t("startGame")}</span>
+              </Button>
+            ) : (
+              <Badge
+                variant="warning"
+                size="sm"
+                className="whitespace-nowrap text-[10px] sm:text-xs px-2.5 py-1 font-bold inline-flex items-center gap-1.5"
+              >
+                <SpreadPing variant="amber" size="xs" />
+                <span>{t("waitingForHost")}</span>
+              </Badge>
+            )
+          ) : isMyTurn ? (
+            t("yourTurn")
+          ) : (
+            t("opponentAiming")
+          )
         }
         notice={
-          isEightBallPocketed ? (
-            <span className="text-[10px] font-bold text-rose-500 uppercase">
-              🎱 8-Ball Pocketed
-            </span>
-          ) : lastFoul ? (
-            <span className="text-[10px] text-rose-500 dark:text-rose-400 font-bold tracking-tight text-center animate-in fade-in duration-150">
-              ⚠️ {lastFoul}
-            </span>
+          !isGameFinished && isGameStarted ? (
+            isEightBallPocketed ? (
+              <span className="text-[10px] font-bold text-rose-500 uppercase">
+                🎱 8-Ball Pocketed
+              </span>
+            ) : lastFoul ? (
+              <span className="text-[10px] text-rose-500 dark:text-rose-400 font-bold tracking-tight text-center animate-in fade-in duration-150">
+                ⚠️ {lastFoul}
+              </span>
+            ) : null
           ) : null
         }
       />
@@ -154,7 +169,7 @@ export function BidaScoreboard({
         fallbackText={opponentName.slice(0, 1).toUpperCase()}
         isActiveTurn={isOpponentActiveTurn}
         activeColor="sky"
-        timer={!isGameFinished ? { timeLeft, timeFraction, isWarning: isTimerWarning, totalTime: 45 } : undefined}
+        timer={!isGameFinished && isGameStarted ? { timeLeft, timeFraction, isWarning: isTimerWarning, totalTime: 45 } : undefined}
         badge={
           opponentGroup === null ? (
             <Badge variant="subtle" size="sm" className="shrink-0">
@@ -175,7 +190,7 @@ export function BidaScoreboard({
       >
         <div className="flex items-center gap-1 sm:gap-1.5 mt-1.5 px-2 py-1 rounded-full bg-secondary/50 dark:bg-muted/40 shrink-0">
           {(opponentGroup === BidaBallType.SOLIDS ? solidBalls : stripeBalls).map((b) => (
-            <ScoreboardBallItem key={b.id} ball={b} />
+            <BidaBallItem key={b.id} id={b.id} ball={b} size="sm" />
           ))}
         </div>
       </GameScoreboard.Right>

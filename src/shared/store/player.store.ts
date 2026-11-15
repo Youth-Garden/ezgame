@@ -24,16 +24,16 @@ interface PlayerStoreState {
   updateProfile: (updates: { name?: string; avatarSeed?: string; avatarStyle?: AvatarStyle }) => void;
 }
 
-const STORAGE_KEY = "ezgame_player_profile";
+const STORAGE_KEY = "player_profile";
 
 // Stable initial fallback for SSR matching
 const DEFAULT_FALLBACK_PROFILE: PlayerProfile = {
   id: "guest_player",
   name: "Player",
-  avatarSeed: "ezgame_default",
+  avatarSeed: "default_seed",
   avatarStyle: "bottts-neutral",
   isGuest: true,
-  avatarUrl: getAvatarUrl("bottts-neutral", "ezgame_default"),
+  avatarUrl: getAvatarUrl("bottts-neutral", "default_seed"),
 };
 
 export const usePlayerStore = create<PlayerStoreState>()(

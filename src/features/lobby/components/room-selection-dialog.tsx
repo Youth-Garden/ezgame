@@ -13,6 +13,8 @@ import { GameType } from "@/shared/types/room";
 import { DEFAULT_CARO_CONFIG } from "@/features/caro/config/caro-config";
 import { DEFAULT_BIDA_CONFIG } from "@/features/bida/config/bida-config";
 import { DEFAULT_XIANGQI_CONFIG } from "@/features/xiangqi/config/xiangqi-config";
+import { DEFAULT_CHESS_CONFIG } from "@/features/chess/config/chess-config";
+import { DEFAULT_ANIMAL_CHESS_CONFIG } from "@/features/animal-chess/config/animal-chess-config";
 import { Icons } from "@/shared/icons";
 import type { PortalProps } from "@/shared/types/portal.types";
 import type { GameRoomModalData } from "../types";
@@ -29,6 +31,8 @@ const CARO_TIME_OPTIONS = [15, 30, 45, 60] as const;
 const CARO_BOARD_OPTIONS = [15, 19] as const;
 const BIDA_TIME_OPTIONS = [30, 45, 60, 90] as const;
 const XIANGQI_TIME_OPTIONS = [30, 45, 60, 90] as const;
+const CHESS_TIME_OPTIONS = [30, 45, 60, 90] as const;
+const ANIMAL_CHESS_TIME_OPTIONS = [20, 30, 45, 60] as const;
 
 export function RoomSelectionDialog({
   isOpen,
@@ -48,6 +52,8 @@ export function RoomSelectionDialog({
   const isCaro = gameType === GameType.CARO;
   const isBida = gameType === GameType.BIDA;
   const isXiangqi = gameType === GameType.XIANGQI;
+  const isChess = gameType === GameType.CHESS;
+  const isAnimalChess = gameType === GameType.ANIMAL_CHESS;
 
   // Editable Match Configuration State
   const [turnTimeLimit, setTurnTimeLimit] = useState<number>(
@@ -55,6 +61,10 @@ export function RoomSelectionDialog({
       ? DEFAULT_CARO_CONFIG.turnTimeLimitSeconds
       : isXiangqi
       ? DEFAULT_XIANGQI_CONFIG.turnTimeoutSeconds
+      : isChess
+      ? DEFAULT_CHESS_CONFIG.turnTimeoutSeconds
+      : isAnimalChess
+      ? DEFAULT_ANIMAL_CHESS_CONFIG.turnTimeoutSeconds
       : DEFAULT_BIDA_CONFIG.turnTimeLimitSeconds
   );
   const [caroBoardSize, setCaroBoardSize] = useState<number>(
@@ -205,6 +215,10 @@ export function RoomSelectionDialog({
                         ? t("ruleStandard")
                         : isXiangqi
                         ? t("ruleXiangqi")
+                        : isChess
+                        ? t("ruleChess")
+                        : isAnimalChess
+                        ? t("ruleAnimalChess")
                         : t("rule8Ball")}
                     </Badge>
                   </div>
@@ -225,6 +239,10 @@ export function RoomSelectionDialog({
                         ? CARO_TIME_OPTIONS
                         : isXiangqi
                         ? XIANGQI_TIME_OPTIONS
+                        : isChess
+                        ? CHESS_TIME_OPTIONS
+                        : isAnimalChess
+                        ? ANIMAL_CHESS_TIME_OPTIONS
                         : BIDA_TIME_OPTIONS
                       ).map((sec) => (
                         <button
@@ -280,6 +298,28 @@ export function RoomSelectionDialog({
                       >
                         <span className="text-xs font-semibold text-foreground font-mono">
                           9 × 10 Grid (32 Wooden Pieces)
+                        </span>
+                      </Card>
+                    </div>
+                  ) : isChess ? (
+                    <div className="pt-1">
+                      <Card
+                        variant="subtle"
+                        className="flex items-center justify-center p-2.5 rounded-xl text-center"
+                      >
+                        <span className="text-xs font-semibold text-foreground font-mono">
+                          8 × 8 Grid (32 Standard Pieces)
+                        </span>
+                      </Card>
+                    </div>
+                  ) : isAnimalChess ? (
+                    <div className="pt-1">
+                      <Card
+                        variant="subtle"
+                        className="flex items-center justify-center p-2.5 rounded-xl text-center"
+                      >
+                        <span className="text-xs font-semibold text-foreground font-mono">
+                          7 × 9 Grid (16 Animals, Rivers & Traps)
                         </span>
                       </Card>
                     </div>

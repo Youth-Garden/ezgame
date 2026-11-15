@@ -52,6 +52,30 @@ export const GAME_CATALOG_CONFIGS: readonly GameCatalogConfig[] = [
     gradient: "bg-gradient-to-b from-[#C2410C] via-[#EA580C] to-[#F59E0B]",
     defaultPlayingCount: 1420,
   },
+  {
+    id: GameType.CHESS,
+    titleKey: "chess.title",
+    badgeKey: "chess.badge",
+    descriptionKey: "chess.description",
+    playersKey: "chess.players",
+    isAvailable: true,
+    tagKey: "chess.tag",
+    iconSrc: "/games/chess.jpg",
+    gradient: "bg-gradient-to-b from-[#1E293B] via-[#334155] to-[#475569]",
+    defaultPlayingCount: 2540,
+  },
+  {
+    id: GameType.ANIMAL_CHESS,
+    titleKey: "animalChess.title",
+    badgeKey: "animalChess.badge",
+    descriptionKey: "animalChess.description",
+    playersKey: "animalChess.players",
+    isAvailable: true,
+    tagKey: "animalChess.tag",
+    iconSrc: "/games/animal-chess.jpg",
+    gradient: "bg-gradient-to-b from-[#065F46] via-[#047857] to-[#10B981]",
+    defaultPlayingCount: 1680,
+  },
 ] as const;
 
 export interface LanguageOption {

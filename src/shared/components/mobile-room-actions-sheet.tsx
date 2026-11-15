@@ -16,7 +16,11 @@ export interface MobileRoomActionsSheetData {
   roomCode: string;
   inviteUrl: string;
   soundOn: boolean;
+  isFullscreen: boolean;
   onToggleSound: () => void;
+  onToggleFullscreen: () => void;
+  onOpenRules?: () => void;
+  onOpenShare?: () => void;
   onSurrender?: () => void;
   canSurrender?: boolean;
 }
@@ -35,7 +39,11 @@ export function MobileRoomActionsSheet({
     roomCode,
     inviteUrl,
     soundOn,
+    isFullscreen,
     onToggleSound,
+    onToggleFullscreen,
+    onOpenRules,
+    onOpenShare,
     onSurrender,
     canSurrender = true,
   } = data;
@@ -45,7 +53,7 @@ export function MobileRoomActionsSheet({
       <SheetContent side="bottom" showCloseButton={true} className="space-y-4">
         <SheetHeader>
           <div className="flex items-center gap-2">
-            <SheetTitle>Room Actions</SheetTitle>
+            <SheetTitle>{t("roomActions")}</SheetTitle>
             <span className="text-xs font-mono px-2 py-0.5 rounded-md bg-muted text-muted-foreground font-semibold">
               #{roomCode}
             </span>
@@ -54,6 +62,25 @@ export function MobileRoomActionsSheet({
 
         {/* Action List */}
         <div className="space-y-2">
+          {/* Game Rules & Guide */}
+          {onOpenRules && (
+            <Button
+              variant="secondary"
+              size="default"
+              className="w-full justify-between h-11 px-4 text-xs font-semibold"
+              onClick={() => {
+                onDismiss?.();
+                onOpenRules();
+              }}
+            >
+              <span className="flex items-center gap-2.5">
+                <Icons name="book" size={16} />
+                <span>{t("gameRules")}</span>
+              </span>
+              <Icons name="arrow-right" size={14} className="text-muted-foreground" />
+            </Button>
+          )}
+
           {/* Audio Toggle */}
           <Button
             variant="secondary"
@@ -69,6 +96,41 @@ export function MobileRoomActionsSheet({
               {soundOn ? "ON" : "OFF"}
             </span>
           </Button>
+
+          {/* Fullscreen Toggle */}
+          <Button
+            variant="secondary"
+            size="default"
+            className="w-full justify-between h-11 px-4 text-xs font-semibold"
+            onClick={() => {
+              onDismiss?.();
+              onToggleFullscreen();
+            }}
+          >
+            <span className="flex items-center gap-2.5">
+              <Icons name={isFullscreen ? "minimize" : "maximize"} size={16} />
+              <span>{t("fullScreen")}</span>
+            </span>
+            <span className="text-[11px] font-mono text-muted-foreground uppercase">
+              {isFullscreen ? "ON" : "OFF"}
+            </span>
+          </Button>
+
+          {/* Invite & Share Action */}
+          {onOpenShare && (
+            <Button
+              variant="default"
+              size="default"
+              className="w-full justify-center h-11 px-4 text-xs font-semibold gap-2"
+              onClick={() => {
+                onDismiss?.();
+                onOpenShare();
+              }}
+            >
+              <Icons name="share" size={16} />
+              <span>{tNav("inviteFriends", { defaultMessage: "Mời bạn bè vào phòng" })}</span>
+            </Button>
+          )}
 
           {/* Copy Invite Link */}
           <CopyLinkButton

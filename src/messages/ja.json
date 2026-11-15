@@ -8,7 +8,9 @@
     "toggleSound": "サウンド切替",
     "copyRoomCode": "ルームコードをコピー",
     "copyInviteLink": "招待リンクをコピー",
-    "copyInviteLinkDesc": "友達に招待リンクを共有して対戦"
+    "copyInviteLinkDesc": "友達に招待リンクを共有して対戦",
+    "inviteFriends": "友達を招待",
+    "inviteFriendTitle": "友達をルームに招待"
   },
   "lobby": {
     "tagline": "オンライン対戦",
@@ -52,6 +54,20 @@
       "description": "9x10の伝統的な対戦ボードゲーム",
       "players": "2人プレイ",
       "tag": "BOARD"
+    },
+    "chess": {
+      "title": "チェス",
+      "badge": "8x8",
+      "description": "世界標準の8x8国際対局チェス",
+      "players": "2人プレイ",
+      "tag": "BOARD"
+    },
+    "animalChess": {
+      "title": "闘獣棋 (どうじゅうき)",
+      "badge": "7x9",
+      "description": "7x9盤上の動物たちの戦略バトル",
+      "players": "2人プレイ",
+      "tag": "BOARD"
     }
   },
   "modal": {
@@ -76,6 +92,8 @@
     "ruleStandard": "標準ルール",
     "rule8Ball": "エイトボール",
     "ruleXiangqi": "9x10 伝統盤面",
+    "ruleChess": "8x8 国際チェス",
+    "ruleAnimalChess": "7x9 伝統動物将棋",
     "ruleCaro": "5目並べ"
   },
   "game": {
@@ -103,9 +121,9 @@
     "opponentAiming": "相手がエイム中...",
     "ballsRolling": "ボール転がり中...",
     "cueBallSpin": "スピン調整",
-    "center": "中心 (Center)",
-    "follow": "押し球 (Follow)",
-    "draw": "引き球 (Draw)",
+    "center": "中心",
+    "follow": "押し球",
+    "draw": "引き球",
     "englishRight": "右ヒネリ",
     "englishLeft": "左ヒネリ",
     "resetCenter": "リセット",
@@ -120,7 +138,37 @@
     "dragOrSpace": "ドラッグまたはSPACE長押し",
     "connectingMatch": "対戦セッションに接続中...",
     "red": "先手 (赤)",
-    "black": "後手 (黒)"
+    "black": "後手 (黒)",
+    "white": "白 (先手)",
+    "blue": "青 (先手)",
+    "animalRat": "ネズミ (鼠)",
+    "animalCat": "ネコ (猫)",
+    "animalWolf": "オオカミ (狼)",
+    "animalDog": "イヌ (犬)",
+    "animalLeopard": "ヒョウ (豹)",
+    "animalTiger": "トラ (虎)",
+    "animalLion": "ライオン (獅)",
+    "animalElephant": "ゾウ (象)",
+    "denCaptured": "本拠地 (獣穴) が制圧されました！",
+    "check": "王手 (チェック)！",
+    "checkmate": "詰み (チェックメイト)！",
+    "drawByStalemate": "ステイルメイト (引き分け)",
+    "drawByRepetition": "同形反復 (千日手)",
+    "drawByMaterial": "戦力不足による引き分け",
+    "promotePawnTitle": "ポーンの昇格 (プロモーション)",
+    "promotePawnDesc": "変身させる駒を選択してください",
+    "queen": "クイーン",
+    "rook": "ルーク",
+    "bishop": "ビショップ",
+    "knight": "ナイト",
+    "matchOver": "対局終了",
+    "startGame": "対局開始",
+    "waitingForHost": "ホストの開始を待っています...",
+    "gameRules": "ルールとガイド",
+    "roomActions": "ルームアクション",
+    "fullScreen": "全画面表示",
+    "clickToCopyCode": "ルームコードをコピー",
+    "offline": "オフライン"
   },
   "dialog": {
     "leaveMatchTitle": "対局を退出しますか？",
@@ -156,7 +204,8 @@
   "common": {
     "close": "閉じる",
     "copied": "コピーしました！",
-    "you": "あなた"
+    "you": "あなた",
+    "understand": "了解"
   },
   "profile": {
     "title": "プレイヤープロフィール",
@@ -168,7 +217,7 @@
     "randomName": "名前をランダム生成",
     "avatarSection": "アバターのカスタマイズ",
     "avatarStyle": "アバタースタイル",
-    "avatarSeed": "シード値 (Seed)",
+    "avatarSeed": "シード値",
     "avatarSeedPlaceholder": "シードキーワードを入力...",
     "randomSeed": "シードをランダム生成",
     "save": "変更を保存",

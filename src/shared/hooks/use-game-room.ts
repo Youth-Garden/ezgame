@@ -26,7 +26,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface UseGameRoomParams {
   gameTitle: string;
-  gameType?: "caro" | "bida" | "tictactoe" | "xiangqi";
+  gameType?: "caro" | "bida" | "tictactoe" | "xiangqi" | "chess" | "animal-chess";
   defaultRoomCode?: string;
   onEventReceived?: (event: RealtimeEvent) => void;
   onSurrenderConfirmed?: () => Promise<void> | void;
@@ -56,7 +56,7 @@ export function useGameRoom({
     // Check if player role was saved in sessionStorage for this room (prevents random flip on F5)
     if (typeof window !== 'undefined') {
       const savedRole = window.sessionStorage.getItem(
-        `ezgame_role_${roomCode}`,
+        `role_${roomCode}`,
       );
       if (savedRole === PlayerRole.X || savedRole === PlayerRole.O) {
         return savedRole as PlayerRole;
@@ -72,7 +72,7 @@ export function useGameRoom({
     (newRole: PlayerRole) => {
       setMyRoleState(newRole);
       if (typeof window !== 'undefined') {
-        window.sessionStorage.setItem(`ezgame_role_${roomCode}`, newRole);
+        window.sessionStorage.setItem(`role_${roomCode}`, newRole);
       }
     },
     [roomCode],
@@ -83,7 +83,7 @@ export function useGameRoom({
       typeof window !== 'undefined' &&
       (myRole === PlayerRole.X || myRole === PlayerRole.O)
     ) {
-      window.sessionStorage.setItem(`ezgame_role_${roomCode}`, myRole);
+      window.sessionStorage.setItem(`role_${roomCode}`, myRole);
     }
   }, [myRole, roomCode]);
 
@@ -97,6 +97,8 @@ export function useGameRoom({
   const hasShownVsModalRef = useRef(false);
   const hasOpponentEverJoinedRef = useRef(false);
   const isGameOverRef = useRef(false);
+  const [isGameStarted, setIsGameStarted] = useState(false);
+  const isHost = myRole === PlayerRole.X;
   const sendEventRef = useRef<(event: RealtimeEvent) => Promise<void>>(
     async () => {},
   );
@@ -127,6 +129,16 @@ export function useGameRoom({
   );
 
   // Hook into Realtime (Supabase Broadcast + Presence)
+  const handleInternalEventReceived = useCallback(
+    (event: RealtimeEvent) => {
+      if (event.type === RealtimeEventType.GAME_START) {
+        setIsGameStarted(true);
+      }
+      onEventReceived?.(event);
+    },
+    [onEventReceived]
+  );
+
   const {
     isOpponentOnline,
     opponentProfile,
@@ -138,8 +150,20 @@ export function useGameRoom({
     myRole,
     profile: myProfile,
     onRoleAssigned: (newRole) => setMyRole(newRole),
-    onEventReceived,
+    onEventReceived: handleInternalEventReceived,
   });
+
+  // Start game action (called by Host or triggered via GAME_START event)
+  const startGame = useCallback(async () => {
+    setIsGameStarted(true);
+    await sendEvent({
+      type: RealtimeEventType.GAME_START,
+      payload: {
+        startedBy: myRole,
+        timestamp: Date.now(),
+      },
+    });
+  }, [myRole, sendEvent]);
 
   useEffect(() => {
     sendEventRef.current = sendEvent;
@@ -154,7 +178,7 @@ export function useGameRoom({
           from: myRole,
           clientId:
             typeof window !== 'undefined'
-              ? window.sessionStorage.getItem('ezgame_client_id') || ''
+              ? window.sessionStorage.getItem('client_id') || ''
               : '',
         },
       }).catch((err) =>
@@ -251,5 +275,9 @@ export function useGameRoom({
     showResultDialog,
     dismissResultDialog,
     promptSurrender,
+    isGameStarted,
+    setIsGameStarted,
+    isHost,
+    startGame,
   };
 }

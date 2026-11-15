@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "graph": "skott --displayMode=webapp --includeBaseDir=src"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.115.0",
@@ -14,11 +15,13 @@
     "@uidotdev/usehooks": "^2.4.1",
     "axios": "^1.21.0",
     "canvas-confetti": "^1.9.4",
+    "chess.js": "^1.4.0",
     "clsx": "^2.1.1",
     "lucide-react": "^1.41.0",
     "matter-js": "^0.20.0",
     "next": "16.3.4",
     "next-intl": "^4.14.9",
+    "qrcode.react": "^4.2.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "tailwind-merge": "^3.6.0",
@@ -35,6 +38,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.3.4",
+    "skott": "^0.35.12",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

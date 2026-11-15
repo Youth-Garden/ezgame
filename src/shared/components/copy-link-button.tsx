@@ -52,16 +52,13 @@ export function CopyLinkButton({
           aria-label={defaultLabel}
         >
           {copied ? (
-            <>
-              <Icons name="check" size={14} className="text-emerald-500 animate-in zoom-in-75 duration-150" />
-              <span className="text-emerald-500 font-sans font-medium">{tCommon("copied")}</span>
-            </>
+            <Icons name="check" size={14} className="text-emerald-500 animate-in zoom-in-75 duration-150 shrink-0" />
           ) : (
-            <>
-              <Icons name="copy" size={14} className="text-muted-foreground" />
-              <span className="font-sans">{defaultLabel}</span>
-            </>
+            <Icons name="copy" size={14} className="text-muted-foreground shrink-0" />
           )}
+          <span className={`font-sans ${copied ? "text-emerald-500 font-medium" : ""}`}>
+            {defaultLabel}
+          </span>
         </Button>
       </TooltipTrigger>
       <TooltipContent side="bottom" align="end">

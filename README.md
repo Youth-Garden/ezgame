@@ -6,9 +6,9 @@ Designed with **Feature-Sliced Design (FSD)** architecture and a **Zero Configur
 
 ---
 
-## ⚡ What Do You Need to Set Up?
+## What Do You Need to Set Up?
 
-### 👉 Case 1: Try It on Your Own Machine (No Setup Required)
+### Case 1: Try It on Your Own Machine (No Setup Required)
 * **Pass & Play Mode**: Two people sit side by side sharing one screen and mouse. Just toggle `"Local Mode: ON"`.
 * **Two Tabs on the Same Machine**: Open 2 browser tabs (tab 1 creates a room, tab 2 opens the invite link). The game syncs automatically via the browser's `BroadcastChannel` API — **no Supabase account or database needed**.
 * **How to Run**:
@@ -21,7 +21,7 @@ Designed with **Feature-Sliced Design (FSD)** architecture and a **Zero Configur
 
 ---
 
-### 👉 Case 2: Two People in Different Locations (2 Machines / 2 Networks) Playing Together
+### Case 2: Two People in Different Locations (2 Machines / 2 Networks) Playing Together
 * **You only need to do one thing**: Create a free Supabase project and fill in 2 keys in `.env.local`:
   1. Go to [supabase.com](https://supabase.com) and create a project (takes 1-2 minutes).
   2. Go to **Project Settings -> API**, copy:
@@ -42,11 +42,11 @@ Designed with **Feature-Sliced Design (FSD)** architecture and a **Zero Configur
     The system will generate a public link (e.g. `https://xxx.trycloudflare.com`). Send this link to your friends.
   * **Professional long-term option**: Push the code to GitHub and import it into **Vercel** (free), then add the 2 environment variables above.
 
-📖 **See the illustrated step-by-step guide at**: [docs/ONLINE_MULTIPLAYER_GUIDE.md](docs/ONLINE_MULTIPLAYER_GUIDE.md)
+**See the illustrated step-by-step guide at**: [docs/ONLINE_MULTIPLAYER_GUIDE.md](docs/ONLINE_MULTIPLAYER_GUIDE.md)
 
 ---
 
-## 🎮 Caro Board (Gomoku 15x15) — Ready to Play?
+## Caro Board (Gomoku 15x15) — Ready to Play?
 
 **Caro is 100% complete and fully playable:**
 
@@ -62,7 +62,7 @@ Designed with **Feature-Sliced Design (FSD)** architecture and a **Zero Configur
 
 ---
 
-## 🚀 Bun Commands
+## Bun Commands
 
 ```bash
 # Install dependencies
@@ -83,7 +83,7 @@ bun run build
 
 ---
 
-## 🧩 Project Structure (Feature-Sliced Design)
+## Project Structure (Feature-Sliced Design)
 
 ```text
 ezgame/
@@ -117,10 +117,10 @@ ezgame/
 
 ---
 
-## 🛡️ Configuration Matrix
+## Configuration Matrix
 
 | Use Case | Supabase Needed? | PostgreSQL Needed? | Deploy / Tunnel Needed? |
 | :--- | :---: | :---: | :---: |
-| **2 players on the same machine** | ❌ No | ❌ No | ❌ No (just `bun run dev`) |
-| **2 tabs on the same machine** | ❌ No | ❌ No | ❌ No (uses local `BroadcastChannel`) |
-| **2 players in different locations (Internet)** | ✅ **Yes, keys required** | ❌ Optional | ✅ **Yes** (via Tunnel or Vercel) |
+| **2 players on the same machine** | No | No | No (just `bun run dev`) |
+| **2 tabs on the same machine** | No | No | No (uses local `BroadcastChannel`) |
+| **2 players in different locations (Internet)** | **Yes, keys required** | Optional | **Yes** (via Tunnel or Vercel) |

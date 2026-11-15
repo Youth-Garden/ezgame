@@ -8,7 +8,9 @@
     "toggleSound": "Toggle Sound",
     "copyRoomCode": "Copy room code",
     "copyInviteLink": "Copy invite link",
-    "copyInviteLinkDesc": "Share invite link with your friend"
+    "copyInviteLinkDesc": "Share invite link with your friend",
+    "inviteFriends": "Invite Friends",
+    "inviteFriendTitle": "Invite Friends to Play"
   },
   "lobby": {
     "tagline": "Online PvP Gaming",
@@ -52,6 +54,20 @@
       "description": "Traditional 9x10 Tactical Board Game",
       "players": "2 Players",
       "tag": "BOARD"
+    },
+    "chess": {
+      "title": "CHESS",
+      "badge": "8x8",
+      "description": "Classic International 8x8 Chess Duel",
+      "players": "2 Players",
+      "tag": "BOARD"
+    },
+    "animalChess": {
+      "title": "ANIMAL CHESS",
+      "badge": "7x9",
+      "description": "Tactical 7x9 Jungle Animal Battle",
+      "players": "2 Players",
+      "tag": "BOARD"
     }
   },
   "modal": {
@@ -76,6 +92,8 @@
     "ruleStandard": "Standard Rules",
     "rule8Ball": "Standard 8-Ball",
     "ruleXiangqi": "Standard 9x10 Board",
+    "ruleChess": "Standard 8x8 Chess",
+    "ruleAnimalChess": "Standard 7x9 Jungle Chess",
     "ruleCaro": "5 in a row"
   },
   "game": {
@@ -121,7 +139,36 @@
     "connectingMatch": "Connecting match session...",
     "red": "Red",
     "black": "Black",
-    "matchOver": "Match Over"
+    "white": "White",
+    "blue": "Blue",
+    "animalRat": "Rat",
+    "animalCat": "Cat",
+    "animalWolf": "Wolf",
+    "animalDog": "Dog",
+    "animalLeopard": "Leopard",
+    "animalTiger": "Tiger",
+    "animalLion": "Lion",
+    "animalElephant": "Elephant",
+    "denCaptured": "Den captured!",
+    "check": "Check!",
+    "checkmate": "Checkmate!",
+    "drawByStalemate": "Draw by Stalemate",
+    "drawByRepetition": "Draw by Threefold Repetition",
+    "drawByMaterial": "Draw by Insufficient Material",
+    "promotePawnTitle": "Promote Pawn",
+    "promotePawnDesc": "Choose a piece to promote your pawn to",
+    "queen": "Queen",
+    "rook": "Rook",
+    "bishop": "Bishop",
+    "knight": "Knight",
+    "matchOver": "Match Over",
+    "startGame": "Start Game",
+    "waitingForHost": "Waiting for host to start...",
+    "gameRules": "Rules & Guide",
+    "roomActions": "Room Actions",
+    "fullScreen": "Full Screen",
+    "clickToCopyCode": "Click to copy room code",
+    "offline": "Offline"
   },
   "dialog": {
     "leaveMatchTitle": "Leave Current Match?",
@@ -140,9 +187,9 @@
     "victoryDesc": "Congratulations! You took the win.",
     "drawDesc": "Both sides played evenly to a draw.",
     "defeatDesc": "Ready for the next round?",
-    "rematchAccept": "Accept Rematch",
+    "rematchAccept": "Opponent requested rematch",
     "rematchPending": "Waiting for confirmation...",
-    "rematchRequest": "Rematch",
+    "rematchRequest": "Request Rematch",
     "backToLobby": "Back to Lobby"
   },
   "error": {
@@ -157,7 +204,8 @@
   "common": {
     "close": "Close",
     "copied": "Copied!",
-    "you": "You"
+    "you": "You",
+    "understand": "Understood"
   },
   "profile": {
     "title": "Player Profile",

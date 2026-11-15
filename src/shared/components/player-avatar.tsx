@@ -160,7 +160,7 @@ export function PlayerAvatar({
         {(badgePosition === "below" && subBadge || contentBelow) && (
           <div
             className={cn(
-              "mt-0.5 flex items-center gap-1.5 min-w-0",
+              "mt-0.5 flex items-center gap-1.5 min-w-0 h-5",
               isRight && "flex-row-reverse"
             )}
           >

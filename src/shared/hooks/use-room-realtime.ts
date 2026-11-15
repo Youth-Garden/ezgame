@@ -17,10 +17,10 @@ interface UseRoomRealtimeOptions {
 
 function getOrCreateClientId(): string {
   if (typeof window === "undefined") return "client_ssr";
-  let id = window.sessionStorage.getItem("ezgame_client_id");
+  let id = window.sessionStorage.getItem("client_id");
   if (!id) {
     id = `client_${Math.random().toString(36).substring(2, 9)}`;
-    window.sessionStorage.setItem("ezgame_client_id", id);
+    window.sessionStorage.setItem("client_id", id);
   }
   return id;
 }

@@ -8,7 +8,9 @@
     "toggleSound": "Bật/Tắt âm thanh",
     "copyRoomCode": "Sao chép mã phòng",
     "copyInviteLink": "Sao chép link mời",
-    "copyInviteLinkDesc": "Gửi link này cho bạn bè để vào chơi ngay"
+    "copyInviteLinkDesc": "Gửi link này cho bạn bè để vào chơi ngay",
+    "inviteFriends": "Mời bạn bè",
+    "inviteFriendTitle": "Mời bạn bè vào phòng"
   },
   "lobby": {
     "tagline": "Đấu Trí Trực Tuyến",
@@ -52,6 +54,20 @@
       "description": "Cờ tướng đối kháng 9x10 truyền thống",
       "players": "2 Người",
       "tag": "BOARD"
+    },
+    "chess": {
+      "title": "CỜ VUA",
+      "badge": "8x8",
+      "description": "Cờ vua quốc tế đối kháng đỉnh cao",
+      "players": "2 Người",
+      "tag": "BOARD"
+    },
+    "animalChess": {
+      "title": "CỜ THÚ",
+      "badge": "7x9",
+      "description": "Đấu trường muông thú 7x9 kịch tính",
+      "players": "2 Người",
+      "tag": "BOARD"
     }
   },
   "modal": {
@@ -76,6 +92,8 @@
     "ruleStandard": "Quy tắc tiêu chuẩn",
     "rule8Ball": "Bida lỗ 8 bóng",
     "ruleXiangqi": "Cờ tướng 9x10 chuẩn",
+    "ruleChess": "Cờ vua 8x8 quốc tế",
+    "ruleAnimalChess": "Cờ thú 7x9 truyền thống",
     "ruleCaro": "5 ô liên tiếp"
   },
   "game": {
@@ -121,7 +139,36 @@
     "connectingMatch": "Đang kết nối phiên đấu...",
     "red": "Đỏ",
     "black": "Đen",
-    "matchOver": "Trận đấu kết thúc"
+    "white": "Trắng",
+    "blue": "Xanh",
+    "animalRat": "Chuột",
+    "animalCat": "Mèo",
+    "animalWolf": "Sói",
+    "animalDog": "Chó",
+    "animalLeopard": "Báo",
+    "animalTiger": "Hổ",
+    "animalLion": "Sư tử",
+    "animalElephant": "Voi",
+    "denCaptured": "Hang đã bị chiếm!",
+    "check": "Chiếu tướng!",
+    "checkmate": "Chiếu bí! Hết cờ",
+    "drawByStalemate": "Hòa cờ do hết nước đi",
+    "drawByRepetition": "Hòa cờ do lặp nước",
+    "drawByMaterial": "Hòa cờ do không đủ lực lượng",
+    "promotePawnTitle": "Phong cấp Tốt",
+    "promotePawnDesc": "Chọn quân cờ bạn muốn biến đổi",
+    "queen": "Hậu",
+    "rook": "Xe",
+    "bishop": "Tượng",
+    "knight": "Mã",
+    "matchOver": "Trận đấu kết thúc",
+    "startGame": "Bắt đầu",
+    "waitingForHost": "Chờ chủ phòng bắt đầu...",
+    "gameRules": "Hướng dẫn & Luật chơi",
+    "roomActions": "Tùy chọn phòng",
+    "fullScreen": "Toàn màn hình",
+    "clickToCopyCode": "Sao chép mã phòng",
+    "offline": "Ngoại tuyến"
   },
   "dialog": {
     "leaveMatchTitle": "Rời trận đấu hiện tại?",
@@ -140,9 +187,9 @@
     "victoryDesc": "Chúc mừng! Bạn đã giành chiến thắng trong trận đấu này.",
     "drawDesc": "Hai bên ngang tài ngang sức, trận đấu kết thúc với kết quả hòa.",
     "defeatDesc": "Đừng nản lòng, hãy phục thù ở ván đấu tiếp theo!",
-    "rematchAccept": "Chấp nhận đấu lại",
+    "rematchAccept": "Đối thủ yêu cầu đấu lại",
     "rematchPending": "Đang đợi đối thủ...",
-    "rematchRequest": "Đấu lại ván mới",
+    "rematchRequest": "Yêu cầu đấu lại",
     "backToLobby": "Về sảnh chính"
   },
   "error": {
@@ -157,7 +204,8 @@
   "common": {
     "close": "Đóng",
     "copied": "Đã sao chép!",
-    "you": "Bạn"
+    "you": "Bạn",
+    "understand": "Đã hiểu"
   },
   "profile": {
     "title": "Hồ sơ người chơi",

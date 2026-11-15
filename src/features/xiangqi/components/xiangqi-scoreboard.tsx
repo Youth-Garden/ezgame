@@ -3,8 +3,11 @@ import { XiangqiColor, XiangqiPiece } from "../types";
 import { PlayerRole, type GameWinner } from "@/shared/types/room";
 import { PlayerProfile } from "@/shared/hooks/use-player-profile";
 import { Badge } from "@/shared/components/ui/badge";
+import { Button } from "@/shared/components/ui/button";
+import { Icons } from "@/shared/icons";
 import { GameScoreboard } from "@/shared/components/game-scoreboard";
-import { getPieceDisplay } from "../utils/xiangqi-display";
+import { SpreadPing } from "@/shared/components/spread-ping";
+import { XiangqiPieceComponent } from "./xiangqi-piece";
 
 interface XiangqiScoreboardProps {
   currentTurn: XiangqiColor;
@@ -24,6 +27,9 @@ interface XiangqiScoreboardProps {
   isInCheckColor?: XiangqiColor | null;
   capturedByRed: XiangqiPiece[];
   capturedByBlack: XiangqiPiece[];
+  isGameStarted?: boolean;
+  isHost?: boolean;
+  onStartGame?: () => void;
 }
 
 function CapturedPiecesList({ pieces }: { pieces: XiangqiPiece[] }) {
@@ -32,17 +38,12 @@ function CapturedPiecesList({ pieces }: { pieces: XiangqiPiece[] }) {
   return (
     <div className="flex items-center gap-0.5 overflow-hidden max-w-[70px] xs:max-w-[85px] sm:max-w-[110px]">
       {pieces.slice(-5).map((piece) => (
-        <span
+        <XiangqiPieceComponent
           key={piece.id}
-          className={`text-[10px] sm:text-xs opacity-80 font-serif font-bold ${
-            piece.color === XiangqiColor.RED
-              ? "text-red-600 dark:text-red-400"
-              : "text-slate-700 dark:text-slate-300"
-          }`}
-          title={getPieceDisplay(piece.type, piece.color).vietnameseName}
-        >
-          {getPieceDisplay(piece.type, piece.color).char}
-        </span>
+          piece={piece}
+          size="xs"
+          interactive={false}
+        />
       ))}
     </div>
   );
@@ -61,6 +62,9 @@ export function XiangqiScoreboard({
   isInCheckColor = null,
   capturedByRed,
   capturedByBlack,
+  isGameStarted = true,
+  isHost = false,
+  onStartGame,
 }: XiangqiScoreboardProps) {
   const t = useTranslations("game");
 
@@ -72,8 +76,9 @@ export function XiangqiScoreboard({
   const opponentName = opponentProfile?.name || t("opponent");
 
   const isGameFinished = Boolean(winner);
-  const isMyTurn = !isGameFinished && currentTurn === myColor;
-  const isOpponentTurn = !isGameFinished && currentTurn === opponentColor;
+  const isReadyToStart = isOpponentOnline && !isGameStarted && !isGameFinished;
+  const isMyTurn = !isGameFinished && isGameStarted && currentTurn === myColor;
+  const isOpponentTurn = !isGameFinished && isGameStarted && currentTurn === opponentColor;
 
   const myCapturedPieces = isMeRed ? capturedByRed : capturedByBlack;
   const opponentCapturedPieces = isMeRed ? capturedByBlack : capturedByRed;
@@ -87,7 +92,7 @@ export function XiangqiScoreboard({
         fallbackText={isMeRed ? "R" : "B"}
         isActiveTurn={isMyTurn}
         activeColor={isMeRed ? "amber" : "sky"}
-        timer={!isGameFinished ? { timeLeft, timeFraction, isWarning: isTimerWarning, totalTime: 45 } : undefined}
+        timer={!isGameFinished && isGameStarted ? { timeLeft, timeFraction, isWarning: isTimerWarning, totalTime: 45 } : undefined}
         badge={
           <Badge
             variant="subtle"
@@ -105,7 +110,7 @@ export function XiangqiScoreboard({
         <CapturedPiecesList pieces={myCapturedPieces} />
       </GameScoreboard.Left>
 
-      {/* Center: Turn Info & In-Check Notice */}
+      {/* Center: Turn Info, Start Button & In-Check Notice */}
       <GameScoreboard.Center
         isWaiting={!isOpponentOnline && !isGameFinished}
         turnText={
@@ -113,6 +118,27 @@ export function XiangqiScoreboard({
             <span className="text-[11px] sm:text-xs font-bold text-muted-foreground">
               {t("matchOver", { defaultMessage: "Trận đấu kết thúc" })}
             </span>
+          ) : isReadyToStart ? (
+            isHost ? (
+              <Button
+                variant="default"
+                size="sm"
+                onClick={onStartGame}
+                className="text-[11px] sm:text-xs font-bold gap-1 px-3 py-1 shadow-md hover:scale-105 transition-transform"
+              >
+                <Icons name="check" size={13} />
+                <span>{t("startGame")}</span>
+              </Button>
+            ) : (
+              <Badge
+                variant="warning"
+                size="sm"
+                className="whitespace-nowrap text-[10px] sm:text-xs px-2.5 py-1 font-bold inline-flex items-center gap-1.5"
+              >
+                <SpreadPing variant="amber" size="xs" />
+                <span>{t("waitingForHost")}</span>
+              </Badge>
+            )
           ) : (
             <Badge
               variant={isMyTurn ? "success" : "secondary"}
@@ -126,7 +152,7 @@ export function XiangqiScoreboard({
           )
         }
         notice={
-          !isGameFinished && isInCheckColor ? (
+          !isGameFinished && isGameStarted && isInCheckColor ? (
             <span className="text-[10px] sm:text-[11px] text-rose-500 dark:text-rose-400 font-extrabold tracking-tight text-center animate-pulse whitespace-nowrap mt-0.5">
               ⚡ CHIẾU TƯỚNG!
             </span>
@@ -141,7 +167,7 @@ export function XiangqiScoreboard({
         fallbackText={isMeRed ? "B" : "R"}
         isActiveTurn={isOpponentTurn}
         activeColor={isMeRed ? "sky" : "amber"}
-        timer={!isGameFinished ? { timeLeft, timeFraction, isWarning: isTimerWarning, totalTime: 45 } : undefined}
+        timer={!isGameFinished && isGameStarted ? { timeLeft, timeFraction, isWarning: isTimerWarning, totalTime: 45 } : undefined}
         badge={
           <Badge
             variant="subtle"

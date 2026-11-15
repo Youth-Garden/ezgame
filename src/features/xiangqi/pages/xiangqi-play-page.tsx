@@ -4,8 +4,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { RoomHeader } from "@/shared/components/room-header";
 import { GameBoard } from "@/shared/components/game-board";
-import { Button } from "@/shared/components/ui/button";
-import { Icons } from "@/shared/icons";
+import { GameActionBar } from "@/shared/components/game-action-bar";
 import { GameType, GameWinner, PlayerRole, RealtimeEventType, type RealtimeEvent } from "@/shared/types/room";
 import { useGameRoom } from "@/shared/hooks/use-game-room";
 import { useTurnTimer } from "@/shared/hooks/use-turn-timer";
@@ -33,6 +32,9 @@ export function XiangqiPlayPage() {
     showResultDialog,
     dismissResultDialog,
     promptSurrender,
+    isGameStarted,
+    isHost,
+    startGame,
   } = useGameRoom({
     gameTitle: DEFAULT_XIANGQI_CONFIG.title,
     gameType: "xiangqi",
@@ -187,12 +189,12 @@ export function XiangqiPlayPage() {
   );
 
   const isMyTurn = myColor !== null && currentTurn === myColor;
-  const canInteract = isMyTurn && isOpponentOnline && !winner;
+  const canInteract = isMyTurn && isOpponentOnline && isGameStarted && !winner;
 
   // Turn Timer
   const { timeLeft, timeFraction, isWarning } = useTurnTimer({
     currentTurn,
-    isGameActive: isOpponentOnline && !winner,
+    isGameActive: isOpponentOnline && isGameStarted && !winner,
     timeLimitSeconds: DEFAULT_XIANGQI_CONFIG.turnTimeoutSeconds,
     onTimeOut: async () => {
       if (isMyTurn) {
@@ -230,53 +232,51 @@ export function XiangqiPlayPage() {
 
       {/* Main Play Area */}
       <main className="flex-1 flex flex-col items-center justify-start p-2 sm:p-4 max-w-[1440px] mx-auto w-full gap-2.5 sm:gap-3">
-        {/* Quick Actions - Reserved height container (h-8) so rendering the surrender button never shifts content */}
-        <div className="w-full max-w-[520px] h-8 flex items-center justify-end gap-2">
-          {isOpponentOnline && !winner && (
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={promptSurrender}
-              className="text-xs gap-1.5"
-            >
-              <Icons name="flag" size={14} />
-              <span>{t("surrender")}</span>
-            </Button>
-          )}
-        </div>
-
-        {/* Live Scoreboard */}
-        <div className="w-full max-w-[520px]">
-          <XiangqiScoreboard
-            currentTurn={currentTurn}
-            myRole={myRole}
-            myColor={myColor}
-            winner={winner}
-            myProfile={myProfile}
-            opponentProfile={opponentProfile}
-            isOpponentOnline={isOpponentOnline}
-            timeLeft={timeLeft}
-            timeFraction={timeFraction}
-            isTimerWarning={isWarning}
-            isInCheckColor={isInCheckColor}
-            capturedByRed={capturedByRed}
-            capturedByBlack={capturedByBlack}
+        {/* Game Stage Content Container: Aligned uniformly with standard game board width */}
+        <div className="w-full max-w-[540px] flex flex-col items-center gap-2.5 sm:gap-3">
+          {/* Game Action Bar - Fixed height (h-8) avoids layout shifts */}
+          <GameActionBar
+            canSurrender={Boolean(isOpponentOnline && !winner)}
+            onSurrender={promptSurrender}
+            maxWidthClass="w-full"
           />
-        </div>
 
-        {/* Strategy Game Board */}
-        <GameBoard gameType={GameType.XIANGQI}>
-          <XiangqiBoard
-            board={board}
-            selectedPos={selectedPos}
-            validMoves={validMoves}
-            lastMove={lastMove}
-            myColor={myColor}
-            isInCheckColor={isInCheckColor}
-            canInteract={canInteract}
-            onSelectPosition={handleSelectPosition}
-          />
-        </GameBoard>
+          {/* Live Scoreboard */}
+          <div className="w-full">
+            <XiangqiScoreboard
+              currentTurn={currentTurn}
+              myRole={myRole}
+              myColor={myColor}
+              winner={winner}
+              myProfile={myProfile}
+              opponentProfile={opponentProfile}
+              isOpponentOnline={isOpponentOnline}
+              timeLeft={timeLeft}
+              timeFraction={timeFraction}
+              isTimerWarning={isWarning}
+              isInCheckColor={isInCheckColor}
+              capturedByRed={capturedByRed}
+              capturedByBlack={capturedByBlack}
+              isGameStarted={isGameStarted}
+              isHost={isHost}
+              onStartGame={startGame}
+            />
+          </div>
+
+          {/* Strategy Game Board */}
+          <GameBoard gameType={GameType.XIANGQI}>
+            <XiangqiBoard
+              board={board}
+              selectedPos={selectedPos}
+              validMoves={validMoves}
+              lastMove={lastMove}
+              myColor={myColor}
+              isInCheckColor={isInCheckColor}
+              canInteract={canInteract}
+              onSelectPosition={handleSelectPosition}
+            />
+          </GameBoard>
+        </div>
       </main>
     </div>
   );

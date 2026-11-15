@@ -5,7 +5,7 @@ import { useCallback, useTransition } from 'react';
 import { useLocale } from 'next-intl';
 import { cookieUtils } from '@/shared/utils/cookie';
 
-const LOCALE_KEY = 'ezgame_locale';
+const LOCALE_KEY = 'locale';
 
 export function useSyncLocale() {
   const currentLocale = useLocale();

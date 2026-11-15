@@ -6,6 +6,7 @@ import { RoomHeader } from "@/shared/components/room-header";
 import { Button } from "@/shared/components/ui/button";
 import { Icons } from "@/shared/icons";
 import { GameBoard } from "@/shared/components/game-board";
+import { GameActionBar } from "@/shared/components/game-action-bar";
 import { GameType, PlayerRole, RealtimeEventType, GameWinner, type RealtimeEvent } from "@/shared/types/room";
 import { BidaTable } from "../components/bida-table";
 import { BidaScoreboard } from "../components/bida-scoreboard";
@@ -34,6 +35,9 @@ export function BidaPlayPage() {
     showResultDialog,
     dismissResultDialog,
     promptSurrender,
+    isGameStarted,
+    isHost,
+    startGame,
   } = useGameRoom({
     gameTitle: DEFAULT_BIDA_CONFIG.title,
     gameType: "bida",
@@ -42,7 +46,13 @@ export function BidaPlayPage() {
     onSurrenderConfirmed: async () => {
       const winner: GameWinner =
         myRole === PlayerRole.X ? GameWinner.O : GameWinner.X;
-      showResultDialog(winner, false, false);
+      showResultDialog(
+        winner,
+        false,
+        false,
+        () => handleRequestRematchRef.current(),
+        () => handleAcceptRematchRef.current()
+      );
       await sendEvent({
         type: RealtimeEventType.PLAYER_SURRENDER,
         payload: { player: myRole },
@@ -66,11 +76,17 @@ export function BidaPlayPage() {
   } = useBidaGame({
     myRole,
     sendEvent: async (e) => sendEventRef.current(e),
-    onShowResultDialog: (winner) => showResultDialog(winner),
+    onShowResultDialog: (winner) =>
+      showResultDialog(
+        winner,
+        false,
+        false,
+        () => handleRequestRematchRef.current(),
+        () => handleAcceptRematchRef.current()
+      ),
     onDismissResultDialog: dismissResultDialog,
   });
 
-  // Unified latest state refs to prevent stale closure in handleRealtimeEvent
   const latestGameStateRef = useRef({
     isBreakShot,
     balls,
@@ -85,6 +101,36 @@ export function BidaPlayPage() {
     assignedGroups,
     lastFoul,
   };
+
+  const handleRequestRematchRef = useRef<() => void>(() => {});
+  const handleAcceptRematchRef = useRef<() => void>(() => {});
+
+  const handleRequestRematch = useCallback(async () => {
+    showResultDialog(
+      null,
+      true, // isRequestedByMe
+      false, // isRequestedByOpponent
+      () => handleRequestRematchRef.current(),
+      () => handleAcceptRematchRef.current()
+    );
+    await sendEventRef.current({
+      type: RealtimeEventType.REMATCH_REQUEST,
+      payload: { from: myRole },
+    });
+  }, [myRole, showResultDialog]);
+
+  const handleAcceptRematch = useCallback(async () => {
+    resetGame(PlayerRole.X);
+    await sendEventRef.current({
+      type: RealtimeEventType.REMATCH_ACCEPT,
+      payload: { acceptedBy: myRole },
+    });
+  }, [resetGame, myRole]);
+
+  useEffect(() => {
+    handleRequestRematchRef.current = handleRequestRematch;
+    handleAcceptRematchRef.current = handleAcceptRematch;
+  }, [handleRequestRematch, handleAcceptRematch]);
 
   // Handle incoming Supabase realtime events
   const handleRealtimeEvent = useCallback(
@@ -143,7 +189,13 @@ export function BidaPlayPage() {
       } else if (event.type === RealtimeEventType.GAME_RESET) {
         resetGame(event.payload.startingPlayer);
       } else if (event.type === RealtimeEventType.REMATCH_REQUEST) {
-        showResultDialog(null, false, true);
+        showResultDialog(
+          null,
+          false, // isRequestedByMe
+          true,  // isRequestedByOpponent
+          () => handleRequestRematchRef.current(),
+          () => handleAcceptRematchRef.current()
+        );
       } else if (event.type === RealtimeEventType.REMATCH_ACCEPT) {
         resetGame(event.payload.acceptedBy === PlayerRole.X ? PlayerRole.O : PlayerRole.X);
       } else if (event.type === RealtimeEventType.GAME_TIMEOUT_PASS_TURN) {
@@ -151,7 +203,13 @@ export function BidaPlayPage() {
       } else if (event.type === RealtimeEventType.PLAYER_SURRENDER) {
         const winner =
           event.payload.player === PlayerRole.X ? GameWinner.O : GameWinner.X;
-        showResultDialog(winner, false, false);
+        showResultDialog(
+          winner,
+          false,
+          false,
+          () => handleRequestRematchRef.current(),
+          () => handleAcceptRematchRef.current()
+        );
       }
     },
     [
@@ -166,7 +224,7 @@ export function BidaPlayPage() {
 
   // Turn Countdown Timer
   const isMyTurn = currentTurn === myRole;
-  const isGameActive = isOpponentOnline && turnState === BidaTurnState.AIMING;
+  const isGameActive = isOpponentOnline && isGameStarted && turnState === BidaTurnState.AIMING;
 
   const { timeLeft, timeFraction, isWarning: isTimerWarning } = useTurnTimer({
     currentTurn,
@@ -211,30 +269,23 @@ export function BidaPlayPage() {
       {/* Main Play Area */}
       <main className="flex-1 flex flex-col items-center justify-start p-2 sm:p-3 max-w-[1440px] mx-auto w-full gap-2.5 sm:gap-3">
         {/* Game Tools & Quick Actions - Reserved height container (h-8) */}
-        <div className="w-full max-w-[1360px] h-8 flex items-center justify-between gap-2">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setIsVertical((prev) => !prev)}
-            className="text-xs gap-1.5"
-            title="Toggle table orientation (horizontal / vertical)"
-          >
-            <Icons name="arrow-up-right" size={14} />
-            <span>{isVertical ? t("horizontalView") : t("verticalView")}</span>
-          </Button>
-
-          {isOpponentOnline && (
+        <GameActionBar
+          canSurrender={Boolean(isOpponentOnline)}
+          onSurrender={promptSurrender}
+          maxWidthClass="max-w-[1360px]"
+          leftContent={
             <Button
-              variant="destructive"
+              variant="secondary"
               size="sm"
-              onClick={promptSurrender}
+              onClick={() => setIsVertical((prev) => !prev)}
               className="text-xs gap-1.5"
+              title="Toggle table orientation (horizontal / vertical)"
             >
-              <Icons name="flag" size={14} />
-              <span>{t("surrender")}</span>
+              <Icons name="arrow-up-right" size={14} />
+              <span>{isVertical ? t("horizontalView") : t("verticalView")}</span>
             </Button>
-          )}
-        </div>
+          }
+        />
 
         {/* Live Scoreboard */}
         <div className="w-full max-w-[1360px]">
@@ -250,6 +301,9 @@ export function BidaPlayPage() {
             timeLeft={timeLeft}
             timeFraction={timeFraction}
             isTimerWarning={isTimerWarning}
+            isGameStarted={isGameStarted}
+            isHost={isHost}
+            onStartGame={startGame}
           />
         </div>
 

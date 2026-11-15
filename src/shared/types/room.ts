@@ -21,6 +21,8 @@ export enum GameType {
   TICTACTOE = "tictactoe",
   BIDA = "bida",
   XIANGQI = "xiangqi",
+  CHESS = "chess",
+  ANIMAL_CHESS = "animal-chess",
 }
 
 export interface RoomData {
@@ -41,6 +43,7 @@ export interface PlayerPresence {
 }
 
 export enum RealtimeEventType {
+  GAME_START = "GAME_START",
   GAME_MOVE = "GAME_MOVE",
   GAME_RESET = "GAME_RESET",
   REMATCH_REQUEST = "REMATCH_REQUEST",
@@ -51,10 +54,21 @@ export enum RealtimeEventType {
   REQUEST_ROOM_SYNC = "REQUEST_ROOM_SYNC",
   RESPONSE_CARO_SYNC = "RESPONSE_CARO_SYNC",
   RESPONSE_BIDA_SYNC = "RESPONSE_BIDA_SYNC",
+  RESPONSE_CHESS_SYNC = "RESPONSE_CHESS_SYNC",
+  RESPONSE_ANIMAL_CHESS_SYNC = "RESPONSE_ANIMAL_CHESS_SYNC",
   GAME_TIMEOUT_PASS_TURN = "GAME_TIMEOUT_PASS_TURN",
+  CHESS_MOVE = "CHESS_MOVE",
+  ANIMAL_CHESS_MOVE = "ANIMAL_CHESS_MOVE",
 }
 
 export type RealtimeEvent =
+  | {
+      type: RealtimeEventType.GAME_START;
+      payload: {
+        startedBy: PlayerRole;
+        timestamp: number;
+      };
+    }
   | {
       type: RealtimeEventType.GAME_TIMEOUT_PASS_TURN;
       payload: {
@@ -98,6 +112,48 @@ export type RealtimeEvent =
         };
         winner?: PlayerRole | null;
         foulMessage?: string | null;
+        timestamp: number;
+      };
+    }
+  | {
+      type: RealtimeEventType.CHESS_MOVE;
+      payload: {
+        from: string;
+        to: string;
+        promotion?: string;
+        fen: string;
+        player: PlayerRole.X | PlayerRole.O;
+        timestamp: number;
+      };
+    }
+  | {
+      type: RealtimeEventType.ANIMAL_CHESS_MOVE;
+      payload: {
+        fromRow: number;
+        fromCol: number;
+        toRow: number;
+        toCol: number;
+        player: PlayerRole.X | PlayerRole.O;
+        timestamp: number;
+      };
+    }
+  | {
+      type: RealtimeEventType.RESPONSE_ANIMAL_CHESS_SYNC;
+      payload: {
+        board: Array<Array<{ type: string; color: string } | null>>;
+        currentTurn: PlayerRole.X | PlayerRole.O;
+        winner: GameWinner | null;
+        lastMove: { from: [number, number]; to: [number, number] } | null;
+        timestamp: number;
+      };
+    }
+  | {
+      type: RealtimeEventType.RESPONSE_CHESS_SYNC;
+      payload: {
+        fen: string;
+        currentTurn: PlayerRole.X | PlayerRole.O;
+        winner: GameWinner | null;
+        lastMove: { from: string; to: string } | null;
         timestamp: number;
       };
     }

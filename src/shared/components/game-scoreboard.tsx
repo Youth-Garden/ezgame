@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Card } from "@/shared/components/ui/card";
 import { Badge } from "@/shared/components/ui/badge";
 import { PlayerAvatar } from "@/shared/components/player-avatar";
+import { SpreadPing } from "@/shared/components/spread-ping";
 
 /* -------------------------------------------------------------------------- */
 /* Root Component                                                             */
@@ -144,21 +145,22 @@ function ScoreboardCenter({
   const t = useTranslations("game");
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center shrink min-w-0 px-1 sm:px-4 text-center">
+    <div className="flex-1 flex flex-col items-center justify-center shrink min-w-0 px-1 sm:px-2 text-center h-[42px]">
       {children ? (
         children
       ) : isWaiting ? (
-        <Badge variant="warning" className="truncate max-w-[130px] sm:max-w-none text-[10px] sm:text-xs">
-          {waitingText || t("waitingForOpponent")}
+        <Badge variant="warning" className="truncate max-w-[130px] sm:max-w-none text-[10px] sm:text-xs inline-flex items-center gap-1.5">
+          <SpreadPing variant="amber" size="xs" />
+          <span>{waitingText || t("waitingForOpponent")}</span>
         </Badge>
       ) : (
-        <div className="text-[11px] sm:text-sm font-bold text-foreground tracking-tight text-center animate-in fade-in duration-200 truncate max-w-[120px] xs:max-w-[160px] sm:max-w-none">
+        <div className="flex items-center justify-center animate-in fade-in duration-200">
           {turnText}
         </div>
       )}
 
       {notice && (
-        <div className="mt-0.5 flex items-center justify-center truncate max-w-full">
+        <div className="animate-in fade-in zoom-in-95 duration-200 leading-none">
           {notice}
         </div>
       )}

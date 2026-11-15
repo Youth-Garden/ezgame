@@ -249,6 +249,32 @@
   }
 }
 
+/* Responsive root rem unit scaling across display widths */
+html {
+  font-size: 16px;
+}
+
+/* Medium-Large screens & Laptops (tăng nhẹ từ 1280px để các thành phần nở đều) */
+@media (min-width: 1280px) {
+  html {
+    font-size: 17px;
+  }
+}
+
+/* Full HD & 2K Displays (≥ 1536px / 1920px) */
+@media (min-width: 1536px) {
+  html {
+    font-size: 18px;
+  }
+}
+
+/* Ultra-wide & 4K Displays (≥ 2560px) */
+@media (min-width: 2560px) {
+  html {
+    font-size: 19.5px;
+  }
+}
+
 /* Default Mobile: Bottom sheet slide from bottom screen edge */
 .animate-modal-in {
   animation: sheet-slide-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;

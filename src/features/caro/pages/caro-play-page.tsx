@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
+import { useTranslations } from "next-intl";
 import { CaroBoard } from "../components/caro-board";
 import { CaroScoreboard } from "../components/caro-scoreboard";
 import { CaroPlayer, GameWinner } from "../types";
 import { RoomHeader } from "@/shared/components/room-header";
-import { Button } from "@/shared/components/ui/button";
+import { GameActionBar } from "@/shared/components/game-action-bar";
 import { PlayerRole, RealtimeEventType, type RealtimeEvent } from "@/shared/types/room";
 import { Icons } from "@/shared/icons";
 import { GameBoard } from "@/shared/components/game-board";
@@ -16,6 +17,8 @@ import { DEFAULT_CARO_CONFIG } from "../config/caro-config";
 import { useTurnTimer } from "@/shared/hooks/use-turn-timer";
 
 export function CaroPlayPage() {
+  const t = useTranslations("game");
+
   // Encapsulated shared room realtime, presence, profiles, and portal dialogs
   const {
     roomCode,
@@ -39,7 +42,13 @@ export function CaroPlayPage() {
       const winner: GameWinner =
         myRole === PlayerRole.X ? GameWinner.O : GameWinner.X;
       setGameState((prev) => ({ ...prev, winner }));
-      showResultDialog(winner, false, false);
+      showResultDialog(
+        winner,
+        false,
+        false,
+        () => handleRequestRematchRef.current(),
+        () => handleAcceptRematchRef.current()
+      );
       await sendEvent({
         type: RealtimeEventType.PLAYER_SURRENDER,
         payload: { player: myRole },
@@ -57,26 +66,67 @@ export function CaroPlayPage() {
   } = useCaroGame({
     myRole,
     sendEvent: async (e) => sendEventRef.current(e),
-    onShowResultDialog: (winner) => showResultDialog(winner),
+    onShowResultDialog: (winner) =>
+      showResultDialog(
+        winner,
+        false,
+        false,
+        () => handleRequestRematchRef.current(),
+        () => handleAcceptRematchRef.current()
+      ),
     onDismissResultDialog: dismissResultDialog,
   });
+
+  const latestGameStateRef = useRef(gameState);
+  latestGameStateRef.current = gameState;
+
+  const handleRequestRematchRef = useRef<() => void>(() => {});
+  const handleAcceptRematchRef = useRef<() => void>(() => {});
+
+  const handleRequestRematch = useCallback(async () => {
+    const currentWinner = latestGameStateRef.current.winner;
+    showResultDialog(
+      currentWinner,
+      true, // isRequestedByMe
+      false, // isRequestedByOpponent
+      () => handleRequestRematchRef.current(),
+      () => handleAcceptRematchRef.current()
+    );
+    await sendEventRef.current({
+      type: RealtimeEventType.REMATCH_REQUEST,
+      payload: { from: myRole },
+    });
+  }, [myRole, showResultDialog]);
+
+  const handleAcceptRematch = useCallback(async () => {
+    resetGame(CaroPlayer.X);
+    await sendEventRef.current({
+      type: RealtimeEventType.REMATCH_ACCEPT,
+      payload: { acceptedBy: myRole },
+    });
+  }, [resetGame]);
+
+  useEffect(() => {
+    handleRequestRematchRef.current = handleRequestRematch;
+    handleAcceptRematchRef.current = handleAcceptRematch;
+  }, [handleRequestRematch, handleAcceptRematch]);
 
   // Handle incoming broadcast events from peer
   const handleRealtimeEvent = useCallback(
     (event: RealtimeEvent) => {
       switch (event.type) {
         case RealtimeEventType.REQUEST_ROOM_SYNC: {
-          // A peer joined or refreshed: send them current authoritative board state
-          if (gameState.moveCount > 0) {
+          const current = latestGameStateRef.current;
+          if (current.moveCount > 0) {
             sendEventRef.current({
               type: RealtimeEventType.RESPONSE_CARO_SYNC,
               payload: {
-                board: gameState.board,
-                currentTurn: gameState.currentTurn,
-                lastMove: gameState.lastMove,
-                winner: gameState.winner,
-                winningLine: gameState.winningLine,
-                moveCount: gameState.moveCount,
+                board: current.board,
+                currentTurn: current.currentTurn,
+                lastMove: current.lastMove,
+                winner: current.winner,
+                winningLine: current.winningLine,
+                moveCount: current.moveCount,
                 timestamp: Date.now(),
               },
             });
@@ -106,7 +156,14 @@ export function CaroPlayPage() {
         }
 
         case RealtimeEventType.REMATCH_REQUEST: {
-          showResultDialog(gameState.winner, false, true);
+          const currentWinner = latestGameStateRef.current.winner;
+          showResultDialog(
+            currentWinner,
+            false,
+            true,
+            () => handleRequestRematchRef.current(),
+            () => handleAcceptRematchRef.current()
+          );
           break;
         }
 
@@ -129,7 +186,13 @@ export function CaroPlayPage() {
           const winner =
             event.payload.player === PlayerRole.X ? GameWinner.O : GameWinner.X;
           setGameState((prev) => ({ ...prev, winner }));
-          showResultDialog(winner, false, false);
+          showResultDialog(
+            winner,
+            false,
+            false,
+            () => handleRequestRematchRef.current(),
+            () => handleAcceptRematchRef.current()
+          );
           break;
         }
 
@@ -137,7 +200,7 @@ export function CaroPlayPage() {
           break;
       }
     },
-    [applyMove, gameState, resetGame, setGameState, showResultDialog, sendEventRef]
+    [applyMove, resetGame, setGameState, showResultDialog]
   );
 
   // Turn permission calculation
@@ -195,22 +258,15 @@ export function CaroPlayPage() {
 
       {/* Main Game Stage */}
       <main className="flex-1 flex flex-col items-center justify-start p-2 sm:p-6 w-full">
-        {/* Game Stage Content Container: Fits tightly to the board width so Scoreboard matches the Board */}
-        <div className="w-full sm:w-fit flex flex-col items-center">
-          {/* Desktop Game Tools & Quick Actions - Reserved height container (h-8) to prevent layout shifts */}
-          <div className="hidden sm:flex w-full h-8 items-center justify-end gap-2 mb-3">
-            {isOpponentOnline && !gameState.winner && (
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={promptSurrender}
-                className="text-xs gap-1.5"
-              >
-                <Icons name="flag" size={14} />
-                <span>Surrender</span>
-              </Button>
-            )}
-          </div>
+        {/* Game Stage Content Container: Uniform max width matching Caro and Xiangqi */}
+        <div className="w-full max-w-[540px] flex flex-col items-center">
+          {/* Desktop Game Tools & Quick Actions */}
+          <GameActionBar
+            canSurrender={Boolean(isOpponentOnline && !gameState.winner)}
+            onSurrender={promptSurrender}
+            maxWidthClass="w-full"
+            className="hidden sm:flex mb-3"
+          />
 
           {/* Live Caro Scoreboard directly on table - Perfectly matches board width */}
           <div className="mb-4 w-full">

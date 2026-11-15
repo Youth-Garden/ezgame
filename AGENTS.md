@@ -52,6 +52,13 @@
 ## 8. Strict Git Safety Rules
 - **STRICT RULE FOR GIT COMMIT AND PUSH**: Absolutely NEVER execute `git commit` or `git push` automatically. Every `git commit` or `git push` action MUST be explicitly requested by the user in the CURRENT prompt.
 
+## 9. Architectural Index & Skills (CodeGraph)
+- **CodeGraph Quick Lookup**: Before diving into deep file searches, consult `docs/codegraph.md` for the component, hook, and rule matrix.
+- **Workflow Skills in `.agents/skills/`**:
+  - `fe-workflow`: Zero-layout-shift guidelines, dimension lockouts (`h-8`, `h-5`), reusable visual piece units (`XiangqiPieceComponent`, `CaroPieceMark`, `BidaBallItem`), surface no-border rules.
+  - `be-game-workflow`: Module structure, enum rules, realtime broadcast flow (`useGameRoom`, `useRoomRealtime`), unit test requirements (`*.test.ts`).
+- **Storage Conventions**: Never add custom prefixes (`ezgame_`). Use `player_profile`, `locale`, `theme`, `client_id`, `role_${roomCode}`.
+
 ---
 
 <!-- BEGIN:nextjs-agent-rules -->

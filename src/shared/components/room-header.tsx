@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useTranslations } from "next-intl";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCopyToClipboard } from "@uidotdev/usehooks";
 import { CopyLinkButton } from "./copy-link-button";
@@ -10,16 +11,17 @@ import { sounds } from "@/shared/lib/sound-effects";
 import { RouteEnum, formatUrl, getGamePlayRoute } from "@/shared/constants/routes";
 import { PlayerRole } from "@/shared/types/room";
 import { type PlayerProfile } from "@/shared/hooks/use-player-profile";
-import { useIsMobile } from "@/shared/hooks/use-match-breakpoint";
 import { Icons } from "@/shared/icons";
 import { usePortal } from "@/shared/components/portal";
 import { ConfirmDialog, type ConfirmDialogData } from "./confirm-dialog";
 import { MobileRoomActionsSheet, type MobileRoomActionsSheetData } from "./mobile-room-actions-sheet";
+import { GameRulesDialog, type GameRulesDialogData } from "./game-rules-dialog";
+import { InviteShareDialog, type InviteShareDialogData } from "./invite-share-dialog";
 
 interface RoomHeaderProps {
   roomCode: string;
   gameTitle: string;
-  gameType?: "caro" | "bida" | "tictactoe" | "xiangqi";
+  gameType?: "caro" | "bida" | "tictactoe" | "xiangqi" | "chess" | "animal-chess";
   myRole?: PlayerRole;
   myProfile?: PlayerProfile;
   opponentProfile?: {
@@ -45,11 +47,39 @@ export function RoomHeader({
   onSurrender,
 }: RoomHeaderProps) {
   const router = useRouter();
+  const tGame = useTranslations("game");
+  const tNav = useTranslations("nav");
   const [presentConfirmDialog] = usePortal<ConfirmDialogData>(ConfirmDialog);
   const [presentMobileSheet] = usePortal<MobileRoomActionsSheetData>(MobileRoomActionsSheet);
+  const [presentRulesDialog] = usePortal<GameRulesDialogData>(GameRulesDialog);
+  const [presentInviteDialog] = usePortal<InviteShareDialogData>(InviteShareDialog);
   const [soundOn, setSoundOn] = useState(sounds.isEnabled());
   const [, copyToClipboard] = useCopyToClipboard();
   const [copiedCode, setCopiedCode] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    };
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    };
+  }, []);
+
+  const toggleFullscreen = async () => {
+    try {
+      if (!document.fullscreenElement) {
+        await document.documentElement.requestFullscreen();
+      } else {
+        await document.exitFullscreen();
+      }
+    } catch {
+      // Fullscreen not supported or blocked by user/browser permissions
+    }
+  };
 
   const handleBack = () => {
     if (isOpponentOnline || isGameActive) {
@@ -102,7 +132,11 @@ export function RoomHeader({
       roomCode,
       inviteUrl,
       soundOn,
+      isFullscreen,
       onToggleSound: toggleSound,
+      onToggleFullscreen: toggleFullscreen,
+      onOpenRules: () => presentRulesDialog({ gameType, gameTitle }),
+      onOpenShare: () => presentInviteDialog({ roomCode, inviteUrl, gameTitle }),
       onSurrender,
       canSurrender: isGameActive,
     });
@@ -119,13 +153,13 @@ export function RoomHeader({
                 variant="secondary"
                 size="icon-sm"
                 onClick={handleBack}
-                aria-label="Back to Lobby"
+                aria-label={tNav("backToLobby")}
                 className="shrink-0"
               >
                 <Icons name="arrow-left" size={16} />
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="bottom" align="start">Back to Lobby</TooltipContent>
+            <TooltipContent side="bottom" align="start">{tNav("backToLobby")}</TooltipContent>
           </Tooltip>
 
           <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
@@ -149,12 +183,12 @@ export function RoomHeader({
                   )}
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="bottom">Click to copy room code</TooltipContent>
+              <TooltipContent side="bottom">{tGame("clickToCopyCode")}</TooltipContent>
             </Tooltip>
 
             {!isSupabaseConfigured && (
               <span className="text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full bg-destructive/15 text-destructive font-medium shrink-0">
-                Offline
+                {tGame("offline")}
               </span>
             )}
           </div>
@@ -181,6 +215,40 @@ export function RoomHeader({
                 <Button
                   variant="secondary"
                   size="icon-sm"
+                  onClick={() => presentRulesDialog({ gameType, gameTitle })}
+                  aria-label="Game Rules & Guide"
+                >
+                  <Icons name="book" size={16} className="text-foreground" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">{tGame("gameRules")}</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="secondary"
+                  size="icon-sm"
+                  onClick={toggleFullscreen}
+                  aria-label={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+                >
+                  <Icons
+                    name={isFullscreen ? "minimize" : "maximize"}
+                    size={16}
+                    className="text-foreground"
+                  />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                {isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="secondary"
+                  size="icon-sm"
                   onClick={toggleSound}
                 >
                   {soundOn ? (
@@ -193,7 +261,22 @@ export function RoomHeader({
               <TooltipContent side="bottom">{soundOn ? "Mute audio" : "Enable audio"}</TooltipContent>
             </Tooltip>
 
-            <CopyLinkButton url={inviteUrl} />
+            {/* Invite / Share Dialog Trigger Button */}
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() =>
+                presentInviteDialog({
+                  roomCode,
+                  inviteUrl,
+                  gameTitle,
+                })
+              }
+              className="gap-2 text-xs font-semibold"
+            >
+              <Icons name="share" size={14} />
+              <span>{tNav("inviteFriends", { defaultMessage: "Mời bạn" })}</span>
+            </Button>
           </div>
         </div>
       </div>

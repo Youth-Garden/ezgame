@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { CaroCell } from "./caro-cell";
 import { CaroPlayer, type BoardState, type WinningLine } from "../types";
 import { PlayerRole } from "@/shared/types/room";
+import { Card } from "@/shared/components/ui/card";
 
 interface CaroBoardProps {
   board: BoardState;
@@ -21,6 +22,7 @@ export function CaroBoard({
   winningLine,
   canClick,
   myRole,
+  currentTurn,
   onCellClick,
 }: CaroBoardProps) {
   const winningSet = useMemo(() => {
@@ -32,16 +34,19 @@ export function CaroBoard({
   }, [winningLine]);
 
   return (
-    <div className="w-full flex flex-col items-center select-none">
-      {/* Board Outer Wooden Frame (Phong cách bàn cờ vây / cờ ca rô gỗ ấm) */}
-      <div className="p-2 sm:p-4 rounded-2xl bg-gradient-to-b from-[#ECD7B5] to-[#DFCA9F] dark:from-[#261E16] dark:to-[#1A140F] shadow-[0_12px_36px_rgba(0,0,0,0.35),inset_0_1px_2px_rgba(255,255,255,0.4)] border-[6px] border-[#78461E] dark:border-[#4A2C14] max-w-full overflow-x-auto flex justify-center">
-        {/* Inner Border Trim */}
-        <div className="p-1 sm:p-2 rounded-xl border-2 border-[#A26D3F]/40 dark:border-[#5C3B1E]/60 bg-[#F4E4C6]/40 dark:bg-[#1E1710]/40 flex flex-col items-center">
+    <div className="w-full flex flex-col items-center">
+      {/* Board Outer Card using Shared Card Component */}
+      <Card
+        variant="solid"
+        className="w-full sm:w-fit p-1.5 sm:p-5 max-w-full overflow-x-auto flex justify-center"
+      >
+        <div className="flex flex-col items-center">
           {/* Board Grid */}
-          <div className="flex flex-col border border-[#8B5A2B]/40 dark:border-[#78532F]/50 bg-[#F9F0DF]/90 dark:bg-[#1C1712]/90 shadow-inner rounded-sm overflow-hidden">
+          <div className="flex flex-col">
             {board.map((row, rowIndex) => (
               <div key={rowIndex} className="flex items-center">
-                <div className={`flex ${rowIndex === 0 ? "" : "border-t border-[#8B5A2B]/25 dark:border-[#78532F]/30"}`}>
+                {/* Row of Cells */}
+                <div className={`flex ${rowIndex === 0 ? "border-t border-neutral-200 dark:border-neutral-800" : ""}`}>
                   {row.map((cellValue, colIndex) => {
                     const isLast =
                       lastMove?.[0] === rowIndex && lastMove?.[1] === colIndex;
@@ -50,7 +55,7 @@ export function CaroBoard({
                     return (
                       <div
                         key={`${rowIndex}-${colIndex}`}
-                        className={colIndex === 0 ? "" : "border-l border-[#8B5A2B]/25 dark:border-[#78532F]/30"}
+                        className={colIndex === 0 ? "border-l border-neutral-200 dark:border-neutral-800" : ""}
                       >
                         <CaroCell
                           row={rowIndex}
@@ -70,7 +75,7 @@ export function CaroBoard({
             ))}
           </div>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

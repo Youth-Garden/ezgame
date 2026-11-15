@@ -293,6 +293,110 @@ class SoundManager {
       // Audio playback failed silently
     }
   }
+
+  /**
+   * Sound effect for Billiards cue ball hit (tiếng cơ gõ vào bi cái)
+   */
+  public playCueHitSound() {
+    if (!this.enabled) return;
+    try {
+      const ctx = this.getContext();
+      if (!ctx) return;
+
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(380, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(120, ctx.currentTime + 0.05);
+
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start();
+      osc.stop(ctx.currentTime + 0.05);
+    } catch {
+      // Audio playback failed silently
+    }
+  }
+
+  /**
+   * Sound effect for ball collision in Billiards (tiếng 2 bi va chạm lách cách)
+   */
+  public playBallCollisionSound() {
+    if (!this.enabled) return;
+    try {
+      const ctx = this.getContext();
+      if (!ctx) return;
+
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(1400, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(450, ctx.currentTime + 0.04);
+
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.04);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start();
+      osc.stop(ctx.currentTime + 0.04);
+    } catch {
+      // Audio playback failed silently
+    }
+  }
+
+  /**
+   * Sound effect for pocketing a ball in Billiards (tiếng bi rơi tõm vào lỗ)
+   */
+  public playBidaPocketSound() {
+    if (!this.enabled) return;
+    try {
+      const ctx = this.getContext();
+      if (!ctx) return;
+
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(220, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(60, ctx.currentTime + 0.12);
+
+      gain.gain.setValueAtTime(0.35, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start();
+      osc.stop(ctx.currentTime + 0.15);
+    } catch {
+      // Audio playback failed silently
+    }
+  }
+
+  // Aliases for compatibility
+  public playClick() {
+    this.playPieceDropSound();
+  }
+
+  public playMove() {
+    this.playPieceDropSound();
+  }
+
+  public playBidaPocket() {
+    this.playBidaPocketSound();
+  }
+
+  public playTimerWarning() {
+    this.playTimerTickSound();
+  }
 }
 
 export const sounds = new SoundManager();

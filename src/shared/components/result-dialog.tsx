@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@/shared/components/ui/button';
+import { SpreadPing } from '@/shared/components/spread-ping';
 import {
   Dialog,
   DialogContent,
@@ -17,6 +18,7 @@ import { GameWinner, PlayerRole } from '@/shared/types/room';
 import confetti from 'canvas-confetti';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 
 export interface ResultDialogData {
   winner: GameWinner | null;
@@ -34,6 +36,7 @@ export function ResultDialog({
   data,
 }: PortalProps<ResultDialogData>) {
   const router = useRouter();
+  const tResult = useTranslations('result');
   const winner = data?.winner ?? null;
   const myRole = data?.myRole ?? PlayerRole.X;
   const reason = data?.reason ?? "normal";
@@ -74,8 +77,18 @@ export function ResultDialog({
         className="sm:w-[460px] sm:max-w-[460px] flex flex-col items-center text-center p-6 sm:p-9 relative overflow-visible bg-transparent backdrop-blur-none rounded-3xl border-none shadow-none"
       >
         <DialogHeader className="items-center text-center relative z-10 w-full">
-          {/* Trophy / Icon container - Clean and focused */}
+          {/* Trophy / Icon container - Clean and focused with subtle radial ambient glow */}
           <div className="relative mb-4 flex items-center justify-center mx-auto">
+            {/* Subtle soft gradient ambient glow behind the icon */}
+            <div
+              className={cn(
+                "absolute w-36 h-36 rounded-full blur-2xl pointer-events-none transition-all duration-500",
+                isMeWinner && "bg-gradient-to-tr from-amber-500/35 via-yellow-400/25 to-transparent",
+                isDraw && "bg-gradient-to-tr from-slate-400/30 via-slate-300/20 to-transparent",
+                !isMeWinner && !isDraw && "bg-gradient-to-tr from-rose-600/35 via-pink-500/25 to-transparent"
+              )}
+            />
+
             {/* Icon enlarged and perfectly centered in container */}
             <div className="transform hover:scale-105 transition-all duration-300 drop-shadow-md relative z-10 flex items-center justify-center">
               {isMeWinner ? (
@@ -100,7 +113,7 @@ export function ResultDialog({
                 "bg-gradient-to-b from-rose-300 via-rose-500 to-rose-600 bg-clip-text text-transparent drop-shadow-[0_2px_12px_rgba(244,63,94,0.45)]"
             )}
           >
-            {isMeWinner ? "Chiến Thắng!" : isDraw ? "Hòa Trận!" : "Thất Bại!"}
+            {isMeWinner ? tResult("victory") : isDraw ? tResult("draw") : tResult("defeat")}
           </DialogTitle>
         </DialogHeader>
 
@@ -116,7 +129,7 @@ export function ResultDialog({
                   className="w-full gap-2"
                 >
                   <Icons name="rotateccw" size={16} />
-                  <span>Chấp nhận đấu lại</span>
+                  <span>{tResult("rematchAccept")}</span>
                 </Button>
               ) : isRematchRequestedByMe ? (
                 <Button
@@ -125,8 +138,8 @@ export function ResultDialog({
                   disabled
                   className="w-full gap-2 text-muted-foreground"
                 >
-                  <span className="w-2 h-2 rounded-full bg-primary animate-ping" />
-                  <span>Đang chờ đối thủ đồng ý...</span>
+                  <SpreadPing variant="primary" size="sm" />
+                  <span>{tResult("rematchPending")}</span>
                 </Button>
               ) : (
                 <Button
@@ -136,7 +149,7 @@ export function ResultDialog({
                   className="w-full gap-2"
                 >
                   <Icons name="rotateccw" size={16} />
-                  <span>Yêu cầu đấu lại</span>
+                  <span>{tResult("rematchRequest")}</span>
                 </Button>
               )}
             </>
@@ -152,7 +165,7 @@ export function ResultDialog({
             className="w-full gap-2"
           >
             <Icons name="home" size={16} />
-            <span>Về sảnh chính</span>
+            <span>{tResult("backToLobby")}</span>
           </Button>
         </div>
       </DialogContent>

@@ -85,9 +85,9 @@ export function useBidaGame({
         const result = sim.step();
         if (result.pocketedIds.length > 0) {
           allPocketedThisTurn.push(...result.pocketedIds);
-          sounds.playMoveSound("X");
+          sounds.playBidaPocketSound();
         }
-        if (result.hasCollisions) sounds.playMoveSound("O");
+        if (result.hasCollisions) sounds.playBallCollisionSound();
 
         // Update balls snapshot from simulation
         const currentSimBalls = stateRef.current.balls.map((b) => ({ ...b }));
@@ -169,7 +169,7 @@ export function useBidaGame({
   const applyShot = useCallback(
     (_player: PlayerRole.X | PlayerRole.O, cueAngle: number, power: number, cueBallX: number, cueBallY: number, englishX = 0, englishY = 0) => {
       setTurnState(BidaTurnState.ROLLING);
-      sounds.playMoveSound(stateRef.current.currentTurn === PlayerRole.X ? "X" : "O");
+      sounds.playCueHitSound();
       setBalls((prev) => prev.map((b) => (b.type === BidaBallType.CUE ? { ...b, x: cueBallX, y: cueBallY } : b)));
 
       if (simulationRef.current) {

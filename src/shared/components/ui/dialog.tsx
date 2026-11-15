@@ -119,7 +119,7 @@ export function DialogContent({
         // Mobile Bottom Sheet styling: full width, dính 2 mép điện thoại, chỉ bo 2 góc trên, 2 góc dưới thẳng tắp 0px
         "rounded-t-[28px] rounded-b-none max-h-[92vh] overflow-y-auto pb-8",
         // Desktop Dialog: căn giữa, modal nổi bo góc đều đặn, mặc định 448px (cho phép override qua className)
-        "sm:rounded-2xl sm:max-h-[90vh] sm:overflow-visible sm:pb-6",
+        "sm:rounded-3xl sm:max-h-[90vh] sm:overflow-visible sm:pb-6",
         !className?.includes("sm:w-") && !className?.includes("sm:max-w-") && "sm:w-[448px] sm:max-w-[448px]",
         open ? "animate-modal-in" : "animate-modal-out pointer-events-none",
         className

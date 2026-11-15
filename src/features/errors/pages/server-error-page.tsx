@@ -21,7 +21,7 @@ export function ServerErrorPage({ error, reset }: ServerErrorPageProps) {
 
       <main className="relative z-10 max-w-md w-full flex flex-col items-center text-center gap-6">
         {/* Number 500 */}
-        <span className="text-8xl sm:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-b from-foreground via-foreground/70 to-foreground/20 drop-shadow-2xl select-none">
+        <span className="text-8xl sm:text-9xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-foreground via-foreground/70 to-foreground/20 drop-shadow-2xl select-none">
           500
         </span>
 

@@ -6,6 +6,7 @@ import { CaroPlayer } from "../types";
 import { type PlayerProfile } from "@/shared/hooks/use-player-profile";
 import { Badge } from "@/shared/components/ui/badge";
 import { GameScoreboard } from "@/shared/components/game-scoreboard";
+import { CaroPieceMark } from "./caro-piece-mark";
 
 interface CaroScoreboardProps {
   currentTurn: CaroPlayer;
@@ -54,12 +55,17 @@ export function CaroScoreboard({
       <GameScoreboard.Left
         name={myName}
         avatarUrl={myProfile?.avatarUrl}
-        roleText={isMeX ? "Player X" : "Player O"}
         fallbackText={isMeX ? "X" : "O"}
         isActiveTurn={isMeActiveTurn}
         activeColor={isMeX ? "primary" : "destructive"}
         size="sm"
         timer={!isGameFinished ? { timeLeft, timeFraction, isWarning: isTimerWarning, totalTime: 30 } : undefined}
+        badge={
+          <Badge variant="subtle" size="sm" className="gap-1 shrink-0 font-bold px-1.5 py-0.5">
+            <CaroPieceMark value={myTurnRole} size="xs" />
+            <span>{isMeX ? "Player X" : "Player O"}</span>
+          </Badge>
+        }
       />
 
       {/* Turn indicator in the middle */}
@@ -87,12 +93,17 @@ export function CaroScoreboard({
       <GameScoreboard.Right
         name={opponentName}
         avatarUrl={opponentProfile?.avatarUrl}
-        roleText={isMeX ? "Player O" : "Player X"}
         fallbackText={isMeX ? "O" : "X"}
         isActiveTurn={isOpponentActiveTurn}
         activeColor={isMeX ? "destructive" : "primary"}
         size="sm"
         timer={!isGameFinished ? { timeLeft, timeFraction, isWarning: isTimerWarning, totalTime: 30 } : undefined}
+        badge={
+          <Badge variant="subtle" size="sm" className="gap-1 shrink-0 font-bold px-1.5 py-0.5">
+            <CaroPieceMark value={opponentTurnRole} size="xs" />
+            <span>{isMeX ? "Player O" : "Player X"}</span>
+          </Badge>
+        }
       />
     </GameScoreboard.Root>
   );

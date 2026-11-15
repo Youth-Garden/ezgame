@@ -9,6 +9,7 @@ import {
   DialogContent,
 } from "@/shared/components/ui/dialog";
 import { Avatar } from "@/shared/components/ui/avatar";
+import { SpreadPing } from "@/shared/components/spread-ping";
 
 export interface MatchStartVsDialogData {
   playerXName: string;
@@ -16,7 +17,7 @@ export interface MatchStartVsDialogData {
   playerOName: string;
   playerOAvatar: string;
   gameTitle?: string;
-  gameType?: "caro" | "bida" | "tictactoe" | "xiangqi";
+  gameType?: "caro" | "bida" | "tictactoe" | "xiangqi" | "chess" | "animal-chess";
   onFinish?: () => void;
 }
 
@@ -45,25 +46,43 @@ export function MatchStartVsDialog({
 
   const isXiangqi = data.gameType === "xiangqi";
   const isBida = data.gameType === "bida";
+  const isChess = data.gameType === "chess";
+  const isAnimalChess = data.gameType === "animal-chess";
 
   const player1RoleLabel = isXiangqi
     ? `${t("red")} (先)`
+    : isChess
+    ? `${t("white")} (♔)`
+    : isAnimalChess
+    ? `${t("blue")} (🦁)`
     : isBida
     ? t("player") + " 1"
     : `${t("player")} X`;
 
   const player2RoleLabel = isXiangqi
     ? `${t("black")} (後)`
+    : isChess
+    ? `${t("black")} (♚)`
+    : isAnimalChess
+    ? `${t("red")} (🐯)`
     : isBida
     ? t("player") + " 2"
     : `${t("player")} O`;
 
   const player1RingColor = isXiangqi
     ? "ring-rose-500 text-rose-500"
+    : isChess
+    ? "ring-amber-300 text-amber-500 dark:text-amber-300"
+    : isAnimalChess
+    ? "ring-blue-500 text-blue-500"
     : "ring-primary text-primary";
 
   const player2RingColor = isXiangqi
     ? "ring-slate-700 dark:ring-slate-400 text-slate-700 dark:text-slate-400"
+    : isChess
+    ? "ring-stone-700 dark:ring-stone-400 text-stone-700 dark:text-stone-300"
+    : isAnimalChess
+    ? "ring-rose-500 text-rose-500"
     : "ring-destructive text-destructive";
 
   return (
@@ -82,12 +101,12 @@ export function MatchStartVsDialog({
               size="lg"
               src={data.playerXAvatar}
               fallback={
-                <span className={`text-3xl font-black ${isXiangqi ? "text-rose-500" : "text-primary"}`}>
-                  {isXiangqi ? "R" : isBida ? "1" : "X"}
+                <span className={`text-3xl font-black ${isXiangqi ? "text-rose-500" : isChess ? "text-amber-500" : "text-primary"}`}>
+                  {isXiangqi ? "R" : isChess ? "♔" : isBida ? "1" : "X"}
                 </span>
               }
               className={`w-20 h-20 sm:w-24 sm:h-24 rounded-3xl ring-4 shadow-2xl bg-neutral-900 ${
-                isXiangqi ? "ring-rose-500" : "ring-primary"
+                isXiangqi ? "ring-rose-500" : isChess ? "ring-amber-300" : "ring-primary"
               }`}
             />
             <div className="flex flex-col items-center">
@@ -115,12 +134,12 @@ export function MatchStartVsDialog({
               size="lg"
               src={data.playerOAvatar}
               fallback={
-                <span className={`text-3xl font-black ${isXiangqi ? "text-slate-400" : "text-destructive"}`}>
-                  {isXiangqi ? "B" : isBida ? "2" : "O"}
+                <span className={`text-3xl font-black ${isXiangqi ? "text-slate-400" : isChess ? "text-stone-300" : "text-destructive"}`}>
+                  {isXiangqi ? "B" : isChess ? "♚" : isBida ? "2" : "O"}
                 </span>
               }
               className={`w-20 h-20 sm:w-24 sm:h-24 rounded-3xl ring-4 shadow-2xl bg-neutral-900 ${
-                isXiangqi ? "ring-slate-600 dark:ring-slate-400" : "ring-destructive"
+                isXiangqi ? "ring-slate-600 dark:ring-slate-400" : isChess ? "ring-stone-600" : "ring-destructive"
               }`}
             />
             <div className="flex flex-col items-center">
@@ -136,7 +155,7 @@ export function MatchStartVsDialog({
 
         {/* Bottom Status bar */}
         <div className="mt-8 flex items-center justify-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+          <SpreadPing variant="emerald" size="sm" />
           <span className="text-xs font-semibold text-muted-foreground">
             {t("connectingMatch")}
           </span>

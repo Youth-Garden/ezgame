@@ -61,4 +61,13 @@ export const iconRegistry: Record<string, IconComponent> = {
   settings: LucideIcons.SlidersHorizontal,
   timer: LucideIcons.Timer,
   grid: LucideIcons.Grid,
+  maximize: LucideIcons.Maximize,
+  minimize: LucideIcons.Minimize,
+  info: LucideIcons.Info,
+  "help-circle": LucideIcons.HelpCircle,
+  book: LucideIcons.BookOpen,
+  share: LucideIcons.Share2,
+  "qr-code": LucideIcons.QrCode,
+  send: LucideIcons.Send,
+  message: LucideIcons.MessageCircle,
 };

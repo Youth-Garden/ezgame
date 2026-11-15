@@ -296,6 +296,8 @@ export function XiangqiBoard({
                     {piece && (
                       <XiangqiPieceComponent
                         piece={piece}
+                        size="lg"
+                        interactive={canInteract}
                         isSelected={isSelected}
                         isInCheck={isGeneralInCheck}
                       />
