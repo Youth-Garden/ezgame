@@ -69,7 +69,7 @@ export default async function RootLayout({
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var m=document.cookie.match(/(?:^|; )${THEME_COOKIE_KEY}=([^;]*)/);var t=m?decodeURIComponent(m[1]):localStorage.getItem("${THEME_COOKIE_KEY}");var d=document.documentElement;if(t==="light"){d.classList.remove("dark");d.style.colorScheme="light";d.style.backgroundColor="#edf1f7";}else{d.classList.add("dark");d.style.colorScheme="dark";d.style.backgroundColor="#09090b";}}catch(e){}})();`,
+            __html: `(function(){try{var m=document.cookie.match(/(?:^|; )${THEME_COOKIE_KEY}=([^;]*)/);var t=m?decodeURIComponent(m[1]):null;var d=document.documentElement;if(t==="light"){d.classList.remove("dark");d.style.colorScheme="light";d.style.backgroundColor="#edf1f7";}else{d.classList.add("dark");d.style.colorScheme="dark";d.style.backgroundColor="#09090b";}}catch(e){}})();`,
           }}
         />
       </head>

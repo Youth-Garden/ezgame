@@ -31,7 +31,7 @@ export function ThemeProvider({
   // Sync to cookie and DOM on mount if different or missing
   useEffect(() => {
     try {
-      const stored = (cookieUtils.get(THEME_COOKIE_KEY) || localStorage.getItem(THEME_COOKIE_KEY)) as ThemeMode | null;
+      const stored = cookieUtils.get(THEME_COOKIE_KEY) as ThemeMode | null;
       if (stored && (stored === "dark" || stored === "light")) {
         setThemeState(stored);
         const root = document.documentElement;
@@ -55,7 +55,6 @@ export function ThemeProvider({
       const applyTheme = () => {
         try {
           cookieUtils.set(THEME_COOKIE_KEY, newTheme);
-          localStorage.setItem(THEME_COOKIE_KEY, newTheme);
           const root = document.documentElement;
           if (newTheme === "dark") {
             root.classList.add("dark");

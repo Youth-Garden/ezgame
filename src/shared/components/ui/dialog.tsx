@@ -113,11 +113,11 @@ export function DialogContent({
       data-slot="dialog-content"
       onClick={handleStopPropagation}
       className={cn(
-        "relative z-50 w-full bg-card p-6 text-card-foreground shadow-2xl border-none transition-all duration-300 ease-out select-none",
+        "relative z-50 w-full bg-card p-6 text-card-foreground shadow-2xl border-none select-none transition-[height] duration-250 ease-[cubic-bezier(0.16,1,0.3,1)]",
         // Mobile Bottom Sheet styling: full width, dính 2 mép điện thoại, chỉ bo 2 góc trên, 2 góc dưới thẳng tắp 0px
         "rounded-t-[28px] rounded-b-none max-h-[92vh] overflow-y-auto pb-8",
-        // Desktop Dialog: căn giữa, modal nổi bo góc đều đặn
-        "sm:rounded-2xl sm:max-w-md sm:pb-6",
+        // Desktop Dialog: căn giữa, modal nổi bo góc đều đặn, khóa cứng width cố định 28rem (448px)
+        "sm:rounded-2xl sm:w-[448px] sm:max-w-[448px] sm:max-h-[90vh] sm:overflow-visible sm:pb-6",
         open ? "animate-modal-in" : "animate-modal-out pointer-events-none",
         className
       )}

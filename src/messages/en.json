@@ -45,6 +45,13 @@
       "description": "Pocket Billiards 2D",
       "players": "2 Players",
       "tag": "SPORTS"
+    },
+    "xiangqi": {
+      "title": "XIANGQI",
+      "badge": "CHINESE CHESS",
+      "description": "Traditional 9x10 Tactical Board Game",
+      "players": "2 Players",
+      "tag": "BOARD"
     }
   },
   "modal": {
@@ -68,6 +75,7 @@
     "boardSize": "Board Size",
     "ruleStandard": "Standard Rules",
     "rule8Ball": "Standard 8-Ball",
+    "ruleXiangqi": "Standard 9x10 Board",
     "ruleCaro": "5 in a row"
   },
   "game": {
@@ -110,7 +118,9 @@
     "waitingForOpponentToJoin": "Waiting for opponent to join room...",
     "releaseToShoot": "RELEASE TO SHOOT",
     "dragOrSpace": "DRAG & PULL or HOLD SPACE",
-    "connectingMatch": "Connecting match session..."
+    "connectingMatch": "Connecting match session...",
+    "red": "Red",
+    "black": "Black"
   },
   "dialog": {
     "leaveMatchTitle": "Leave Current Match?",

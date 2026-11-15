@@ -26,17 +26,28 @@ const AvatarContext = React.createContext<AvatarContextValue>({
 
 export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   size?: "default" | "sm" | "lg";
+  src?: string;
+  alt?: string;
+  fallback?: React.ReactNode;
 }
 
 export function Avatar({
   className,
   size = "default",
+  src,
+  alt = "Avatar",
+  fallback,
   children,
   ...props
 }: AvatarProps) {
-  const [hasImage, setHasImage] = React.useState(false);
+  const [hasImage, setHasImage] = React.useState(Boolean(src));
   const [hasError, setHasError] = React.useState(false);
   const [isLoaded, setIsLoaded] = React.useState(false);
+
+  React.useEffect(() => {
+    setHasImage(Boolean(src));
+    setHasError(false);
+  }, [src]);
 
   const sizeClasses = {
     sm: "w-7 h-7 sm:w-8 sm:h-8 text-xs",
@@ -66,6 +77,10 @@ export function Avatar({
         )}
         {...props}
       >
+        {/* If direct props (src/fallback) are provided, render them automatically */}
+        {src && <AvatarImage src={src} alt={alt} />}
+        {fallback && <AvatarFallback>{fallback}</AvatarFallback>}
+        {/* Support compound children if provided */}
         {children}
       </div>
     </AvatarContext.Provider>

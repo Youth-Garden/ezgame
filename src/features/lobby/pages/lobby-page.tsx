@@ -40,6 +40,7 @@ export function LobbyPage() {
         iconSrc: item.iconSrc,
         gradient: item.gradient,
         playingCount: item.defaultPlayingCount,
+        isBeta: item.isBeta,
       })),
     [tGames]
   );

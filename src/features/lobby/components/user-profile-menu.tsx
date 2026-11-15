@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { Icons } from "@/shared/icons";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
-import { Avatar, AvatarImage, AvatarFallback } from "@/shared/components/ui/avatar";
+import { Avatar } from "@/shared/components/ui/avatar";
 import { usePlayerProfile } from "@/shared/hooks/use-player-profile";
 import { usePortal } from "@/shared/components/portal";
 import { ProfileDialog } from "./profile-dialog";
@@ -51,12 +51,12 @@ export function UserProfileMenu() {
         aria-expanded={isOpen}
         aria-label="User Profile Menu"
       >
-        <Avatar size="sm" className="!w-5 !h-5 rounded-full overflow-hidden shrink-0">
-          {displayAvatar && <AvatarImage src={displayAvatar} alt={displayName} className="rounded-full" />}
-          <AvatarFallback className="text-[10px]">
-            <Icons name="user" size={12} className="text-foreground" />
-          </AvatarFallback>
-        </Avatar>
+        <Avatar
+          size="sm"
+          src={displayAvatar}
+          fallback={<Icons name="user" size={12} className="text-foreground" />}
+          className="!w-5 !h-5 rounded-full overflow-hidden shrink-0"
+        />
         <span className="hidden md:inline text-xs font-semibold text-foreground truncate max-w-[85px] lg:max-w-[110px]">
           {displayName}
         </span>
@@ -79,12 +79,12 @@ export function UserProfileMenu() {
       >
         {/* Header Profile Identity */}
         <div className="p-2 rounded-xl bg-muted/60 flex items-center gap-2.5">
-          <Avatar size="sm" className="w-8 h-8 rounded-full bg-background">
-            {displayAvatar && <AvatarImage src={displayAvatar} alt={displayName} />}
-            <AvatarFallback>
-              <Icons name="user" size={14} className="text-foreground" />
-            </AvatarFallback>
-          </Avatar>
+          <Avatar
+            size="sm"
+            src={displayAvatar}
+            fallback={<Icons name="user" size={14} className="text-foreground" />}
+            className="w-8 h-8 rounded-full bg-background"
+          />
           <div className="flex flex-col min-w-0 flex-1">
             <div className="flex items-center justify-between gap-1">
               <span className="text-xs font-bold text-foreground truncate">

@@ -45,6 +45,13 @@
       "description": "Pocket Billiards 2D",
       "players": "2人プレイ",
       "tag": "SPORTS"
+    },
+    "xiangqi": {
+      "title": "シャンチー (中国将棋)",
+      "badge": "XIANGQI",
+      "description": "9x10の伝統的な対戦ボードゲーム",
+      "players": "2人プレイ",
+      "tag": "BOARD"
     }
   },
   "modal": {
@@ -68,6 +75,7 @@
     "boardSize": "盤面サイズ",
     "ruleStandard": "標準ルール",
     "rule8Ball": "エイトボール",
+    "ruleXiangqi": "9x10 伝統盤面",
     "ruleCaro": "5目並べ"
   },
   "game": {
@@ -110,7 +118,9 @@
     "waitingForOpponentToJoin": "対戦相手の入室を待っています...",
     "releaseToShoot": "離してショット",
     "dragOrSpace": "ドラッグまたはSPACE長押し",
-    "connectingMatch": "対戦セッションに接続中..."
+    "connectingMatch": "対戦セッションに接続中...",
+    "red": "先手 (赤)",
+    "black": "後手 (黒)"
   },
   "dialog": {
     "leaveMatchTitle": "対局を退出しますか？",

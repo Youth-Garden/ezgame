@@ -7,7 +7,7 @@ import { Input } from "@/shared/components/ui/input";
 import { Card } from "@/shared/components/ui/card";
 import { Badge } from "@/shared/components/ui/badge";
 import { Icons } from "@/shared/icons";
-import { Avatar, AvatarImage, AvatarFallback } from "@/shared/components/ui/avatar";
+import { Avatar } from "@/shared/components/ui/avatar";
 import { usePlayerProfile } from "@/shared/hooks/use-player-profile";
 import {
   AvatarStyles,
@@ -73,10 +73,12 @@ export function ProfileDialog({ isOpen, onDismiss }: PortalProps<void>) {
         <div className="space-y-4 max-h-[75vh] overflow-y-auto px-0.5 py-1">
           {/* Avatar Preview Card: Rộng rãi, avatar lớn và thông tin rõ nét */}
           <Card variant="subtle" className="flex items-center gap-4 p-4">
-            <Avatar size="lg" className="w-20 h-20 rounded-2xl bg-background shrink-0">
-              <AvatarImage src={previewAvatarUrl} alt="Avatar Preview" />
-              <AvatarFallback>{name?.[0] || "P"}</AvatarFallback>
-            </Avatar>
+            <Avatar
+              size="lg"
+              src={previewAvatarUrl}
+              fallback={name?.[0] || "P"}
+              className="w-20 h-20 rounded-2xl bg-background shrink-0"
+            />
             <div className="flex flex-col min-w-0 flex-1">
               <span className="text-base font-bold text-foreground truncate">
                 {name || profile.name}
@@ -124,10 +126,12 @@ export function ProfileDialog({ isOpen, onDismiss }: PortalProps<void>) {
                     onClick={() => setDraftStyle(itemStyle)}
                     className="relative flex flex-col items-center p-2.5 rounded-2xl transition-all cursor-pointer select-none"
                   >
-                    <Avatar size="sm" className="w-12 h-12 rounded-xl bg-background mb-1.5 pointer-events-none">
-                      <AvatarImage src={sampleUrl} alt={itemStyle} />
-                      <AvatarFallback>{itemStyle[0]}</AvatarFallback>
-                    </Avatar>
+                    <Avatar
+                      size="sm"
+                      src={sampleUrl}
+                      fallback={itemStyle[0]}
+                      className="w-12 h-12 rounded-xl bg-background mb-1.5 pointer-events-none"
+                    />
                     <span className="text-xs font-medium truncate w-full text-center capitalize pointer-events-none">
                       {itemStyle.replace("-", " ")}
                     </span>

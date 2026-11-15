@@ -3,10 +3,15 @@ import * as LucideIcons from "lucide-react";
 import { FlagVnIcon, FlagUsIcon, FlagJpIcon } from "./svgs/flag-icons";
 import { EzGameLogo } from "./svgs/logo";
 import { VictoryIcon3D, DefeatIcon3D, DrawIcon3D, LeaveMatchIcon3D } from "./svgs/game-result-icons";
+import { ArrowDownIcon } from "./svgs/arrow-down";
 
 export type IconComponent = ComponentType<SVGProps<SVGSVGElement> & { size?: number | string }>;
 
 export const iconRegistry: Record<string, IconComponent> = {
+  // Custom Arrows
+  "arrow-down": ArrowDownIcon,
+  "chevron-down": ArrowDownIcon,
+
   // Brand Logo
   "logo": EzGameLogo,
   "ezgame": EzGameLogo,
@@ -28,7 +33,6 @@ export const iconRegistry: Record<string, IconComponent> = {
   plus: LucideIcons.Plus,
   check: LucideIcons.Check,
   languages: LucideIcons.Languages,
-  "chevron-down": LucideIcons.ChevronDown,
   sun: LucideIcons.Sun,
   moon: LucideIcons.Moon,
   gamepad: LucideIcons.Gamepad2,

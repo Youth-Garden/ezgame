@@ -3,6 +3,7 @@
 import { useEffect, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { usePortalStore } from "@/shared/store/portal.store";
+import { useLockBodyScroll } from "@/shared/hooks/use-lock-body-scroll";
 import { Backdrop } from "./backdrop";
 
 const emptySubscribe = () => () => {};
@@ -15,6 +16,12 @@ export const PortalRenderer = () => {
     () => true,
     () => false
   );
+
+  // Check if any portal modal is currently open
+  const isAnyOpen = portals.some((p) => p.isOpen);
+
+  // Lock body scroll whenever at least one portal is opened and active
+  useLockBodyScroll(isClient && isAnyOpen);
 
   // Close top-most portal when Escape is pressed
   useEffect(() => {

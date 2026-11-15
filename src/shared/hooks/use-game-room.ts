@@ -1,14 +1,28 @@
-"use client";
+'use client';
 
-import { useState, useCallback, useRef, useEffect } from "react";
-import { useParams, useSearchParams } from "next/navigation";
-import { usePortal } from "@/shared/components/portal";
-import { ResultDialog, type ResultDialogData } from "@/shared/components/result-dialog";
-import { MatchStartVsDialog, type MatchStartVsDialogData } from "@/shared/components/match-start-vs-dialog";
-import { ConfirmDialog, type ConfirmDialogData } from "@/shared/components/confirm-dialog";
-import { usePlayerProfile } from "@/shared/hooks/use-player-profile";
-import { useRoomRealtime } from "@/shared/hooks/use-room-realtime";
-import { PlayerRole, RealtimeEventType, GameWinner, type RealtimeEvent } from "@/shared/types/room";
+import {
+  ConfirmDialog,
+  type ConfirmDialogData,
+} from '@/shared/components/confirm-dialog';
+import {
+  MatchStartVsDialog,
+  type MatchStartVsDialogData,
+} from '@/shared/components/match-start-vs-dialog';
+import { usePortal } from '@/shared/components/portal';
+import {
+  ResultDialog,
+  type ResultDialogData,
+} from '@/shared/components/result-dialog';
+import { usePlayerProfile } from '@/shared/hooks/use-player-profile';
+import { useRoomRealtime } from '@/shared/hooks/use-room-realtime';
+import {
+  GameWinner,
+  PlayerRole,
+  RealtimeEventType,
+  type RealtimeEvent,
+} from '@/shared/types/room';
+import { useParams, useSearchParams } from 'next/navigation';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface UseGameRoomParams {
   gameTitle: string;
@@ -19,7 +33,7 @@ interface UseGameRoomParams {
 
 export function useGameRoom({
   gameTitle,
-  defaultRoomCode = "ROOM-DEMO",
+  defaultRoomCode = 'ROOM-DEMO',
   onEventReceived,
   onSurrenderConfirmed,
 }: UseGameRoomParams) {
@@ -31,15 +45,17 @@ export function useGameRoom({
   const rawCode = (routeParams?.code as string) || defaultRoomCode;
   const roomCode = rawCode.toUpperCase();
 
-  const roleParam = searchParams?.get("role")?.toUpperCase();
+  const roleParam = searchParams?.get('role')?.toUpperCase();
   const getInitialRole = (): PlayerRole => {
-    if (roleParam === "O") return PlayerRole.O;
-    if (roleParam === "X") return PlayerRole.X;
-    if (roleParam === "SPECTATOR") return PlayerRole.SPECTATOR;
+    if (roleParam === 'O') return PlayerRole.O;
+    if (roleParam === 'X') return PlayerRole.X;
+    if (roleParam === 'SPECTATOR') return PlayerRole.SPECTATOR;
 
     // Check if player role was saved in sessionStorage for this room (prevents random flip on F5)
-    if (typeof window !== "undefined") {
-      const savedRole = window.sessionStorage.getItem(`ezgame_role_${roomCode}`);
+    if (typeof window !== 'undefined') {
+      const savedRole = window.sessionStorage.getItem(
+        `ezgame_role_${roomCode}`,
+      );
       if (savedRole === PlayerRole.X || savedRole === PlayerRole.O) {
         return savedRole as PlayerRole;
       }
@@ -50,26 +66,36 @@ export function useGameRoom({
 
   const [myRole, setMyRoleState] = useState<PlayerRole>(getInitialRole);
 
-  const setMyRole = useCallback((newRole: PlayerRole) => {
-    setMyRoleState(newRole);
-    if (typeof window !== "undefined") {
-      window.sessionStorage.setItem(`ezgame_role_${roomCode}`, newRole);
-    }
-  }, [roomCode]);
+  const setMyRole = useCallback(
+    (newRole: PlayerRole) => {
+      setMyRoleState(newRole);
+      if (typeof window !== 'undefined') {
+        window.sessionStorage.setItem(`ezgame_role_${roomCode}`, newRole);
+      }
+    },
+    [roomCode],
+  );
 
   useEffect(() => {
-    if (typeof window !== "undefined" && (myRole === PlayerRole.X || myRole === PlayerRole.O)) {
+    if (
+      typeof window !== 'undefined' &&
+      (myRole === PlayerRole.X || myRole === PlayerRole.O)
+    ) {
       window.sessionStorage.setItem(`ezgame_role_${roomCode}`, myRole);
     }
   }, [myRole, roomCode]);
 
   // Modal / Dialog Portal hooks
-  const [presentResultDialog, dismissResultDialog] = usePortal<ResultDialogData>(ResultDialog);
-  const [presentVsDialog] = usePortal<MatchStartVsDialogData>(MatchStartVsDialog);
+  const [presentResultDialog, dismissResultDialog] =
+    usePortal<ResultDialogData>(ResultDialog);
+  const [presentVsDialog] =
+    usePortal<MatchStartVsDialogData>(MatchStartVsDialog);
   const [presentConfirmDialog] = usePortal<ConfirmDialogData>(ConfirmDialog);
 
   const hasShownVsModalRef = useRef(false);
-  const sendEventRef = useRef<(event: RealtimeEvent) => Promise<void>>(async () => {});
+  const sendEventRef = useRef<(event: RealtimeEvent) => Promise<void>>(
+    async () => {},
+  );
 
   const showResultDialog = useCallback(
     (
@@ -77,7 +103,7 @@ export function useGameRoom({
       isRequestedByMe: boolean = false,
       isRequestedByOpponent: boolean = false,
       onRequestRematch?: () => void,
-      onAcceptRematch?: () => void
+      onAcceptRematch?: () => void,
     ) => {
       presentResultDialog({
         winner: currentWinner,
@@ -88,7 +114,7 @@ export function useGameRoom({
         onAcceptRematch,
       });
     },
-    [presentResultDialog, myRole]
+    [presentResultDialog, myRole],
   );
 
   // Hook into Realtime (Supabase Broadcast + Presence)
@@ -117,9 +143,14 @@ export function useGameRoom({
         type: RealtimeEventType.REQUEST_ROOM_SYNC,
         payload: {
           from: myRole,
-          clientId: typeof window !== "undefined" ? window.sessionStorage.getItem("ezgame_client_id") || "" : "",
+          clientId:
+            typeof window !== 'undefined'
+              ? window.sessionStorage.getItem('ezgame_client_id') || ''
+              : '',
         },
-      }).catch((err) => console.error("[GameRoom] Failed to request room sync:", err));
+      }).catch((err) =>
+        console.error('[GameRoom] Failed to request room sync:', err),
+      );
     }
   }, [isOpponentOnline, myRole, sendEvent]);
 
@@ -128,30 +159,39 @@ export function useGameRoom({
     if (isOpponentOnline && opponentProfile && !hasShownVsModalRef.current) {
       hasShownVsModalRef.current = true;
 
-      const playerXProfile = myRole === PlayerRole.X ? myProfile : opponentProfile;
-      const playerOProfile = myRole === PlayerRole.O ? myProfile : opponentProfile;
+      const playerXProfile =
+        myRole === PlayerRole.X ? myProfile : opponentProfile;
+      const playerOProfile =
+        myRole === PlayerRole.O ? myProfile : opponentProfile;
 
       presentVsDialog({
-        playerXName: playerXProfile?.name || "Player X",
-        playerXAvatar: playerXProfile?.avatarUrl || "",
-        playerOName: playerOProfile?.name || "Player O",
-        playerOAvatar: playerOProfile?.avatarUrl || "",
+        playerXName: playerXProfile?.name || 'Player X',
+        playerXAvatar: playerXProfile?.avatarUrl || '',
+        playerOName: playerOProfile?.name || 'Player O',
+        playerOAvatar: playerOProfile?.avatarUrl || '',
         gameTitle,
       });
     }
-  }, [isOpponentOnline, opponentProfile, myRole, myProfile, presentVsDialog, gameTitle]);
+  }, [
+    isOpponentOnline,
+    opponentProfile,
+    myRole,
+    myProfile,
+    presentVsDialog,
+    gameTitle,
+  ]);
 
   // Unified Surrender Confirmation Dialog
   const promptSurrender = useCallback(() => {
     if (myRole === PlayerRole.SPECTATOR) return;
 
     presentConfirmDialog({
-      title: "Surrender Match?",
-      description: "Are you sure you want to surrender this match? Your opponent will be awarded the win.",
-      confirmText: "Surrender",
-      cancelText: "Keep Playing",
-      variant: "destructive",
-      icon3D: "defeat-3d",
+      title: 'Surrender Match?',
+      description:
+        'Are you sure you want to surrender this match? Your opponent will be awarded the win.',
+      confirmText: 'Surrender',
+      variant: 'destructive',
+      icon3D: 'defeat-3d',
       onConfirm: async () => {
         await onSurrenderConfirmed?.();
       },

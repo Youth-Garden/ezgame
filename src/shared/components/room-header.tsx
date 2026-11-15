@@ -19,7 +19,7 @@ import { MobileRoomActionsSheet, type MobileRoomActionsSheetData } from "./mobil
 interface RoomHeaderProps {
   roomCode: string;
   gameTitle: string;
-  gameType?: "caro" | "bida" | "tictactoe";
+  gameType?: "caro" | "bida" | "tictactoe" | "xiangqi";
   myRole?: PlayerRole;
   myProfile?: PlayerProfile;
   opponentProfile?: {

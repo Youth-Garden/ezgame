@@ -1,21 +1,21 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import confetti from "canvas-confetti";
-import { useRouter } from "next/navigation";
-import { RouteEnum } from "@/shared/constants/routes";
-import { sounds } from "@/shared/lib/sound-effects";
-import { PlayerRole, GameWinner } from "@/shared/types/room";
-import type { PortalProps } from "@/shared/types/portal.types";
-import { Button } from "@/shared/components/ui/button";
-import { Icons } from "@/shared/icons";
+import { Button } from '@/shared/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
-} from "@/shared/components/ui/dialog";
+} from '@/shared/components/ui/dialog';
+import { RouteEnum } from '@/shared/constants/routes';
+import { Icons } from '@/shared/icons';
+import { sounds } from '@/shared/lib/sound-effects';
+import type { PortalProps } from '@/shared/types/portal.types';
+import { GameWinner, PlayerRole } from '@/shared/types/room';
+import confetti from 'canvas-confetti';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export interface ResultDialogData {
   winner: GameWinner | null;
@@ -35,7 +35,8 @@ export function ResultDialog({
   const winner = data?.winner ?? null;
   const myRole = data?.myRole ?? PlayerRole.X;
   const isRematchRequestedByMe = data?.isRematchRequestedByMe ?? false;
-  const isRematchRequestedByOpponent = data?.isRematchRequestedByOpponent ?? false;
+  const isRematchRequestedByOpponent =
+    data?.isRematchRequestedByOpponent ?? false;
 
   const isMeWinner = (winner as unknown as PlayerRole) === myRole;
   const isDraw = winner === GameWinner.DRAW;
@@ -65,9 +66,11 @@ export function ResultDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onDismiss?.()}>
-      <DialogContent showCloseButton={false} className="sm:max-w-sm flex flex-col items-center text-center">
+      <DialogContent
+        showCloseButton={false}
+        className="sm:max-w-sm flex flex-col items-center text-center"
+      >
         <DialogHeader className="items-center text-center">
-          {/* 3D / Cartoon Game Result Illustration (Zero-border, Standalone) */}
           <div className="mb-3 transform hover:scale-105 transition-transform duration-200">
             {isMeWinner ? (
               <Icons name="victory-3d" size={80} />
@@ -79,15 +82,15 @@ export function ResultDialog({
           </div>
 
           <DialogTitle className="text-xl font-bold uppercase tracking-tight mb-1 font-game">
-            {isMeWinner ? "Victory!" : isDraw ? "Game Draw!" : "Defeat!"}
+            {isMeWinner ? 'Victory!' : isDraw ? 'Game Draw!' : 'Defeat!'}
           </DialogTitle>
 
           <DialogDescription className="text-xs text-text-secondary mb-4 max-w-xs leading-relaxed font-medium">
             {isMeWinner
               ? `Congratulations! You (Piece ${myRole}) took the win.`
               : isDraw
-              ? "Both sides played evenly to a draw."
-              : `Piece ${winner} connected 5. Ready for the next round?`}
+                ? 'Both sides played evenly to a draw.'
+                : `Piece ${winner} connected 5. Ready for the next round?`}
           </DialogDescription>
         </DialogHeader>
 

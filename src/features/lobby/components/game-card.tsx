@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useRipple } from "@/shared/hooks/use-ripple";
 import { Card } from "@/shared/components/ui/card";
+import { Badge } from "@/shared/components/ui/badge";
 import type { GameMetadata } from "../types";
 
 interface GameCardProps {
@@ -39,6 +40,19 @@ export function GameCard({ game, onSelect }: GameCardProps) {
               sizes="(max-width: 640px) 100vw, 400px"
               className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
             />
+
+            {/* Top Right Beta Badge */}
+            {game.isBeta && (
+              <div className="absolute top-2.5 right-2.5 z-20">
+                <Badge
+                  variant="warning"
+                  size="sm"
+                  className="font-black text-[10px] tracking-wider uppercase px-2 py-0.5 shadow-md backdrop-blur-xs"
+                >
+                  BETA
+                </Badge>
+              </div>
+            )}
           </div>
         ) : null}
 

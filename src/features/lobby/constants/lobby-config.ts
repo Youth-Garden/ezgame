@@ -11,6 +11,7 @@ export interface GameCatalogConfig {
   iconSrc: string;
   gradient: string;
   defaultPlayingCount: number;
+  isBeta?: boolean;
 }
 
 export const GAME_CATALOG_CONFIGS: readonly GameCatalogConfig[] = [
@@ -37,6 +38,19 @@ export const GAME_CATALOG_CONFIGS: readonly GameCatalogConfig[] = [
     iconSrc: "/games/bida.jpg",
     gradient: "bg-gradient-to-b from-[#7B3FF2] via-[#C03CF0] to-[#FF4D4D]",
     defaultPlayingCount: 1850,
+    isBeta: true,
+  },
+  {
+    id: GameType.XIANGQI,
+    titleKey: "xiangqi.title",
+    badgeKey: "xiangqi.badge",
+    descriptionKey: "xiangqi.description",
+    playersKey: "xiangqi.players",
+    isAvailable: true,
+    tagKey: "xiangqi.tag",
+    iconSrc: "/games/xiangqi.jpg",
+    gradient: "bg-gradient-to-b from-[#C2410C] via-[#EA580C] to-[#F59E0B]",
+    defaultPlayingCount: 1420,
   },
 ] as const;
 

@@ -8,7 +8,7 @@ import {
   Dialog,
   DialogContent,
 } from "@/shared/components/ui/dialog";
-import { Avatar, AvatarImage, AvatarFallback } from "@/shared/components/ui/avatar";
+import { Avatar } from "@/shared/components/ui/avatar";
 
 export interface MatchStartVsDialogData {
   playerXName: string;
@@ -54,10 +54,12 @@ export function MatchStartVsDialog({
         <div className="w-full flex items-center justify-between gap-4 px-4 sm:px-8">
           {/* Player X (Left) */}
           <div className="flex-1 flex flex-col items-center gap-3 animate-in slide-in-from-left duration-500">
-            <Avatar size="lg" className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl ring-4 ring-primary shadow-2xl bg-neutral-900">
-              {data.playerXAvatar && <AvatarImage src={data.playerXAvatar} alt={data.playerXName} />}
-              <AvatarFallback className="text-3xl font-black text-primary">X</AvatarFallback>
-            </Avatar>
+            <Avatar
+              size="lg"
+              src={data.playerXAvatar}
+              fallback={<span className="text-3xl font-black text-primary">X</span>}
+              className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl ring-4 ring-primary shadow-2xl bg-neutral-900"
+            />
             <div className="flex flex-col items-center">
               <span className="text-sm sm:text-base font-black text-foreground truncate max-w-[120px]">
                 {data.playerXName}
@@ -79,10 +81,12 @@ export function MatchStartVsDialog({
 
           {/* Player O (Right) */}
           <div className="flex-1 flex flex-col items-center gap-3 animate-in slide-in-from-right duration-500">
-            <Avatar size="lg" className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl ring-4 ring-destructive shadow-2xl bg-neutral-900">
-              {data.playerOAvatar && <AvatarImage src={data.playerOAvatar} alt={data.playerOName} />}
-              <AvatarFallback className="text-3xl font-black text-destructive">O</AvatarFallback>
-            </Avatar>
+            <Avatar
+              size="lg"
+              src={data.playerOAvatar}
+              fallback={<span className="text-3xl font-black text-destructive">O</span>}
+              className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl ring-4 ring-destructive shadow-2xl bg-neutral-900"
+            />
             <div className="flex flex-col items-center">
               <span className="text-sm sm:text-base font-black text-foreground truncate max-w-[120px]">
                 {data.playerOName}

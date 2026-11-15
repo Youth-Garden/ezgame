@@ -11,6 +11,7 @@ export interface GameMetadata {
   iconSrc?: string;
   gradient?: string;
   playingCount?: number;
+  isBeta?: boolean;
 }
 
 export interface GameRoomModalData {

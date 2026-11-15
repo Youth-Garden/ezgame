@@ -1,5 +1,5 @@
 import { cn } from "@/shared/lib/utils";
-import { Avatar, AvatarImage, AvatarFallback } from "@/shared/components/ui/avatar";
+import { Avatar } from "@/shared/components/ui/avatar";
 
 interface PlayerAvatarProps {
   name?: string;
@@ -11,6 +11,7 @@ interface PlayerAvatarProps {
   size?: "default" | "sm";
   align?: "left" | "right";
   subBadge?: React.ReactNode;
+  badgePosition?: "beside" | "below";
   contentBelow?: React.ReactNode;
   timeLeft?: number;
   timeFraction?: number;
@@ -50,6 +51,7 @@ export function PlayerAvatar({
   size = "default",
   align = "left",
   subBadge,
+  badgePosition = "below",
   contentBelow,
   timeLeft,
   timeFraction,
@@ -88,13 +90,13 @@ export function PlayerAvatar({
       <div
         className={cn(
           "relative shrink-0 flex items-center justify-center",
-          size === "sm" ? "w-11 h-11" : "w-[52px] h-[52px]"
+          size === "sm" ? "w-[42px] h-[42px]" : "w-[50px] h-[50px]"
         )}
       >
         {/* Animated Countdown SVG Ring */}
         {isActiveTurn && typeof timeLeft === "number" && (
           <svg
-            className="absolute inset-0 pointer-events-none transition-all z-10"
+            className="absolute inset-0 m-auto pointer-events-none transition-all z-10"
             width={ringSize}
             height={ringSize}
             viewBox={`0 0 ${ringSize} ${ringSize}`}
@@ -132,27 +134,34 @@ export function PlayerAvatar({
 
         <Avatar
           size={size}
+          src={avatarUrl}
+          fallback={fallbackText}
           className="transition-all z-0"
-        >
-          {avatarUrl && <AvatarImage src={avatarUrl} alt={name || fallbackText} />}
-          <AvatarFallback>{fallbackText}</AvatarFallback>
-        </Avatar>
+        />
       </div>
 
       {/* Info Pod */}
       <div
         className={cn(
-          "flex flex-col min-w-0",
+          "flex flex-col min-w-0 justify-center",
           isRight ? "items-end text-right" : "items-start text-left"
         )}
       >
-        <div className="flex items-center gap-1.5">
-          {isRight && subBadge}
-          <span className="text-[11px] sm:text-xs font-bold text-foreground truncate max-w-[90px] sm:max-w-[130px]">
+        {/* Name and optional beside badge */}
+        <div className="flex items-center gap-1.5 max-w-[140px] sm:max-w-[180px]">
+          {isRight && badgePosition === "beside" && subBadge}
+          <span className="text-[11px] sm:text-xs font-bold text-foreground truncate">
             {name || fallbackText}
           </span>
-          {!isRight && subBadge}
+          {!isRight && badgePosition === "beside" && subBadge}
         </div>
+
+        {/* SubBadge placed below the name */}
+        {badgePosition === "below" && subBadge && (
+          <div className="mt-0.5 shrink-0 flex items-center">
+            {subBadge}
+          </div>
+        )}
 
         {roleText && (
           <span className="text-[9px] sm:text-[10px] font-bold uppercase text-muted-foreground mt-0.5 truncate w-full">

@@ -12,7 +12,7 @@
   --popover-foreground: #09090b;
   --primary: #2563eb;
   --primary-foreground: #ffffff;
-  --secondary: #e2e8f0;
+  --secondary: color-mix(in srgb, var(--muted) 60%, transparent);
   --secondary-foreground: #1e293b;
   --control-bg: #ffffff;
   --control-bg-hover: #f8fafc;
@@ -67,11 +67,11 @@
   --text-secondary: #cbd5e1;
   --card: #121216;
   --card-foreground: #ffffff;
-  --popover: #18181d;
+  --popover: #121216;
   --popover-foreground: #ffffff;
   --primary: #3b82f6;
   --primary-foreground: #ffffff;
-  --secondary: #1c1c22;
+  --secondary: color-mix(in srgb, var(--muted) 80%, transparent);
   --secondary-foreground: #f8fafc;
   --control-bg: #1c1c22;
   --control-bg-hover: #27272f;

@@ -1,23 +1,23 @@
-"use client";
+'use client';
 
-import { type PortalProps } from "@/shared/types/portal.types";
-import { Button } from "@/shared/components/ui/button";
-import { Icons } from "@/shared/icons";
+import { Button } from '@/shared/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
-} from "@/shared/components/ui/dialog";
+} from '@/shared/components/ui/dialog';
+import { Icons } from '@/shared/icons';
+import { type PortalProps } from '@/shared/types/portal.types';
 
 export interface ConfirmDialogData {
   title: string;
   description: string;
   confirmText?: string;
   cancelText?: string;
-  variant?: "destructive" | "default";
-  icon3D?: "leave-match-3d" | "victory-3d" | "defeat-3d" | "draw-3d";
+  variant?: 'destructive' | 'default';
+  icon3D?: 'leave-match-3d' | 'victory-3d' | 'defeat-3d' | 'draw-3d';
   showCloseButton?: boolean;
   onConfirm?: () => void;
   onCancel?: () => void;
@@ -33,10 +33,10 @@ export function ConfirmDialog({
   const {
     title,
     description,
-    confirmText = "Confirm",
-    cancelText = "Cancel",
-    variant = "destructive",
-    icon3D = "leave-match-3d",
+    confirmText = 'Confirm',
+    cancelText,
+    variant = 'destructive',
+    icon3D = 'leave-match-3d',
     showCloseButton = true,
     onConfirm,
     onCancel,
@@ -54,7 +54,10 @@ export function ConfirmDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onDismiss?.()}>
-      <DialogContent showCloseButton={showCloseButton} className="sm:max-w-sm flex flex-col items-center gap-4 text-center">
+      <DialogContent
+        showCloseButton={showCloseButton}
+        className="sm:max-w-sm flex flex-col items-center gap-4 text-center"
+      >
         {/* 3D Illustrated Badge (No flat background box) */}
         <div className="transform hover:scale-105 transition-transform duration-200 mt-1">
           <Icons name={icon3D} size={72} />
@@ -70,18 +73,20 @@ export function ConfirmDialog({
         </DialogHeader>
 
         {/* Action Buttons */}
-        <div className="grid grid-cols-2 gap-3 w-full mt-2">
-          <Button
-            variant="secondary"
-            size="default"
-            onClick={handleCancel}
-            className="w-full text-xs font-semibold"
-          >
-            {cancelText}
-          </Button>
+        <div className="flex gap-3 w-full mt-2">
+          {cancelText && (
+            <Button
+              variant="secondary"
+              size="default"
+              onClick={handleCancel}
+              className="w-full text-xs font-semibold"
+            >
+              {cancelText}
+            </Button>
+          )}
 
           <Button
-            variant={variant === "destructive" ? "destructive" : "default"}
+            variant={variant === 'destructive' ? 'destructive' : 'default'}
             size="default"
             onClick={handleConfirm}
             className="w-full text-xs font-bold"

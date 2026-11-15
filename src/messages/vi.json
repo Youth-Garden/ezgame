@@ -45,6 +45,13 @@
       "description": "Pocket Billiards 2D",
       "players": "2 Người",
       "tag": "SPORTS"
+    },
+    "xiangqi": {
+      "title": "CỜ TƯỚNG",
+      "badge": "XIANGQI",
+      "description": "Cờ tướng đối kháng 9x10 truyền thống",
+      "players": "2 Người",
+      "tag": "BOARD"
     }
   },
   "modal": {
@@ -68,6 +75,7 @@
     "boardSize": "Kích thước bàn cờ",
     "ruleStandard": "Quy tắc tiêu chuẩn",
     "rule8Ball": "Bida lỗ 8 bóng",
+    "ruleXiangqi": "Cờ tướng 9x10 chuẩn",
     "ruleCaro": "5 ô liên tiếp"
   },
   "game": {
@@ -110,7 +118,9 @@
     "waitingForOpponentToJoin": "Đang đợi đối thủ vào phòng...",
     "releaseToShoot": "BUÔNG TAY ĐỂ BẮN",
     "dragOrSpace": "KÉO & THẢ hoặc GIỮ PHÍM SPACE",
-    "connectingMatch": "Đang kết nối phiên đấu..."
+    "connectingMatch": "Đang kết nối phiên đấu...",
+    "red": "Đỏ",
+    "black": "Đen"
   },
   "dialog": {
     "leaveMatchTitle": "Rời trận đấu hiện tại?",

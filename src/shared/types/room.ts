@@ -20,6 +20,7 @@ export enum GameType {
   CARO = "caro",
   TICTACTOE = "tictactoe",
   BIDA = "bida",
+  XIANGQI = "xiangqi",
 }
 
 export interface RoomData {
@@ -107,6 +108,8 @@ export type RealtimeEvent =
         col: number;
         player: PlayerRole.X | PlayerRole.O;
         timestamp: number;
+        fromRow?: number;
+        fromCol?: number;
       };
     }
   | {

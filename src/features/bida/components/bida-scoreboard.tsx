@@ -108,6 +108,7 @@ export function BidaScoreboard({
         isActiveTurn={currentTurn === PlayerRole.X}
         activeColor="amber"
         align="left"
+        badgePosition="below"
         timeLeft={currentTurn === PlayerRole.X ? timeLeft : undefined}
         timeFraction={currentTurn === PlayerRole.X ? timeFraction : undefined}
         totalTime={45}
@@ -171,6 +172,7 @@ export function BidaScoreboard({
         isActiveTurn={currentTurn === PlayerRole.O}
         activeColor="sky"
         align="right"
+        badgePosition="below"
         timeLeft={currentTurn === PlayerRole.O ? timeLeft : undefined}
         timeFraction={currentTurn === PlayerRole.O ? timeFraction : undefined}
         totalTime={45}
