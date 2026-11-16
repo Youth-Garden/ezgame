@@ -59,6 +59,23 @@
   - `be-game-workflow`: Module structure, enum rules, realtime broadcast flow (`useGameRoom`, `useRoomRealtime`), unit test requirements (`*.test.ts`).
 - **Storage Conventions**: Never add custom prefixes (`ezgame_`). Use `player_profile`, `locale`, `theme`, `client_id`, `role_${roomCode}`.
 
+## 10. Documentation Standards & Plan Specifications
+- **English Language Requirement**: All documentation, technical specifications, architecture records, roadmap files, and plans MUST be written entirely in English.
+- **Strictly No Decorative Emojis or Icons**: Absolutely DO NOT use decorative emojis (such as 🚀, 💡, 🦁, 🌾, 🃏, 🗺️, 📊, 🎯, 📌, ✅, ❌, etc.) in any documentation, plans, code comments, or architectural records. Keep documentation completely professional, clean, and plain-text standard.
+- **Mandatory Technical Document Suite**:
+  - `docs/architecture.md`: System topology, layered boundaries, FSD module communication, ADRs.
+  - `docs/roadmap.md`: Game release stages, delivery phases, dependency order.
+  - `docs/srs.md`: Software Requirements Specification, system actors, game engine requirements, realtime protocols.
+  - `docs/design-system.md`: Component tokens, typography, surfaces, dialog standards, button variants.
+  - `docs/api.md`: REST API contracts, request/response schemas, error status codes.
+  - `docs/database.md`: Database schema, Prisma models, indexing strategy, migrations.
+  - `docs/deployment.md`: Environment setup, production runtime, Docker containerization.
+  - `docs/ci-cd.md`: Automated linting, typechecking, build pipelines, verification flow.
+  - `docs/contributing.md`: Contribution guide, PR conventions, branch naming.
+  - `docs/coding-standards.md`: Code quality, imports, naming rules, line limits.
+  - `docs/testing.md`: Unit test strategy, engine validation, execution commands.
+  - `docs/security.md`: Authentication boundaries, input sanitization, realtime authorization.
+
 ---
 
 <!-- BEGIN:nextjs-agent-rules -->

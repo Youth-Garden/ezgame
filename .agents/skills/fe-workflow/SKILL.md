@@ -1,42 +1,69 @@
 ---
 name: fe-workflow
-description: >-
-  Standard frontend workflow and design guidelines for EzGame.
-  Use when creating or refactoring UI components, pages, scoreboards, and dialogs.
+description: Frontend architecture, UI standards, design tokens, and implementation rules for EzGame. Use when building or refactoring UI components, game boards, scoreboards, and pages.
 ---
 
-# EzGame Frontend Workflow & Design Rules
+# Frontend Engineering Workflow & Architectural Guidelines
 
-When implementing or modifying any UI in this project, follow this exact workflow:
+This guide specifies the mandatory frontend engineering standards, design system rules, and checklist requirements for EzGame.
 
-## 1. Zero Layout Shift & Dimension Lockdown
-- **Reserved Container Heights**:
-  - `GameScoreboard.Root`: Must maintain fixed vertical min-height (`min-h-[58px] sm:min-h-[66px]`).
-  - Scoreboard Center: Fixed height (`h-[42px]`) with vertical centering.
-  - Row 2 of `PlayerAvatar`: Fixed height (`h-5` / `20px`) for badges and captured pieces so capturing a piece never causes a layout jump.
-  - `GameActionBar`: Fixed height `h-8` container for Surrender / game action buttons.
-- **Surface Design (No-Border Rule)**:
-  - If a container already has a background color (`bg-muted`, `bg-secondary`, `bg-card`), **DO NOT add borders** (`border-none`). Rely on tonal contrast and radius.
+## Core Rules
 
-## 2. Reusable Game Units (Visual Pieces)
-- Never display raw strings or generic text when representing game units (e.g. captured pieces, current markers).
-- Always use the dedicated unit component:
-  - Cờ Tướng: `<XiangqiPieceComponent piece={...} size="xs" | "sm" | "lg" interactive={false} />`
-  - Cờ Caro: `<CaroPieceMark value={...} size="xs" | "sm" | "lg" />`
-  - Bida: `<BidaBallItem id={...} size="xs" | "sm" | "lg" />`
+1. Language: Written in English.
+2. Icon Policy: Zero decorative emojis in code comments, commit messages, or plans.
+3. Component Sizing: Components must not exceed 300 lines. Split into sub-components or extract state into custom hooks if approaching the limit.
+4. Button Overrides: Strictly prohibited from overriding classes (bg, border, rounded, shadow, padding) on `<Button>`. Use standard `variant` and `size` props only.
+5. Portal System: Overlays, modals, and dialogs must use `usePortal` or `usePortalWithoutBackdrop` via `@/shared/components/portal`. Do not mount local overlays deep in the component tree.
+6. Layout Shifts: Never introduce vertical layout shift when action buttons appear or disappear. Wrap tools in fixed height containers (e.g. `h-8`).
+7. Routes: Use `RouteEnum` and `formatUrl` for navigation. No hardcoded URL strings.
 
-## 3. Button & Dialog System Rules
-- **Buttons**:
-  - Never override styles on `<Button>` with manual utility classes (`border-*`, `bg-*`, `rounded-*`).
-  - Use official `variant` (`default`, `secondary`, `outline`, `ghost`, `subtle`, `destructive`) and `size` (`default`, `sm`, `lg`, `icon`, `icon-sm`).
-- **Modals & Dialogs**:
-  - Always use the Portal Stack: `const [presentModal] = usePortal(MyDialog)` mounted via `@/shared/components/portal`.
-  - Every Dialog must implement `PortalProps<T>`.
+## Directory Layout in `src/features/[module]/`
 
-## 4. Internationalization (i18n)
-- Every user-facing text MUST come from `useTranslations(...)`.
-- When adding a key, add it to ALL 3 language dictionaries:
-  1. `src/messages/vi.json`
-  2. `src/messages/en.json`
-  3. `src/messages/ja.json`
-- Key lookup verified with `node scratch/check-i18n.js`.
+- `components/`: UI components only. Group related items in contextual sub-folders if needed.
+- `pages/`: Page component with `-page.tsx` suffix (e.g. `caro-play-page.tsx`, `ChessPlayPage`).
+- `hooks/`: Custom hooks with `use-[feature].ts` naming format.
+- `types/`: Domain-specific enums and interfaces.
+- `utils/`: Pure calculation and utility functions without React dependencies.
+
+## Standard Game Board Layout Pattern
+
+Every game board page must follow this layout skeleton:
+
+```tsx
+<div className="min-h-screen bg-background text-foreground flex flex-col font-game">
+  <RoomHeader
+    roomCode={roomCode}
+    gameTitle={title}
+    gameType={gameType}
+    myRole={myRole}
+    myProfile={myProfile}
+    opponentProfile={opponentProfile}
+    onRandomizeAvatar={randomizeAvatar}
+    isOpponentOnline={isOpponentOnline}
+    isGameActive={isGameActive}
+    onSurrender={promptSurrender}
+  />
+  <main className="flex-1 flex flex-col items-center justify-center p-2 sm:p-4 w-full">
+    <div className="w-full sm:w-fit flex flex-col items-center justify-center">
+      <div className="hidden sm:flex w-full h-8 items-center justify-end gap-2 mb-2">
+        {/* Optional Action Bar */}
+      </div>
+      <div className="mb-2.5 w-full">
+        {/* GameScoreboard */}
+      </div>
+      <GameBoard gameType={gameType}>
+        {/* Custom GameBoard */}
+      </GameBoard>
+    </div>
+  </main>
+</div>
+```
+
+## Checklist Before Finishing Any Frontend Work
+
+- [ ] Unused imports removed and imports organized.
+- [ ] Responsive design verified (scales well down to 320px width).
+- [ ] No button class overrides.
+- [ ] Route uses `RouteEnum`.
+- [ ] Dark and light themes render with high contrast and legibility.
+- [ ] No `any` types used.

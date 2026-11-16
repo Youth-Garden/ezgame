@@ -45,9 +45,9 @@ src/features/[game]/
   - Example: `src/features/[game]/utils/[game]-rules.test.ts`
 - Must test:
   1. Standard moves / placement.
-  2. Obstacle / blocking rules (cản chân mã, chặn mắt tượng, ngòi pháo, scratch bi cái).
+  2. Obstacle / blocking rules (e.g., horse blocking, elephant eye blocking, cannon platform, cue ball scratch).
   3. Win detection (5 in a row, legal 8-ball, checkmate).
-  4. Draw / Stalemate detection (hết nước đi, đầy bàn cờ).
+  4. Draw / Stalemate detection (no legal moves remaining, board fully occupied).
 - Run verification command:
   ```bash
   bun test src/features/[game]/utils/[game]-rules.test.ts

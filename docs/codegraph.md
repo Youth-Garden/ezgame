@@ -50,7 +50,7 @@ Whenever editing, creating features, or debugging, consult this map to locate th
 | Module | Core Logic & Rules (`utils/`) | State Hook (`hooks/`) | Play Page (`pages/`) | Key Reusable Units (`components/`) | Unit Tests |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Caro (15x15)** | `check-win.ts` | `use-caro-game.ts` | `caro-play-page.tsx` | `CaroBoard`, `CaroCell`, `CaroPieceMark`, `CaroScoreboard` | `check-win.test.ts` (7 tests) |
-| **Xiangqi (Cờ Tướng)** | `xiangqi-rules.ts`, `xiangqi-display.ts` | `use-xiangqi-game.ts` | `xiangqi-play-page.tsx` | `XiangqiBoard`, `XiangqiPieceComponent`, `XiangqiScoreboard` | `xiangqi-rules.test.ts` (9 tests) |
+| **Xiangqi (Chinese Chess)** | `xiangqi-rules.ts`, `xiangqi-display.ts` | `use-xiangqi-game.ts` | `xiangqi-play-page.tsx` | `XiangqiBoard`, `XiangqiPieceComponent`, `XiangqiScoreboard` | `xiangqi-rules.test.ts` (9 tests) |
 | **Bida (8-Ball)** | `bida-rules.ts`, `bida-physics.ts`, `bida-simulation.ts` | `use-bida-game.ts` | `bida-play-page.tsx` | `BidaTable`, `BidaBallItem`, `BidaScoreboard`, `BidaSpinDialog` | `bida-rules.test.ts` (4 tests) |
 | **Lobby** | `lobby-config.ts` | - | `lobby-page.tsx` | `GameCard`, `RoomSelectionDialog`, `UserProfileMenu`, `ProfileDialog` | - |
 

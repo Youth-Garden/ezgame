@@ -1,43 +1,47 @@
 # Style Guide: Clean Dark Game UI
 
-Hệ thống thiết kế tối giản, hiện đại (Clean Minimalist Dark Gaming UI) cho toàn bộ nền tảng EzGame.
+A minimal, modern Clean Minimalist Dark Gaming UI system for the entire EzGame platform.
 
 ---
 
-## 1. Triết lý Thiết Kế (Design Philosophy)
-- **Neutral Dark Tone**: Thay vì dùng tone xanh navy rực rỡ, toàn bộ hệ thống sử dụng tone đen/xám than trung tính (`neutral-950` / `#09090b` / `#121215`). Điều này giúp người dùng tập trung tuyệt đối vào artwork và bàn cờ/bàn bida, không bị mỏi mắt.
-- **Content-First & Minimalism**:
-  - Không nhồi nhét text phụ (loại bỏ thông tin "X playing" và chấm live rườm rà).
-  - Thẻ game (GameCard) dạng dọc 3:4 thanh lịch, bo góc 16px (`rounded-2xl`), bên trong là artwork game nổi bật và tên game in hoa rõ ràng.
-- **Zero-Border & Depth**: Chiều sâu tạo bởi ánh sáng chuyển màu mềm (soft vignette), nền mờ `backdrop-blur` và đổ bóng êm (`hover:shadow-2xl`), không dùng viền khung cứng.
+## 1. Design Philosophy
+
+- **Neutral Dark Tone**: Instead of vibrant navy blue tones, the entire system uses neutral black/charcoal tones (`neutral-950` / `#09090b` / `#121215`). This allows users to focus entirely on artwork and the game board, reducing eye strain.
+- **Content-First and Minimalism**:
+  - No redundant secondary text (remove "X playing" indicators and distracting live dots).
+  - GameCard in elegant vertical 3:4 format, 16px border radius (`rounded-2xl`), featuring prominent game artwork and clear uppercase game titles.
+- **Zero-Border and Depth**: Depth is created by soft gradient lighting (soft vignette), blurred backgrounds `backdrop-blur`, and smooth drop shadows (`hover:shadow-2xl`) — no hard border frames.
 
 ---
 
-## 2. Bảng Màu Chuẩn (Color Tokens)
+## 2. Color Tokens
 
 ### 2.1 Neutral Surfaces
-| Token | Giá trị HSL / HEX | Mục đích sử dụng |
+
+| Token | HSL / HEX Value | Purpose |
 | :--- | :--- | :--- |
-| `bg-page` | `#09090b` / `neutral-950` | Nền toàn trang, đen sâu, hiện đại |
-| `bg-card` | `#121215` / `neutral-900` | Nền thẻ game, modal, bảng điều khiển |
-| `bg-elevated` | `#18181b` / `neutral-850` | Nút phụ, popover menu, tab con |
-| `text-primary` | `#f4f4f5` / `neutral-100` | Tiêu đề chính, tên game, điểm số |
-| `text-secondary`| `#a1a1aa` / `neutral-400` | Mô tả phụ, nhãn tag |
-| `accent-primary`| `#3b82f6` (Blue) | Nút bấm hành động chính, active ring |
+| `bg-page` | `#09090b` / `neutral-950` | Full-page background, deep modern black |
+| `bg-card` | `#121215` / `neutral-900` | Game card, modal, and control panel backgrounds |
+| `bg-elevated` | `#18181b` / `neutral-850` | Secondary buttons, popover menus, sub-tabs |
+| `text-primary` | `#f4f4f5` / `neutral-100` | Main headings, game names, scores |
+| `text-secondary` | `#a1a1aa` / `neutral-400` | Subtitles, descriptions, tag labels |
+| `accent-primary` | `#3b82f6` (Blue) | Primary action buttons, active rings |
 
 ---
 
-## 3. Cấu Trúc Thẻ Game (GameCard Anatomy)
-- **Tỉ lệ khung hình**: `aspect-[3/4]`.
-- **Bo góc**: `rounded-2xl` (16px), bo góc mượt mà.
-- **Lớp Artwork**: Nằm ở phần trên thẻ, tự động phóng to nhẹ khi hover (`group-hover:scale-105 transition-transform duration-500`).
-- **Lớp Gradient Chân Thẻ**: Gradient đen mờ chuyển từ trong suốt sang đen chân thẻ giúp chữ hiển thị sắc nét.
-- **Tiêu đề**: Chữ in hoa đậm (`font-bold uppercase tracking-tight text-white`), phía dưới là tag/badge nhỏ gọn.
-- **Hoàn toàn lược bỏ**: Số người chơi ("playing") và chấm xanh nhấp nháy, giữ cho giao diện tĩnh lặng, sạch sẽ và chuyên nghiệp.
+## 3. GameCard Anatomy
+
+- **Aspect ratio**: `aspect-[3/4]`.
+- **Border radius**: `rounded-2xl` (16px), smooth corners.
+- **Artwork layer**: Positioned at the top of the card, scales gently on hover (`group-hover:scale-105 transition-transform duration-500`).
+- **Bottom gradient layer**: Dark gradient transitioning from transparent to black at the card bottom, ensuring sharp text legibility.
+- **Title**: Bold uppercase text (`font-bold uppercase tracking-tight text-white`), with compact tags/badges below.
+- **Removed entirely**: Player count ("playing") and blinking green dots — keeps the interface calm, clean, and professional.
 
 ---
 
-## 4. Modal & Dialog UI
-- Background `bg-neutral-900`, bo góc lớn `rounded-2xl`, hiệu ứng mở `animate-modal-in`.
-- Segmented Control tab: viên thuốc trượt mềm trên nền `bg-neutral-950`.
-- Nút bấm sử dụng variant chuẩn của hệ thống (`default`, `secondary`, `outline`, `destructive`).
+## 4. Modal and Dialog UI
+
+- Background `bg-neutral-900`, large border radius `rounded-2xl`, open animation `animate-modal-in`.
+- Segmented control tabs: soft sliding pill on `bg-neutral-950` background.
+- Buttons use system standard variants (`default`, `secondary`, `outline`, `destructive`).
